@@ -86,6 +86,8 @@ emp::vector<int> Skeletonize(emp::BitVector & org, std::function<double(emp::Bit
     return skeleton;
 }
 
+enum class PROBLEM_TYPE { NK=0, PROGRAM_SYNTHESIS=1, REAL_VALUE=2, SORTING_NETWORK=3, LOGIC_9=4 };
+
 template <typename ORG>
 class EcologyWorld : public emp::World<ORG> {
 
@@ -112,9 +114,17 @@ class EcologyWorld : public emp::World<ORG> {
     using emp::World<ORG>::GetRandom;
     using emp::World<ORG>::Update;
     using emp::World<ORG>::GetGenomeAt;
+    using emp::World<ORG>::AddSystematics;
+    using emp::World<ORG>::OnUpdate;
+    using emp::World<ORG>::SetMutFun;
+    using emp::World<ORG>::Inject;
+    using emp::World<ORG>::SetFitFun;
+    using emp::World<ORG>::SetSharedFitFun;
+    using emp::World<ORG>::SetupFile;
+    using emp::World<ORG>::GetFitFun;
+    using emp::World<ORG>::GetNumOrgs;
 
     enum class SELECTION_METHOD { TOURNAMENT=0, SHARING=1, LEXICASE=2, ECOEA=3, RANDOM=4 };
-    enum class PROBLEM_TYPE { NK=0, PROGRAM_SYNTHESIS=1, REAL_VALUE=2, SORTING_NETWORK=3, LOGIC_9=4 };
 
     emp::Signal<void(void)> evaluate_performance_sig;    ///< Triggered when we want to evaluate performance
 
@@ -153,7 +163,7 @@ class EcologyWorld : public emp::World<ORG> {
     emp::vector<fun_calc_fitness_t> fit_set;
     emp::vector<emp::Resource> resources;
 
-    emp::Ptr<emp::OEETracker<emp::Systematics<ORG, ORG>, emp::vector<int>>> oee;
+    emp::Ptr<emp::OEETracker<emp::Systematics<ORG, ORG>, ORG>> oee;
 
 
     // Data tracking
@@ -192,9 +202,72 @@ class EcologyWorld : public emp::World<ORG> {
         RESOURCE_SELECT_MAX_BONUS = config.RESOURCE_SELECT_MAX_BONUS();
         RESOURCE_SELECT_COST = config.RESOURCE_SELECT_COST();
 
+        emp::Ptr<emp::Systematics<ORG, ORG> > sys;
+        sys.New([](const ORG & o){return o;});
+        oee.New(sys, [this](ORG & org){return org;}, [](const ORG & org){
+            // TODO: Actually calculate complexity
+            return 1;
+        });
+        oee->SetResolution(MODES_RESOLUTION);
+        oee->SetGenerationInterval(FILTER_LENGTH);
+        AddSystematics(sys);
+        OnUpdate([this](int ud){oee->Update(ud);});
+
+        SetupFitnessFile().SetTimingRepeat(10);
+        SetupSystematicsFile().SetTimingRepeat(10);
+        SetupPopulationFile().SetTimingRepeat(10);
+        SetPopStruct_Mixed(true);
+        SetSynchronousSystematics(true);
+
+        AddDataNode("performance");
+        evaluate_performance_sig.AddAction([this](){
+            auto perf_node = GetDataNode("performance");
+            perf_node->Reset();
+            for (emp::Ptr<ORG> org : pop) {
+                perf_node->Add(evaluation_fun(*org));
+            }
+        });
+
+        emp::DataFile & performance_file = SetupFile("performance.csv");
+        performance_file.AddVar(update, "update", "Update");
+        performance_file.AddStats(*GetDataNode("performance"), "performance", "How well are programs actually solving the problem?");
+        performance_file.PrintHeaderKeys();
+        performance_file.SetTimingRepeat(FAST_DATA_RES);
+
+
+        emp::DataFile & oee_file = SetupFile("oee.csv");
+        oee_file.AddVar(update, "generation", "Generation");
+        oee_file.AddCurrent(*oee->GetDataNode("change"), "change", "change potential");
+        oee_file.AddCurrent(*oee->GetDataNode("novelty"), "novelty", "novelty potential");
+        oee_file.AddCurrent(*oee->GetDataNode("diversity"), "ecology", "ecology potential");
+        oee_file.AddCurrent(*oee->GetDataNode("complexity"), "complexity", "complexity potential");
+        oee_file.PrintHeaderKeys();
+        oee_file.SetTimingRepeat(MODES_RESOLUTION);
+
+        interaction_strengths.SetupBins(-1.0, 1.0, 10);
+        node_out_degrees.SetupBins(0, POP_SIZE, 20);
+        node_in_degrees.SetupBins(0, POP_SIZE, 20);
+
+        emp::DataFile & ecology_file = SetupFile("ecology.csv");
+        ecology_file.AddVar(update, "generation", "Generation");
+        ecology_file.AddStats(interaction_strengths, "interaction_strength", "interaction strength");
+        ecology_file.AddAllHistBins(interaction_strengths, "interaction_strength", "interaction strength");
+        ecology_file.AddStats(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
+        ecology_file.AddAllHistBins(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
+        ecology_file.AddStats(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
+        ecology_file.AddAllHistBins(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
+        ecology_file.PrintHeaderKeys();
+        ecology_file.SetTimingRepeat(MODES_RESOLUTION);
+
         switch (PROBLEM){
             case (uint32_t) PROBLEM_TYPE::NK:
-                SetupNK();
+                if constexpr (std::is_same<ORG, emp::BitVector>::value) {
+                    // We need this if so we don't need to define SetupNK for every
+                    // possible ORG type
+                    SetupNK();
+                } else {
+                    exit(1);
+                }
                 break;
 
             case (uint32_t) PROBLEM_TYPE::PROGRAM_SYNTHESIS:
@@ -205,7 +278,7 @@ class EcologyWorld : public emp::World<ORG> {
                 // TODO
                 break;            
 
-            case (uint32_t) PROBLEM_TYPE::SORTING_NETWORKS:
+            case (uint32_t) PROBLEM_TYPE::SORTING_NETWORK:
                 // TODO
                 break;            
 
@@ -232,70 +305,12 @@ class EcologyWorld : public emp::World<ORG> {
 
         }
 
-        emp::Ptr<emp::Systematics<ORG, ORG> > sys;
-        sys.New([](const ORG & o){return o;});
-        oee.New(sys, [this](ORG & org){return Skeletonize(org, fun_calc_fitness);}, [](const emp::vector<int> & org){
-            return org.size() - emp::Count(org, -1);
-        });
-        oee->SetResolution(MODES_RESOLUTION);
-        oee->SetGenerationInterval(FILTER_LENGTH);
-        AddSystematics(sys);
-        OnUpdate([this](int ud){oee->Update(ud);});
-
-        SetupFitnessFile().SetTimingRepeat(10);
-        SetupSystematicsFile().SetTimingRepeat(10);
-        SetupPopulationFile().SetTimingRepeat(10);
-        SetPopStruct_Mixed(true);
-        SetSynchronousSystematics(true);
-
-        AddDataNode("performance");
-        evaluate_performance_sig.AddAction([this](){
-            auto perf_node = GetDataNode("performance");
-            perf_node.Reset();
-            for (ORG & org : pop) {
-                perf_node.Add(evaluation_fun(org));
-            }
-        });
-
-        emp::DataFile performance_file;
-        performance_file.AddVar(update, "update", "Update");
-        performance_file.AddStats(GetDataNode("performance"), "performance", "How well are programs actually solving the problem?");
-        performance_file.PrintHeaderKeys();
-        performance_file.SetTimingRepeat(FAST_DATA_RES);
-        AddDataFile(performance_file);
-
-
-        emp::DataFile oee_file;
-        oee_file.AddVar(update, "generation", "Generation");
-        oee_file.AddCurrent(*oee->GetDataNode("change"), "change", "change potential");
-        oee_file.AddCurrent(*oee->GetDataNode("novelty"), "novelty", "novelty potential");
-        oee_file.AddCurrent(*oee->GetDataNode("diversity"), "ecology", "ecology potential");
-        oee_file.AddCurrent(*oee->GetDataNode("complexity"), "complexity", "complexity potential");
-        oee_file.PrintHeaderKeys();
-        oee_file.SetTimingRepeat(MODES_RESOLUTION);
-        AddDataFile(oee_file);
-
-        interaction_strengths.SetupBins(-1.0, 1.0, 10);
-        node_out_degrees.SetupBins(0, POP_SIZE, 20);
-        node_in_degrees.SetupBins(0, POP_SIZE, 20);
-
-        emp::DataFile ecology_file;
-        ecology_file.AddVar(update, "generation", "Generation");
-        ecology_file.AddStats(interaction_strengths, "interaction_strength", "interaction strength");
-        ecology_file.AddAllHistBins(interaction_strengths, "interaction_strength", "interaction strength");
-        ecology_file.AddStats(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
-        ecology_file.AddAllHistBins(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
-        ecology_file.AddStats(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
-        ecology_file.AddAllHistBins(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
-        ecology_file.PrintHeaderKeys();
-        ecology_file.SetTimingRepeat(MODES_RESOLUTION);
-        AddDataFile(ecology_file);
-
         SetAutoMutate();
         if (SELECTION == (uint32_t)SELECTION_METHOD::TOURNAMENT) {
             SetCache();
         }
 
+        // Update();
     }
 
     void CalcInteractionNetwork() {
@@ -305,50 +320,7 @@ class EcologyWorld : public emp::World<ORG> {
     }
 
 
-    void SetupNK() {
-        // Create landscape based on correct random seed
-        landscape = emp::NKLandscape(N, K, *random_ptr);
-
-        // Set-up fitness function (queries NK Landscape)
-        evaluation_fun =
-            [this](ORG & org){ return landscape.GetFitness(org); };
-
-        if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
-            SetSharedFitFun(fun_calc_fitness, [](ORG & org1, ORG & org2){return calc_hamming_distance(org1, org2);}, SHARING_THRESHOLD, SHARING_ALPHA);
-        } else {
-            SetFitFun(fun_calc_fitness);
-        }
-
-        // Make a fitness function for each gene (set of sites that determine a fitness contribution)
-        // in the bitstring
-        if (SELECTION == (uint32_t) SELECTION_METHOD::LEXICASE || SELECTION == (uint32_t) SELECTION_METHOD::ECOEA ) {
-            for (size_t gene = 0; gene < N; gene++) {
-                fit_set.push_back([this, gene](ORG & org){return landscape.GetFitness(gene, org);});
-            }
-        }
-
-        // Build a random initial population
-        for (uint32_t i = 0; i < POP_SIZE; i++) {
-            ORG next_org(N);
-            for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->P(0.5);
-            Inject(next_org);
-        }
-
-        // Setup the mutation function.
-        std::function<size_t(ORG &, emp::Random &)> mut_fun =
-            [this](ORG & org, emp::Random & random) {
-                size_t num_muts = 0;
-                for (uint32_t m = 0; m < N; m++) {
-                    if (random_ptr->P(MUT_RATE)) {
-                        org[m] = random_ptr->P(.5); // Randomly assign 0 or 1 
-                        num_muts++;
-                    }
-                }
-                return num_muts;
-            };
-        SetMutFun( mut_fun );
-
-    }
+    void SetupNK();
 
     void RunStep() {
 
@@ -372,7 +344,7 @@ class EcologyWorld : public emp::World<ORG> {
 
             case (uint32_t)SELECTION_METHOD::LEXICASE :
                 emp::LexicaseSelect(*this, fit_set, POP_SIZE);
-                 break;
+                break;
 
             default:
                 emp_assert(false && "INVALID SELECTION SCEHME", SELECTION);
@@ -753,3 +725,50 @@ class EcologyWorld : public emp::World<ORG> {
     }
 
 };
+
+template <>
+void EcologyWorld<emp::BitVector>::SetupNK() {
+        // Create landscape based on correct random seed
+        landscape = emp::NKLandscape(N, K, *random_ptr);
+
+        // Set-up fitness function (queries NK Landscape)
+        evaluation_fun =
+            [this](emp::BitVector & org){ return landscape.GetFitness(org); };
+
+        if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
+            SetSharedFitFun(evaluation_fun, [](emp::BitVector & org1, emp::BitVector & org2){return calc_hamming_distance(org1, org2);}, SHARING_THRESHOLD, SHARING_ALPHA);
+        } else {
+            std::cout << "Setting fit fun" << std::endl;
+            SetFitFun(evaluation_fun);
+        }
+
+        // Make a fitness function for each gene (set of sites that determine a fitness contribution)
+        // in the bitstring
+        if (SELECTION == (uint32_t) SELECTION_METHOD::LEXICASE || SELECTION == (uint32_t) SELECTION_METHOD::ECOEA ) {
+            for (size_t gene = 0; gene < N; gene++) {
+                fit_set.push_back([this, gene](emp::BitVector & org){return landscape.GetFitness(gene, org);});
+            }
+        }
+
+        // Build a random initial population
+        for (uint32_t i = 0; i < POP_SIZE; i++) {
+            emp::BitVector next_org(N);
+            for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->P(0.5);
+            Inject(next_org);
+        }
+
+        // Setup the mutation function.
+        std::function<size_t(emp::BitVector &, emp::Random &)> mut_fun =
+            [this](emp::BitVector & org, emp::Random & random) {
+                size_t num_muts = 0;
+                for (uint32_t m = 0; m < N; m++) {
+                    if (random_ptr->P(MUT_RATE)) {
+                        org[m] = random_ptr->P(.5); // Randomly assign 0 or 1 
+                        num_muts++;
+                    }
+                }
+                return num_muts;
+            };
+        SetMutFun( mut_fun );
+
+    } 

@@ -9,9 +9,23 @@
 
 int main(int argc, char* argv[])
 {
-  emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
+  EcologyConfig config;
+  auto args = emp::cl::ArgManager(argc, argv);
+  if (args.ProcessConfigOptions(config, std::cout, "EcologyConfig.cfg", "Ecology-macros.h") == false) exit(0);
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
-  EcologyWorld<int> world;
+  emp::Random rnd(config.SEED());
 
-  std::cout << "Hello World!" << std::endl;
+  if (config.PROBLEM() == (uint32_t)PROBLEM_TYPE::REAL_VALUE) {
+    using ORG_TYPE = emp::vector<double>;
+    EcologyWorld<ORG_TYPE> world(rnd);
+    world.Setup(config);
+    world.Run();
+  } else if (config.PROBLEM() == (uint32_t)PROBLEM_TYPE::NK) {
+    using ORG_TYPE = emp::BitVector;
+    EcologyWorld<ORG_TYPE> world(rnd);
+    world.Setup(config);
+    world.Run();
+  }
+
 }
