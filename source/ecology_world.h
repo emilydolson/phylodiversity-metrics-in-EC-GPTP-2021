@@ -54,6 +54,7 @@ EMP_BUILD_CONFIG( EcologyConfig,
   VALUE(RESOURCE_SELECT_MAX_BONUS, double, 5.0, "What's the max bonus someone can get for consuming a resource?"),
   VALUE(RESOURCE_SELECT_COST, double, 0.0, "Cost of using a resource?"),
   VALUE(RESOURCE_SELECT_NICHE_WIDTH, double, 0.0, "Score necessary to count as attempting to use a resource"),
+  VALUE(LEXICASE_EPSILON, double, 0.0, "To use epsilon-lexicase, set this to an epsilon value greater than 0"),
 
   GROUP(OPEN_ENDED_EVOLUTION, "Settings related to tracking MODES metrics"),
   VALUE(MODES_RESOLUTION, int, 1, "How often should MODES metrics be calculated?"),
@@ -61,9 +62,7 @@ EMP_BUILD_CONFIG( EcologyConfig,
 
   GROUP(DATA_RESOLUTION, "How often should data get printed?"),
   VALUE(FAST_DATA_RES, int, 10, "How often should easy to calculate metrics (e.g. fitness) be calculated?"),
-  VALUE(ECOLOGY_DATA_RES, int, 100, "How often should ecological interactions (expensive) be calculated?"),
-  VALUE(ECOLOGY_DATA_N_SIMULATIONS, int, 500, "How many selection events be simulated to calculate interactions?"),
-  VALUE(ECOLOGY_DATA_SIGNIF_THRESHOLD, double, -1, "Strength of interaction required to be counted (-1 will determine via randomization test)")
+  VALUE(ECOLOGY_DATA_RES, int, 100, "How often should ecological interactions (expensive) be calculated?")
 );
 
 // Special version for bitstrings
@@ -95,6 +94,9 @@ enum class PROBLEM_TYPE { NK=0, PROGRAM_SYNTHESIS=1, REAL_VALUE=2, SORTING_NETWO
 template <typename ORG>
 class EcologyWorld : public emp::World<ORG> {
 
+    using phen_t = emp::vector<double>;
+    using fit_map_t = std::map<phen_t, double>;
+
     using typename emp::World<ORG>::fun_calc_fitness_t;
     using typename emp::World<ORG>::genome_t;
     using emp::World<ORG>::GetSize;
@@ -121,6 +123,8 @@ class EcologyWorld : public emp::World<ORG> {
     using emp::World<ORG>::GetGenomeAt;
     using emp::World<ORG>::AddSystematics;
     using emp::World<ORG>::OnUpdate;
+    using emp::World<ORG>::OnPlacement;
+    using emp::World<ORG>::OnBeforePlacement;
     using emp::World<ORG>::SetMutFun;
     using emp::World<ORG>::Inject;
     using emp::World<ORG>::SetFitFun;
@@ -146,13 +150,11 @@ class EcologyWorld : public emp::World<ORG> {
     int TOURNAMENT_SIZE;
     int MODES_RESOLUTION;
     int FILTER_LENGTH;
-    double SHARING_ALPHA;
-    double SHARING_THRESHOLD;
     int FAST_DATA_RES;
     int ECOLOGY_DATA_RES;
-    int ECOLOGY_DATA_N_SIMULATIONS;
-    double ECOLOGY_DATA_SIGNIF_THRESHOLD;
 
+    double SHARING_ALPHA;
+    double SHARING_THRESHOLD;
     double RESOURCE_SELECT_RES_AMOUNT;
     double RESOURCE_SELECT_RES_INFLOW;
     double RESOURCE_SELECT_RES_OUTFLOW;
@@ -160,11 +162,16 @@ class EcologyWorld : public emp::World<ORG> {
     double RESOURCE_SELECT_MAX_BONUS;
     double RESOURCE_SELECT_COST;
     double RESOURCE_SELECT_NICHE_WIDTH;
+    double LEXICASE_EPSILON;
 
     emp::NKLandscape landscape;
- 
+
     // Function to determine actual performance on problem
     fun_calc_fitness_t evaluation_fun;
+    std::function<fit_map_t(emp::vector<phen_t> &, all_attrs)> evaluate_competition_fun;
+    all_attrs attrs = DEFAULT;
+
+    emp::vector<phen_t> phenotypes;
 
     // Set of fitness functions for lexicase and Eco-EA
     emp::vector<fun_calc_fitness_t> fit_set;
@@ -197,8 +204,6 @@ class EcologyWorld : public emp::World<ORG> {
         MODES_RESOLUTION = config.MODES_RESOLUTION();
         FAST_DATA_RES = config.FAST_DATA_RES();
         ECOLOGY_DATA_RES = config.ECOLOGY_DATA_RES();
-        ECOLOGY_DATA_N_SIMULATIONS = config.ECOLOGY_DATA_N_SIMULATIONS();
-        ECOLOGY_DATA_SIGNIF_THRESHOLD = config.ECOLOGY_DATA_SIGNIF_THRESHOLD();
         FILTER_LENGTH = config.FILTER_LENGTH();
         SHARING_THRESHOLD = config.SHARING_THRESHOLD();
         SHARING_ALPHA = config.SHARING_ALPHA();
@@ -212,6 +217,16 @@ class EcologyWorld : public emp::World<ORG> {
         RESOURCE_SELECT_MAX_BONUS = config.RESOURCE_SELECT_MAX_BONUS();
         RESOURCE_SELECT_COST = config.RESOURCE_SELECT_COST();
         RESOURCE_SELECT_NICHE_WIDTH = config.RESOURCE_SELECT_NICHE_WIDTH();
+        LEXICASE_EPSILON = config.LEXICASE_EPSILON();
+
+        attrs = emp::tools::Merge(SigmaShare(SHARING_THRESHOLD), Alpha(SHARING_ALPHA),
+                                  Cost(RESOURCE_SELECT_COST), Cf(RESOURCE_SELECT_FRAC),
+                                  NicheWidth(RESOURCE_SELECT_NICHE_WIDTH), MaxScore(1),
+                                  ResourceInflow(RESOURCE_SELECT_RES_INFLOW), 
+                                  ResourceOutflow(RESOURCE_SELECT_RES_OUTFLOW), 
+                                  MaxBonus(RESOURCE_SELECT_MAX_BONUS), 
+                                  TournamentSize(TOURNAMENT_SIZE), 
+                                  Epsilon(LEXICASE_EPSILON));
 
         emp::Ptr<emp::Systematics<ORG, ORG> > sys;
         sys.New([](const ORG & o){return o;});
@@ -258,8 +273,8 @@ class EcologyWorld : public emp::World<ORG> {
         oee_file.PrintHeaderKeys();
         oee_file.SetTimingRepeat(MODES_RESOLUTION);
 
-        pos_interaction_strengths.SetupBins(0, 1.01, 10);
-        neg_interaction_strengths.SetupBins(-1, 0, 10);
+        pos_interaction_strengths.SetupBins(0.0, 1.01, 20);
+        neg_interaction_strengths.SetupBins(-1.0, 0.0, 20);
         node_out_degrees.SetupBins(0, POP_SIZE+1, 20);
         node_in_degrees.SetupBins(0, POP_SIZE+1, 20);
 
@@ -310,7 +325,23 @@ class EcologyWorld : public emp::World<ORG> {
         }
  
         switch (SELECTION) {
+
+            case ( (uint32_t) SELECTION_METHOD::TOURNAMENT):
+                evaluate_competition_fun = do_tournament<phen_t>;
+                break;
+
+            case ( (uint32_t) SELECTION_METHOD::SHARING):
+                evaluate_competition_fun = do_sharing<phen_t>;
+                break;
+
+            case ( (uint32_t) SELECTION_METHOD::LEXICASE):
+                evaluate_competition_fun = do_lexicase<phen_t>;
+                break;
+
             case ( (uint32_t) SELECTION_METHOD::ECOEA):
+
+                evaluate_competition_fun = do_eco_ea<phen_t>;
+
                 resources.resize(0);
                 for (size_t i=0; i<N_TEST_CASES; i++) {
                     resources.push_back(emp::Resource(RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_INFLOW, .01));
@@ -327,17 +358,20 @@ class EcologyWorld : public emp::World<ORG> {
             SetCache();
         }
 
-        if (ECOLOGY_DATA_SIGNIF_THRESHOLD != -1) {
-            interaction_signif_threshold = ECOLOGY_DATA_SIGNIF_THRESHOLD;
-        } else {
-            interaction_signif_threshold = DetermineInteractionThreshold();
-        }
-        std::cout << "Threshold: " << interaction_signif_threshold <<std::endl;
+        phenotypes.resize(POP_SIZE);
 
+        OnUpdate([this](int ud){phenotypes.clear(); phenotypes.resize(POP_SIZE);});
+        OnBeforePlacement([this](ORG & o, int pos){
+            for (auto fun : fit_set) {
+                phenotypes[pos].push_back(fun(o));
+            }
+        }); 
 
-        // Update();
+        InitPop();
     }
 
+
+    void InitPop();
 
     void SetupNK();
 
@@ -379,365 +413,8 @@ class EcologyWorld : public emp::World<ORG> {
         }  
     }
 
-    std::map<int, int> SimulateEcoEA(emp::vector<size_t> exclude, const emp::vector< std::function<double(ORG &)> > & extra_funs,
-                   emp::vector<emp::Resource> & resources, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true) {
-
-        emp_assert(GetFitFun(), "Must define a base fitness function");
-        emp_assert(GetSize() > 0);
-        emp_assert(t_size > 0, t_size);
-
-        std::map<int, int> selections;
-
-        // Initialize map
-        for (size_t i = 0; i < GetSize(); i++) {
-            if (IsOccupied(i)) {
-                selections[i] = 0;
-            }
-        }
-
-        emp::vector<double> base_fitness(GetSize());
-
-       // Collect all fitness info.
-        for (size_t org_id = 0; org_id < GetSize(); org_id++) {
-            if (!IsOccupied(org_id)) {
-                continue;
-            }
-
-            if (emp::Has(exclude, org_id)) {
-                base_fitness[org_id] = 0;
-                continue; // Don't allow fitness gain from resources
-            }
-
-            if (use_base) {
-                base_fitness[org_id] = CalcFitnessID(org_id);
-            } else {
-                base_fitness[org_id] = 0;
-            }
-
-            for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-
-                // resources[ex_id].Inc(resources[ex_id].GetInflow()/GetNumOrgs());
-                double cur_fit = extra_funs[ex_id](GetOrg(org_id));
-                cur_fit = emp::Pow(cur_fit, 2.0);            
-                    cur_fit *= frac*(resources[ex_id].GetAmount()-cost);
-                    if (cur_fit > RESOURCE_SELECT_NICHE_WIDTH) {
-                        cur_fit -= cost;
-                    } else {
-                        cur_fit = 0;
-                    }
-
-                cur_fit = std::min(cur_fit, max_bonus);
-
-                base_fitness[org_id] *= emp::Pow2(cur_fit);
-                // resources[ex_id].Dec(std::abs(cur_fit));
-            }
-        }
-
-        emp::vector<size_t> entries;
-        for (size_t T = 0; T < tourny_count; T++) {
-            entries.resize(0);
-            for (size_t i=0; i<t_size; i++) entries.push_back( GetRandomOrgID() ); // Allows replacement!
-            double best_fit = base_fitness[entries[0]];
-            size_t best_id = entries[0];
-
-            // Search for a higher fit org in the tournament.
-            for (size_t i = 1; i < t_size; i++) {
-                const double cur_fit = base_fitness[entries[i]];
-                if (cur_fit > best_fit) {
-                    best_fit = cur_fit;
-                    best_id = entries[i];
-                }
-            }
-
-            // Place the highest fitness into the next generation!
-            selections[best_id]++;
-        }
-
-        return selections;
-    }
-
-    // This works for sharing too, since sharing is baked into the fitness function.
-    std::map<int, int> SimulateTournament(emp::vector<size_t> exclude, size_t t_size, size_t tourny_count=1) {
-
-        emp_assert(t_size > 0, "Cannot have a tournament with zero organisms.", t_size, GetNumOrgs());
-        emp_assert(t_size <= GetNumOrgs(), "Tournament too big for world.", t_size, GetNumOrgs());
-        emp_assert(tourny_count > 0);
-
-        std::map<int, int> selections;
-
-        // Initialize map
-        for (size_t i = 0; i < GetSize(); i++) {
-            if (IsOccupied(i)) {
-                selections[i] = 0;
-            }
-        }
-
-        emp::vector<size_t> entries;
-        for (size_t T = 0; T < tourny_count; T++) {
-            entries.resize(0);
-            // Choose organisms for this tournament (with replacement!)
-            for (size_t i=0; i < t_size; i++) entries.push_back( GetRandomOrgID() );
-
-
-            double best_fit;
-            if (emp::Has(exclude, entries[0])) {
-                best_fit = 0;
-            } else {
-                best_fit = CalcFitnessID(entries[0]);
-            }
-
-            size_t best_id = entries[0];
-
-            // Search for a higher fit org in the tournament.
-            for (size_t i = 1; i < t_size; i++) {
-                if (!emp::Has(exclude, entries[i])) {
-                    const double cur_fit = CalcFitnessID(entries[i]);
-                    if (cur_fit > best_fit) {
-                        best_fit = cur_fit;
-                        best_id = entries[i];
-                    }
-                }
-            }
-
-            // highest fitness wins!
-            selections[best_id]++;
-        }
-
-        return selections;
-    }
-
-
-    EMP_CREATE_OPTIONAL_METHOD(TriggerOnLexicaseSelect, TriggerOnLexicaseSelect);
-    std::map<int, int> SimulateLexicase(emp::vector<size_t> exclude, size_t repro_count=1, size_t max_funs = 0) {
-
-        std::map<int, int> selections;
-
-        // Initialize map
-        for (size_t i = 0; i < GetSize(); i++) {
-            if (IsOccupied(i)) {
-                selections[i] = 0;
-            }
-        }
-
-
-        std::map<genome_t, int> genotype_counts;
-        emp::vector<emp::vector<size_t>> genotype_lists;
-
-        // Find all orgs with same genotype - we can dramatically reduce
-        // fitness evaluations this way.
-        for (size_t org_id = 0; org_id < GetSize(); org_id++) {
-            if (emp::Has(exclude, org_id)) {
-                continue; // Excluded orgs will never be selected
-            }
-
-            if (IsOccupied(org_id)) {
-                const auto gen = GetGenomeAt(org_id);
-                if (emp::Has(genotype_counts, gen)) {
-                    genotype_lists[genotype_counts[gen]].push_back(org_id);
-                } else {
-                    genotype_counts[gen] = genotype_lists.size();
-                    genotype_lists.emplace_back(emp::vector<size_t>{org_id});
-                }
-            }
-        }
-
-        emp::vector<size_t> all_gens(genotype_lists.size()), cur_gens, next_gens;
-
-        for (size_t i = 0; i < genotype_lists.size(); i++) {
-            all_gens[i] = i;
-        }
-
-        if (!max_funs) max_funs = fit_set.size();
-        // std::cout << "in lexicase" << std::endl;
-        // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
-        emp::vector< emp::vector<double> > fitnesses(fit_set.size());
-        for (size_t fit_id = 0; fit_id < fit_set.size(); ++fit_id) {
-            fitnesses[fit_id].resize(genotype_counts.size());
-            // std::cout << fit_id << std::endl;
-            int id = 0;
-            for (auto & gen : genotype_lists) {
-                fitnesses[fit_id][id] = fit_set[fit_id](GetOrg(gen[0]));
-                id++;
-            }
-        }
-
-        // std::cout << to_string(fitnesses) << std::endl;
-        // std::cout << "fitness calculated" << std::endl;
-        // Go through a new ordering of fitness functions for each selections.
-        // std::cout << "randdomized" << std::endl;
-        for (size_t repro = 0; repro < repro_count; ++repro) {
-            // std::cout << "repro: " << repro << std::endl;
-            // Determine the current ordering of the functions.
-            emp::vector<size_t> order;
-
-            if (max_funs == fit_set.size()) {
-                order = GetPermutation(GetRandom(), fit_set.size());
-            } else {
-                order.resize(max_funs); // We want to limit the total numebr of tests done.
-                for (auto & x : order) x = GetRandom().GetUInt(fit_set.size());
-            }
-            // @CAO: We could have selected the order more efficiently!
-            // std::cout << "reoreder" << std::endl;
-            // Step through the functions in the proper order.
-            cur_gens = all_gens;  // Start with all of the organisms.
-            int depth = -1;
-            for (size_t fit_id : order) {
-                // std::cout << "fit_id: " << fit_id << std::endl;
-                depth++;
-
-                // std::cout << "about to index" << std::endl;
-                // std::cout << to_string(fitnesses[fit_id]) << std::endl;
-                // std::cout << cur_orgs[0] << std::endl;
-                double max_fit = fitnesses[fit_id][cur_gens[0]];
-                next_gens.push_back(cur_gens[0]);
-                // std::cout << "Starting max: " << max_fit << to_string(cur_gens) << std::endl;
-                for (size_t gen_id : cur_gens) {
-
-                    const double cur_fit = fitnesses[fit_id][gen_id];
-                    // std::cout << "gen_id: " << gen_id << "Fit: " << cur_fit << std::endl;
-                    if (cur_fit > max_fit) {
-                        max_fit = cur_fit;             // This is a the NEW maximum fitness for this function
-                        next_gens.resize(0);           // Clear out orgs with former maximum fitness
-                        next_gens.push_back(gen_id);   // Add this org as only one with new max fitness
-                        // std::cout << "New max: " << max_fit << " " << cur_gens.size() << std::endl;
-                    }
-                    else if (cur_fit == max_fit) {
-                        next_gens.push_back(gen_id);   // Same as cur max fitness -- save this org too.
-                        // std::cout << "Adding: " << gen_id << std::endl;
-                    }
-                }
-                // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
-                std::swap(cur_gens, next_gens);
-                next_gens.resize(0);
-
-                if (cur_gens.size() == 1) break;  // Stop if we're down to just one organism.
-            }
-
-            // Place a random survivor (all equal) into the next generation!
-            emp_assert(cur_gens.size() > 0, cur_gens.size(), fit_set.size(), all_gens.size());
-            size_t options = 0;
-            for (size_t gen : cur_gens) {
-                options += genotype_lists[gen].size();
-            }
-            size_t winner = GetRandom().GetUInt(options);
-            int repro_id = -1;
-
-            for (size_t gen : cur_gens) {
-                if (winner < genotype_lists[gen].size()) {
-                    repro_id = (int) genotype_lists[gen][winner];
-                    break;
-                }
-                winner -= genotype_lists[gen].size();
-            }
-            emp_assert(repro_id != -1, repro_id, winner, options);
-
-            selections[repro_id]++;
-
-            // std::cout << depth << "abotu to calc used" <<std::endl;
-            emp::vector<size_t> used = emp::Slice(order, 0, depth+1);
-            // If the world has a OnLexicaseSelect method, call it
-            // std::cout << depth << " " << to_string(used) << std::endl;
-            TriggerOnLexicaseSelect(used, repro_id);
-        }
-        // std::cout << "Done with lex" << std::endl;
-        // for (auto el : selections) {
-        //     std::cout << el.first << " " << el.second << std::endl;
-        // }
-        return selections;
-    } 
-
-    emp::WeightedGraph CalcInteractionNetworks() {
-
-        std::map<int, int> base_fitness;
-        std::map<int, int> new_fitness;
-
-        emp::WeightedGraph effects(GetSize());
-
-        switch(SELECTION) {
-            case (uint32_t)SELECTION_METHOD::TOURNAMENT :
-                base_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                break;
-
-            case (uint32_t)SELECTION_METHOD::SHARING : // Sharing is handled in the setting of the fitness function
-                base_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                break;
-
-            case (uint32_t)SELECTION_METHOD::ECOEA :
-                base_fitness = SimulateEcoEA({}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
-                break;
-
-            case (uint32_t)SELECTION_METHOD::RANDOM :
-                for (size_t i = 0; i < GetSize(); i++) {
-                    if (IsOccupied(i)) {
-                        base_fitness[i] = 1;
-                    }
-                }
-                break;
-
-            case (uint32_t)SELECTION_METHOD::LEXICASE :
-                base_fitness = SimulateLexicase({}, ECOLOGY_DATA_N_SIMULATIONS);
-                break;
-
-            default:
-                emp_assert(false && "INVALID SELECTION SCEHME", SELECTION);
-                exit(1);
-                break;
-        }
-
-        for (size_t i = 0; i < GetSize(); i++) {
-            if (!IsOccupied(i)) {
-                continue;
-            }
-
-            switch(SELECTION) {
-                case (uint32_t)SELECTION_METHOD::TOURNAMENT :
-                    new_fitness = SimulateTournament({i}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::SHARING : // Sharing is handled in the setting of the fitness function
-                    new_fitness = SimulateTournament({i}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::ECOEA :
-                    new_fitness = SimulateEcoEA({i}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::RANDOM :
-                    for (size_t i = 0; i < GetSize(); i++) {
-                        if (IsOccupied(i)) {
-                            new_fitness[i] = 1;
-                        }
-                    }
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::LEXICASE :
-                    new_fitness = SimulateLexicase({i}, ECOLOGY_DATA_N_SIMULATIONS);
-                    break;
-
-                default:
-                    emp_assert(false && "INVALID SELECTION SCEHME", SELECTION);
-                    exit(1);
-                    break;
-            }
-
-            for (auto res : new_fitness) {
-                if (res.first == (int)i) {
-                    continue;
-                }
-                double interaction = (base_fitness[res.first] - new_fitness[res.first])/(double)ECOLOGY_DATA_N_SIMULATIONS;
-                if (fabs(interaction) > interaction_signif_threshold) {
-                    // std::cout << i << ' ' << res.first << " " << interaction << std::endl;
-                    effects.AddEdge(i, res.first, interaction);
-                }
-            }
-            
-        }
-
-        return effects;
-    }
-
     void ComputeNetworks() {
-        emp::WeightedGraph i_network = CalcInteractionNetworks();
+        emp::WeightedGraph i_network = CalcCompetition(phenotypes, evaluate_competition_fun, attrs);
         neg_interaction_strengths.Reset();
         pos_interaction_strengths.Reset();
         node_out_degrees.Reset();
@@ -761,65 +438,28 @@ class EcologyWorld : public emp::World<ORG> {
 
     }
 
-    // Since we're determining interaction networks by sampling, we need a way
-    // to establish which interactions are real. We'll do this through a
-    // monte carlo simulation
-    double DetermineInteractionThreshold() {
-        std::map<int, int> base_fitness;
-        std::map<int, int> new_fitness;
-
-        emp::WeightedGraph effects(GetSize());
-
-        emp::vector<double> results;
-
-        for (int i = 0; i < ECOLOGY_DATA_N_SIMULATIONS; i++) {
-            switch(SELECTION) {
-                case (uint32_t)SELECTION_METHOD::TOURNAMENT :
-                    base_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                    new_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::SHARING : // Sharing is handled in the setting of the fitness function
-                    base_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                    new_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::ECOEA :
-                    base_fitness = SimulateEcoEA({}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
-                    new_fitness = SimulateEcoEA({}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::RANDOM :
-                    for (size_t i = 0; i < GetSize(); i++) {
-                        if (IsOccupied(i)) {
-                            base_fitness[i] = 1;
-                            new_fitness[i] = 1;
-                        }
-                    }
-                    break;
-
-                case (uint32_t)SELECTION_METHOD::LEXICASE :
-                    base_fitness = SimulateLexicase({}, ECOLOGY_DATA_N_SIMULATIONS);
-                    new_fitness = SimulateLexicase({}, ECOLOGY_DATA_N_SIMULATIONS);
-                    break;
-
-                default:
-                    emp_assert(false && "INVALID SELECTION SCEHME", SELECTION);
-                    exit(1);
-                    break;
-            }
-
-            // std::cout << (base_fitness[0] - new_fitness[0])/(double)ECOLOGY_DATA_N_SIMULATIONS << std::endl;
-            results.push_back(abs(base_fitness[0] - new_fitness[0])/(double)ECOLOGY_DATA_N_SIMULATIONS);
-        }
-        emp::Sort(results);
-        // std::cout << emp::to_string(results) << std::endl;
-        // std::cout << (int)(ECOLOGY_DATA_N_SIMULATIONS*.95) << std::endl;
-        return results[(int)(ECOLOGY_DATA_N_SIMULATIONS*.95)];
-
-    }
-
 };
+
+template <>
+void EcologyWorld<emp::BitVector>::InitPop() {
+    // Build a random initial population
+    for (uint32_t i = 0; i < POP_SIZE; i++) {
+        emp::BitVector next_org(N);
+        for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->P(0.5);
+        Inject(next_org);
+    }
+}
+
+template <>
+void EcologyWorld<emp::vector<double>>::InitPop() {
+    // Build a random initial population
+    for (uint32_t i = 0; i < POP_SIZE; i++) {
+        emp::vector<double> next_org(N);
+        for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->GetDouble(1);
+        Inject(next_org);
+    }
+}
+
 
 template <>
 void EcologyWorld<emp::BitVector>::SetupNK() {
@@ -839,17 +479,9 @@ void EcologyWorld<emp::BitVector>::SetupNK() {
 
         // Make a fitness function for each gene (set of sites that determine a fitness contribution)
         // in the bitstring
-        if (SELECTION == (uint32_t) SELECTION_METHOD::LEXICASE || SELECTION == (uint32_t) SELECTION_METHOD::ECOEA ) {
-            for (size_t gene = 0; gene < N; gene++) {
-                fit_set.push_back([this, gene](emp::BitVector & org){return landscape.GetFitness(gene, org);});
-            }
-        }
-
-        // Build a random initial population
-        for (uint32_t i = 0; i < POP_SIZE; i++) {
-            emp::BitVector next_org(N);
-            for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->P(0.5);
-            Inject(next_org);
+ 
+        for (size_t gene = 0; gene < N; gene++) {
+            fit_set.push_back([this, gene](emp::BitVector & org){return landscape.GetFitness(gene, org);});
         }
 
         // Setup the mutation function.
