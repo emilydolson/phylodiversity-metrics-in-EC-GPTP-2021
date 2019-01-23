@@ -1,9 +1,10 @@
 # Project-specific settings
 PROJECT := ecology_parameter_sweep
 EMP_DIR := ../Empirical/source
+ECO_DIR := ../ec_ecology_toolbox/source
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++17 -I$(EMP_DIR)/
+CFLAGS_all := -Wall -Wno-unused-function -std=c++17 -I$(EMP_DIR)/ -I$(ECO_DIR)/
 
 # Native compiler information
 CXX_nat := g++

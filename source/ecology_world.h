@@ -17,6 +17,8 @@
 #include "tools/vector_utils.h"
 #include "tools/Graph.h"
 
+#include "interaction_networks.h"
+
 #include "cec2013.h"
 
 EMP_BUILD_CONFIG( EcologyConfig,
@@ -51,6 +53,7 @@ EMP_BUILD_CONFIG( EcologyConfig,
   VALUE(RESOURCE_SELECT_FRAC, double, 0.0025, "Fraction of resource consumed."),
   VALUE(RESOURCE_SELECT_MAX_BONUS, double, 5.0, "What's the max bonus someone can get for consuming a resource?"),
   VALUE(RESOURCE_SELECT_COST, double, 0.0, "Cost of using a resource?"),
+  VALUE(RESOURCE_SELECT_NICHE_WIDTH, double, 0.0, "Score necessary to count as attempting to use a resource"),
 
   GROUP(OPEN_ENDED_EVOLUTION, "Settings related to tracking MODES metrics"),
   VALUE(MODES_RESOLUTION, int, 1, "How often should MODES metrics be calculated?"),
@@ -59,7 +62,8 @@ EMP_BUILD_CONFIG( EcologyConfig,
   GROUP(DATA_RESOLUTION, "How often should data get printed?"),
   VALUE(FAST_DATA_RES, int, 10, "How often should easy to calculate metrics (e.g. fitness) be calculated?"),
   VALUE(ECOLOGY_DATA_RES, int, 100, "How often should ecological interactions (expensive) be calculated?"),
-  VALUE(ECOLOGY_DATA_N_SIMULATIONS, int, 500, "How many selection events be simulated to calculate interactions?")
+  VALUE(ECOLOGY_DATA_N_SIMULATIONS, int, 500, "How many selection events be simulated to calculate interactions?"),
+  VALUE(ECOLOGY_DATA_SIGNIF_THRESHOLD, double, -1, "Strength of interaction required to be counted (-1 will determine via randomization test)")
 );
 
 // Special version for bitstrings
@@ -92,6 +96,7 @@ template <typename ORG>
 class EcologyWorld : public emp::World<ORG> {
 
     using typename emp::World<ORG>::fun_calc_fitness_t;
+    using typename emp::World<ORG>::genome_t;
     using emp::World<ORG>::GetSize;
     using emp::World<ORG>::update;
     using emp::World<ORG>::random_ptr;
@@ -146,6 +151,7 @@ class EcologyWorld : public emp::World<ORG> {
     int FAST_DATA_RES;
     int ECOLOGY_DATA_RES;
     int ECOLOGY_DATA_N_SIMULATIONS;
+    double ECOLOGY_DATA_SIGNIF_THRESHOLD;
 
     double RESOURCE_SELECT_RES_AMOUNT;
     double RESOURCE_SELECT_RES_INFLOW;
@@ -153,6 +159,7 @@ class EcologyWorld : public emp::World<ORG> {
     double RESOURCE_SELECT_FRAC;
     double RESOURCE_SELECT_MAX_BONUS;
     double RESOURCE_SELECT_COST;
+    double RESOURCE_SELECT_NICHE_WIDTH;
 
     emp::NKLandscape landscape;
  
@@ -165,9 +172,11 @@ class EcologyWorld : public emp::World<ORG> {
 
     emp::Ptr<emp::OEETracker<emp::Systematics<ORG, ORG>, ORG>> oee;
 
+    double interaction_signif_threshold = 0;
 
     // Data tracking
-    emp::DataNode<double, emp::data::Histogram, emp::data::Stats> interaction_strengths;
+    emp::DataNode<double, emp::data::Histogram, emp::data::Stats> pos_interaction_strengths;
+    emp::DataNode<double, emp::data::Histogram, emp::data::Stats> neg_interaction_strengths;
     emp::DataNode<int, emp::data::Histogram, emp::data::Stats> node_in_degrees;
     emp::DataNode<int, emp::data::Histogram, emp::data::Stats> node_out_degrees;
 
@@ -189,6 +198,7 @@ class EcologyWorld : public emp::World<ORG> {
         FAST_DATA_RES = config.FAST_DATA_RES();
         ECOLOGY_DATA_RES = config.ECOLOGY_DATA_RES();
         ECOLOGY_DATA_N_SIMULATIONS = config.ECOLOGY_DATA_N_SIMULATIONS();
+        ECOLOGY_DATA_SIGNIF_THRESHOLD = config.ECOLOGY_DATA_SIGNIF_THRESHOLD();
         FILTER_LENGTH = config.FILTER_LENGTH();
         SHARING_THRESHOLD = config.SHARING_THRESHOLD();
         SHARING_ALPHA = config.SHARING_ALPHA();
@@ -201,6 +211,7 @@ class EcologyWorld : public emp::World<ORG> {
         RESOURCE_SELECT_FRAC = config.RESOURCE_SELECT_FRAC();
         RESOURCE_SELECT_MAX_BONUS = config.RESOURCE_SELECT_MAX_BONUS();
         RESOURCE_SELECT_COST = config.RESOURCE_SELECT_COST();
+        RESOURCE_SELECT_NICHE_WIDTH = config.RESOURCE_SELECT_NICHE_WIDTH();
 
         emp::Ptr<emp::Systematics<ORG, ORG> > sys;
         sys.New([](const ORG & o){return o;});
@@ -228,6 +239,9 @@ class EcologyWorld : public emp::World<ORG> {
             }
         });
 
+        OnUpdate([this](size_t ud){if(ud % FAST_DATA_RES == 0) {evaluate_performance_sig.Trigger();}});
+        OnUpdate([this](size_t ud){if(ud % ECOLOGY_DATA_RES == 0) {ComputeNetworks();}});
+
         emp::DataFile & performance_file = SetupFile("performance.csv");
         performance_file.AddVar(update, "update", "Update");
         performance_file.AddStats(*GetDataNode("performance"), "performance", "How well are programs actually solving the problem?");
@@ -244,20 +258,23 @@ class EcologyWorld : public emp::World<ORG> {
         oee_file.PrintHeaderKeys();
         oee_file.SetTimingRepeat(MODES_RESOLUTION);
 
-        interaction_strengths.SetupBins(-1.0, 1.0, 10);
-        node_out_degrees.SetupBins(0, POP_SIZE, 20);
-        node_in_degrees.SetupBins(0, POP_SIZE, 20);
+        pos_interaction_strengths.SetupBins(0, 1.01, 10);
+        neg_interaction_strengths.SetupBins(-1, 0, 10);
+        node_out_degrees.SetupBins(0, POP_SIZE+1, 20);
+        node_in_degrees.SetupBins(0, POP_SIZE+1, 20);
 
         emp::DataFile & ecology_file = SetupFile("ecology.csv");
         ecology_file.AddVar(update, "generation", "Generation");
-        ecology_file.AddStats(interaction_strengths, "interaction_strength", "interaction strength");
-        ecology_file.AddAllHistBins(interaction_strengths, "interaction_strength", "interaction strength");
+        ecology_file.AddStats(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
+        ecology_file.AddAllHistBins(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
+        ecology_file.AddStats(neg_interaction_strengths, "neg_interaction_strength", "negative interaction strength");
+        ecology_file.AddAllHistBins(neg_interaction_strengths, "neg_interaction_strength", "negative interaction strength");
         ecology_file.AddStats(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
         ecology_file.AddAllHistBins(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
         ecology_file.AddStats(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
         ecology_file.AddAllHistBins(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
         ecology_file.PrintHeaderKeys();
-        ecology_file.SetTimingRepeat(MODES_RESOLUTION);
+        ecology_file.SetTimingRepeat(ECOLOGY_DATA_RES);
 
         switch (PROBLEM){
             case (uint32_t) PROBLEM_TYPE::NK:
@@ -310,13 +327,15 @@ class EcologyWorld : public emp::World<ORG> {
             SetCache();
         }
 
+        if (ECOLOGY_DATA_SIGNIF_THRESHOLD != -1) {
+            interaction_signif_threshold = ECOLOGY_DATA_SIGNIF_THRESHOLD;
+        } else {
+            interaction_signif_threshold = DetermineInteractionThreshold();
+        }
+        std::cout << "Threshold: " << interaction_signif_threshold <<std::endl;
+
+
         // Update();
-    }
-
-    void CalcInteractionNetwork() {
-        // Get estimate of current fitnesses
-
-
     }
 
 
@@ -335,7 +354,7 @@ class EcologyWorld : public emp::World<ORG> {
                break;
 
             case (uint32_t)SELECTION_METHOD::ECOEA :
-                emp::ResourceSelect(*this, fit_set, resources, TOURNAMENT_SIZE, POP_SIZE, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
+                emp::ResourceSelect(*this, fit_set, resources, TOURNAMENT_SIZE, POP_SIZE, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true, RESOURCE_SELECT_NICHE_WIDTH);
                 break;
 
             case (uint32_t)SELECTION_METHOD::RANDOM :
@@ -360,7 +379,7 @@ class EcologyWorld : public emp::World<ORG> {
         }  
     }
 
-    std::map<int, int> SimulateEcoEA(emp::vector<size_t> exclude, const emp::vector< std::function<double(const ORG &)> > & extra_funs,
+    std::map<int, int> SimulateEcoEA(emp::vector<size_t> exclude, const emp::vector< std::function<double(ORG &)> > & extra_funs,
                    emp::vector<emp::Resource> & resources, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true) {
 
         emp_assert(GetFitFun(), "Must define a base fitness function");
@@ -370,7 +389,7 @@ class EcologyWorld : public emp::World<ORG> {
         std::map<int, int> selections;
 
         // Initialize map
-        for (int i = 0; i < GetSize(); i++) {
+        for (size_t i = 0; i < GetSize(); i++) {
             if (IsOccupied(i)) {
                 selections[i] = 0;
             }
@@ -401,7 +420,7 @@ class EcologyWorld : public emp::World<ORG> {
                 double cur_fit = extra_funs[ex_id](GetOrg(org_id));
                 cur_fit = emp::Pow(cur_fit, 2.0);            
                     cur_fit *= frac*(resources[ex_id].GetAmount()-cost);
-                    if (cur_fit > 0) {
+                    if (cur_fit > RESOURCE_SELECT_NICHE_WIDTH) {
                         cur_fit -= cost;
                     } else {
                         cur_fit = 0;
@@ -447,7 +466,7 @@ class EcologyWorld : public emp::World<ORG> {
         std::map<int, int> selections;
 
         // Initialize map
-        for (int i = 0; i < GetSize(); i++) {
+        for (size_t i = 0; i < GetSize(); i++) {
             if (IsOccupied(i)) {
                 selections[i] = 0;
             }
@@ -494,14 +513,14 @@ class EcologyWorld : public emp::World<ORG> {
         std::map<int, int> selections;
 
         // Initialize map
-        for (int i = 0; i < GetSize(); i++) {
+        for (size_t i = 0; i < GetSize(); i++) {
             if (IsOccupied(i)) {
                 selections[i] = 0;
             }
         }
 
 
-        std::map<typename ORG::genome_t, int> genotype_counts;
+        std::map<genome_t, int> genotype_counts;
         emp::vector<emp::vector<size_t>> genotype_lists;
 
         // Find all orgs with same genotype - we can dramatically reduce
@@ -621,6 +640,9 @@ class EcologyWorld : public emp::World<ORG> {
             TriggerOnLexicaseSelect(used, repro_id);
         }
         // std::cout << "Done with lex" << std::endl;
+        // for (auto el : selections) {
+        //     std::cout << el.first << " " << el.second << std::endl;
+        // }
         return selections;
     } 
 
@@ -645,7 +667,7 @@ class EcologyWorld : public emp::World<ORG> {
                 break;
 
             case (uint32_t)SELECTION_METHOD::RANDOM :
-                for (int i = 0; i < GetSize(); i++) {
+                for (size_t i = 0; i < GetSize(); i++) {
                     if (IsOccupied(i)) {
                         base_fitness[i] = 1;
                     }
@@ -653,7 +675,7 @@ class EcologyWorld : public emp::World<ORG> {
                 break;
 
             case (uint32_t)SELECTION_METHOD::LEXICASE :
-                base_fitness = SimulateLexicase({}, fit_set, ECOLOGY_DATA_N_SIMULATIONS);
+                base_fitness = SimulateLexicase({}, ECOLOGY_DATA_N_SIMULATIONS);
                 break;
 
             default:
@@ -662,26 +684,26 @@ class EcologyWorld : public emp::World<ORG> {
                 break;
         }
 
-        for (int i = 0; i < GetSize(); i++) {
+        for (size_t i = 0; i < GetSize(); i++) {
             if (!IsOccupied(i)) {
                 continue;
             }
 
             switch(SELECTION) {
                 case (uint32_t)SELECTION_METHOD::TOURNAMENT :
-                    new_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
+                    new_fitness = SimulateTournament({i}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
                     break;
 
                 case (uint32_t)SELECTION_METHOD::SHARING : // Sharing is handled in the setting of the fitness function
-                    new_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
+                    new_fitness = SimulateTournament({i}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
                     break;
 
                 case (uint32_t)SELECTION_METHOD::ECOEA :
-                    new_fitness = SimulateEcoEA({}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
+                    new_fitness = SimulateEcoEA({i}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
                     break;
 
                 case (uint32_t)SELECTION_METHOD::RANDOM :
-                    for (int i = 0; i < GetSize(); i++) {
+                    for (size_t i = 0; i < GetSize(); i++) {
                         if (IsOccupied(i)) {
                             new_fitness[i] = 1;
                         }
@@ -689,7 +711,7 @@ class EcologyWorld : public emp::World<ORG> {
                     break;
 
                 case (uint32_t)SELECTION_METHOD::LEXICASE :
-                    new_fitness = SimulateLexicase({}, fit_set, ECOLOGY_DATA_N_SIMULATIONS);
+                    new_fitness = SimulateLexicase({i}, ECOLOGY_DATA_N_SIMULATIONS);
                     break;
 
                 default:
@@ -699,7 +721,14 @@ class EcologyWorld : public emp::World<ORG> {
             }
 
             for (auto res : new_fitness) {
-                effects.AddEdge(i, res.first, base_fitness[res.first] - new_fitness[res.first]/(double)POP_SIZE);
+                if (res.first == (int)i) {
+                    continue;
+                }
+                double interaction = (base_fitness[res.first] - new_fitness[res.first])/(double)ECOLOGY_DATA_N_SIMULATIONS;
+                if (fabs(interaction) > interaction_signif_threshold) {
+                    // std::cout << i << ' ' << res.first << " " << interaction << std::endl;
+                    effects.AddEdge(i, res.first, interaction);
+                }
             }
             
         }
@@ -709,10 +738,18 @@ class EcologyWorld : public emp::World<ORG> {
 
     void ComputeNetworks() {
         emp::WeightedGraph i_network = CalcInteractionNetworks();
+        neg_interaction_strengths.Reset();
+        pos_interaction_strengths.Reset();
+        node_out_degrees.Reset();
+        node_in_degrees.Reset();
 
         for (emp::vector<double> & weights : i_network.GetWeights()) {
             for (double w : weights) {
-                interaction_strengths.Add(w);
+                if (w < 0){
+                    neg_interaction_strengths.Add(w);
+                } else if (w > 0) {
+                    pos_interaction_strengths.Add(w);
+                }
             }
         }
 
@@ -721,6 +758,64 @@ class EcologyWorld : public emp::World<ORG> {
             node_in_degrees.Add(i_network.GetInDegree(i));
         }
 
+
+    }
+
+    // Since we're determining interaction networks by sampling, we need a way
+    // to establish which interactions are real. We'll do this through a
+    // monte carlo simulation
+    double DetermineInteractionThreshold() {
+        std::map<int, int> base_fitness;
+        std::map<int, int> new_fitness;
+
+        emp::WeightedGraph effects(GetSize());
+
+        emp::vector<double> results;
+
+        for (int i = 0; i < ECOLOGY_DATA_N_SIMULATIONS; i++) {
+            switch(SELECTION) {
+                case (uint32_t)SELECTION_METHOD::TOURNAMENT :
+                    base_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
+                    new_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
+                    break;
+
+                case (uint32_t)SELECTION_METHOD::SHARING : // Sharing is handled in the setting of the fitness function
+                    base_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
+                    new_fitness = SimulateTournament({}, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS);
+                    break;
+
+                case (uint32_t)SELECTION_METHOD::ECOEA :
+                    base_fitness = SimulateEcoEA({}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
+                    new_fitness = SimulateEcoEA({}, fit_set, resources, TOURNAMENT_SIZE, ECOLOGY_DATA_N_SIMULATIONS, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true);
+                    break;
+
+                case (uint32_t)SELECTION_METHOD::RANDOM :
+                    for (size_t i = 0; i < GetSize(); i++) {
+                        if (IsOccupied(i)) {
+                            base_fitness[i] = 1;
+                            new_fitness[i] = 1;
+                        }
+                    }
+                    break;
+
+                case (uint32_t)SELECTION_METHOD::LEXICASE :
+                    base_fitness = SimulateLexicase({}, ECOLOGY_DATA_N_SIMULATIONS);
+                    new_fitness = SimulateLexicase({}, ECOLOGY_DATA_N_SIMULATIONS);
+                    break;
+
+                default:
+                    emp_assert(false && "INVALID SELECTION SCEHME", SELECTION);
+                    exit(1);
+                    break;
+            }
+
+            // std::cout << (base_fitness[0] - new_fitness[0])/(double)ECOLOGY_DATA_N_SIMULATIONS << std::endl;
+            results.push_back(abs(base_fitness[0] - new_fitness[0])/(double)ECOLOGY_DATA_N_SIMULATIONS);
+        }
+        emp::Sort(results);
+        // std::cout << emp::to_string(results) << std::endl;
+        // std::cout << (int)(ECOLOGY_DATA_N_SIMULATIONS*.95) << std::endl;
+        return results[(int)(ECOLOGY_DATA_N_SIMULATIONS*.95)];
 
     }
 
