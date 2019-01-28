@@ -10,12 +10,16 @@
 #include "Evolve/NK.h"
 #include "Evolve/World.h"
 #include "Evolve/Resource.h"
-#include "tools/BitVector.h"
 #include "tools/Random.h"
 #include "tools/sequence_utils.h"
 #include "Evolve/OEE.h"
 #include "tools/vector_utils.h"
 #include "tools/Graph.h"
+
+#include "org_types.h"
+#include "TaskSet.h"
+#include "TestcaseSet.h"
+#include "BitSorterMutators.h"
 
 #include "interaction_networks.h"
 
@@ -23,10 +27,12 @@
 
 EMP_BUILD_CONFIG( EcologyConfig,
   GROUP(MAIN, "Global settings"),
+  VALUE(MODE, int, 0, "0 = run experiment, 1 = Just run ecology stats so we can time it."),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
+  VALUE(START_POP_SIZE, uint32_t, 1, "Number of organisms to seed population with."),
   VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
-  VALUE(MUT_RATE, double, .005, "Probability of each site being mutated. For real-valued problems, the standard deviation of of the distribution from which mutations are pulled."),
+  VALUE(MUT_RATE, double, .005, "Probability of each site being mutated. For real-valued problems, the standard deviation of of the distribution from which mutations are pulled. For program, the probability of instruction mutation to a different one."),
   VALUE(PROBLEM, uint32_t, 0, "Which problem to use? 0 = NK, 1 = Program synthesis, 2 = Real-valued, 3 = Sorting network, 4 = Logic-9"),
 
   GROUP(NK, "Settings for NK landscape"),
@@ -36,6 +42,24 @@ EMP_BUILD_CONFIG( EcologyConfig,
   GROUP(REAL_VALUED, "Settings for real-valued optimzation problems"),
   VALUE(FUNCTION_NUMBER, uint32_t, 0, "Problem to use"),
   VALUE(DIMS, uint32_t, 200, "Number of dimensions in orgs"),
+
+  GROUP(SORTING_NETWORKS, "Setting for sorting network problems"),
+  VALUE(NUM_BITS, size_t, 16, "Length of input to sorting network."),
+  VALUE(MAX_NETWORK_SIZE, size_t, 128, "Maximum size of a sorting network."),
+  VALUE(MIN_NETWORK_SIZE, size_t, 1, "Minimum size of a sorting network."),
+  VALUE(PER_INDEX_SUB, double, 0.001, "."),
+  VALUE(PER_PAIR_DUP, double, 0.0005, "."),
+  VALUE(PER_PAIR_INS, double, 0.0005, "."),
+  VALUE(PER_PAIR_DEL, double, 0.001, "."),
+  VALUE(PER_PAIR_SWAP, double, 0.001, "."),
+
+  GROUP(PROGRAM_SYNTHESIS, "Settings for evolving code"),
+  VALUE(GENOME_SIZE, uint32_t, 100, "Starting length of genome"),
+  VALUE(MAX_GENOME_SIZE, uint32_t, 1000, "Maximum length of genome"),
+  VALUE(EVAL_TIME, uint32_t, 100, "How long to run program for"),
+  VALUE(INS_MUT_RATE, double, 0.005, "Probability of insertion mutation per instruction"),  
+  VALUE(DEL_MUT_RATE, double, 0.005, "Probability of deletion mutation per instruction"),  
+  VALUE(ARG_SUB_RATE, double, 0.005, "Probability argument substituion per instruction"),  
 
   GROUP(TESTCASES, "Settings for problems that use testcases"),
   VALUE(TRAINSET_FILE, std::string, "testcases/count-odds.csv", "Which set of testcases should we use for training?"),  
@@ -68,20 +92,20 @@ EMP_BUILD_CONFIG( EcologyConfig,
 // Special version for bitstrings
 // The reason the org can't be const is that it needs to get plugged into the fitness function, 
 // which may not be const
-emp::vector<int> Skeletonize(emp::BitVector & org, std::function<double(emp::BitVector&)> fun_calc_fitness) {
+emp::vector<bool> Skeletonize(bit_t & org, std::function<double(bit_t&)> fun_calc_fitness) {
     emp_assert(org.size() > 0, "Empty org passed to skeletonize");
 
-    emp::vector<int> skeleton;
+    emp::vector<bool> skeleton;
     double fitness = fun_calc_fitness(org);
-    emp::BitVector test_org = emp::BitVector(org);
+    bit_t test_org = bit_t(org);
 
     for (size_t i = 0; i < org.size(); i++) {
         test_org[i] = !test_org[i]; // For bit strings we just flip the bit
         double new_fitness = fun_calc_fitness(test_org);
         if (new_fitness < fitness) {
-            skeleton.push_back(org[i]);
+            skeleton.push_back(true);
         } else {
-            skeleton.push_back(-1);
+            skeleton.push_back(false);
         }
         test_org[i] = (int)org[i];
     }
@@ -96,6 +120,16 @@ class EcologyWorld : public emp::World<ORG> {
 
     using phen_t = emp::vector<double>;
     using fit_map_t = std::map<phen_t, double>;
+
+    // Logic-9 constants
+    static constexpr double MIN_POSSIBLE_SCORE = -32767;
+    static constexpr size_t MAX_LOGIC_TASK_NUM_INPUTS = 2;
+    static constexpr uint32_t MIN_LOGIC_TASK_INPUT = 0;
+    static constexpr uint32_t MAX_LOGIC_TASK_INPUT = 1000000000;
+
+    using task_io_t = uint32_t;
+    using taskset_t = TaskSet<std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS>, task_io_t>;
+    using test_case_t = std::pair<emp::vector<int>, double>;
 
     using typename emp::World<ORG>::fun_calc_fitness_t;
     using typename emp::World<ORG>::genome_t;
@@ -140,12 +174,16 @@ class EcologyWorld : public emp::World<ORG> {
     uint32_t N;
     uint32_t K;
     uint32_t POP_SIZE;
+    uint32_t START_POP_SIZE;
+    uint32_t EVAL_TIME;
     uint32_t MAX_GENS;
     uint32_t SELECTION;
     uint32_t CHANGE_TYPE;
     uint32_t CHANGE_RATE;
     uint32_t PROBLEM;
     uint32_t N_TEST_CASES;
+    uint32_t GENOME_SIZE;
+    uint32_t MAX_GENOME_SIZE;
     double MUT_RATE;
     int TOURNAMENT_SIZE;
     int MODES_RESOLUTION;
@@ -164,7 +202,33 @@ class EcologyWorld : public emp::World<ORG> {
     double RESOURCE_SELECT_NICHE_WIDTH;
     double LEXICASE_EPSILON;
 
-    emp::NKLandscape landscape;
+    double INS_MUT_RATE;
+    double DEL_MUT_RATE;
+    double ARG_SUB_RATE;
+    double PER_INDEX_SUB;
+    double PER_PAIR_DUP;
+    double PER_PAIR_INS;
+    double PER_PAIR_DEL;
+    double PER_PAIR_SWAP;
+
+    size_t NUM_BITS;
+    size_t MAX_NETWORK_SIZE;
+    size_t MIN_NETWORK_SIZE;
+
+    std::string TESTSET_FILE;
+    std::string TRAINSET_FILE;
+
+    // Problem-specific member variables
+    emp::NKLandscape landscape; // NK
+    taskset_t task_set; // Logic-9
+    std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> task_inputs; // Logic-9
+    size_t input_load_id; // Logic-9
+    gp_t::inst_lib_t inst_set; // AvidaGP problems
+    TestcaseSet<int, double> training_set; // Program synthesis
+    TestcaseSet<int, double> testing_set; // Program synthesis
+    BitSorterMutator sorter_mutator;
+
+    std::map<ORG, phen_t> phen_map;
 
     // Function to determine actual performance on problem
     fun_calc_fitness_t evaluation_fun;
@@ -177,15 +241,18 @@ class EcologyWorld : public emp::World<ORG> {
     emp::vector<fun_calc_fitness_t> fit_set;
     emp::vector<emp::Resource> resources;
 
-    emp::Ptr<emp::OEETracker<emp::Systematics<ORG, ORG>, ORG>> oee;
+    emp::Ptr<emp::OEETracker<emp::Systematics<ORG, ORG>, emp::vector<typename ORG::gene_t> > > oee;
 
-    double interaction_signif_threshold = 0;
 
     // Data tracking
     emp::DataNode<double, emp::data::Histogram, emp::data::Stats> pos_interaction_strengths;
     emp::DataNode<double, emp::data::Histogram, emp::data::Stats> neg_interaction_strengths;
     emp::DataNode<int, emp::data::Histogram, emp::data::Stats> node_in_degrees;
     emp::DataNode<int, emp::data::Histogram, emp::data::Stats> node_out_degrees;
+
+
+    emp::Ptr<ORG> best_curr;
+    double best_curr_fit = 0;
 
     public:
 
@@ -197,6 +264,8 @@ class EcologyWorld : public emp::World<ORG> {
         N = config.N();
         K = config.K();
         POP_SIZE = config.POP_SIZE();
+        START_POP_SIZE = config.START_POP_SIZE();
+        EVAL_TIME = config.EVAL_TIME();
         MAX_GENS = config.MAX_GENS();
         MUT_RATE = config.MUT_RATE();
         SELECTION = config.SELECTION();
@@ -209,6 +278,8 @@ class EcologyWorld : public emp::World<ORG> {
         SHARING_ALPHA = config.SHARING_ALPHA();
         PROBLEM = config.PROBLEM();
         N_TEST_CASES = config.N_TEST_CASES();
+        GENOME_SIZE = config.GENOME_SIZE();
+        MAX_GENOME_SIZE = config.MAX_GENOME_SIZE();
 
         RESOURCE_SELECT_RES_AMOUNT = config.RESOURCE_SELECT_RES_AMOUNT();
         RESOURCE_SELECT_RES_INFLOW = config.RESOURCE_SELECT_RES_INFLOW();
@@ -218,6 +289,22 @@ class EcologyWorld : public emp::World<ORG> {
         RESOURCE_SELECT_COST = config.RESOURCE_SELECT_COST();
         RESOURCE_SELECT_NICHE_WIDTH = config.RESOURCE_SELECT_NICHE_WIDTH();
         LEXICASE_EPSILON = config.LEXICASE_EPSILON();
+
+        INS_MUT_RATE = config.INS_MUT_RATE();
+        DEL_MUT_RATE = config.DEL_MUT_RATE();
+        ARG_SUB_RATE = config.ARG_SUB_RATE();
+        PER_INDEX_SUB = config.PER_INDEX_SUB();
+        PER_PAIR_DUP = config.PER_PAIR_DUP();
+        PER_PAIR_INS = config.PER_PAIR_INS();
+        PER_PAIR_DEL = config.PER_PAIR_DEL();
+        PER_PAIR_SWAP = config.PER_PAIR_SWAP();
+  
+        MAX_NETWORK_SIZE = config.MAX_NETWORK_SIZE();
+        MIN_NETWORK_SIZE = config.MIN_NETWORK_SIZE();
+        NUM_BITS = config.NUM_BITS();
+
+        TESTSET_FILE = config.TESTSET_FILE();
+        TRAINSET_FILE = config.TRAINSET_FILE();
 
         attrs = emp::tools::Merge(SigmaShare(SHARING_THRESHOLD), Alpha(SHARING_ALPHA),
                                   Cost(RESOURCE_SELECT_COST), Cf(RESOURCE_SELECT_FRAC),
@@ -230,9 +317,37 @@ class EcologyWorld : public emp::World<ORG> {
 
         emp::Ptr<emp::Systematics<ORG, ORG> > sys;
         sys.New([](const ORG & o){return o;});
-        oee.New(sys, [this](ORG & org){return org;}, [](const ORG & org){
-            // TODO: Actually calculate complexity
-            return 1;
+        oee.New(sys, [this](ORG & org){
+                if constexpr (std::is_same<ORG, bit_t>::value) {
+                    return Skeletonize(org, GetFitFun());                    
+                } else if constexpr (std::is_same<ORG, rv_t>::value) {
+                    return org;
+                } else if constexpr (std::is_same<ORG, gp_t>::value) {
+                    gp_t::Instruction null_inst(inst_set.GetID("Null"));
+                    return emp::Skeletonize(org, null_inst, GetFitFun());
+                } else if constexpr (std::is_same<ORG, sorting_t>::value) {
+                    emp::vector<sorting_t::gene_t> skel;
+                    double fit = fun_calc_fitness(org);
+                    for (int i = org.GetSize() - 1; i >= 0; i--) {
+                        sorting_t test_org = org;
+                        test_org.RemoveCompare(i);
+                        if (fun_calc_fitness(test_org) < fit) {
+                            skel.push_back(org.GetBits(i));
+                        }
+                    }
+                    return skel;
+                } else {
+                    return org;
+                }
+            
+            }, [](const emp::vector<typename ORG::gene_t> & org){
+                if constexpr (std::is_same<ORG, bit_t>::value) {
+                    return emp::Count(org, true);                    
+                } else if constexpr (std::is_same<ORG, rv_t>::value) {
+                    return -1;
+                } else {
+                    return org.size();
+                }
         });
         oee->SetResolution(MODES_RESOLUTION);
         oee->SetGenerationInterval(FILTER_LENGTH);
@@ -249,9 +364,18 @@ class EcologyWorld : public emp::World<ORG> {
         evaluate_performance_sig.AddAction([this](){
             auto perf_node = GetDataNode("performance");
             perf_node->Reset();
+            best_curr = pop[0];
+            best_curr_fit = 0.0;
+
             for (emp::Ptr<ORG> org : pop) {
-                perf_node->Add(evaluation_fun(*org));
+                double fit = evaluation_fun(*org);
+                perf_node->Add(fit);
+                if (fit > best_curr_fit) {
+                    best_curr = org;
+                    best_curr_fit = fit;
+                }
             }
+            std::cout << *best_curr << std::endl;
         });
 
         OnUpdate([this](size_t ud){if(ud % FAST_DATA_RES == 0) {evaluate_performance_sig.Trigger();}});
@@ -291,9 +415,30 @@ class EcologyWorld : public emp::World<ORG> {
         ecology_file.PrintHeaderKeys();
         ecology_file.SetTimingRepeat(ECOLOGY_DATA_RES);
 
+        emp::DataFile & phylodiversity_file = SetupFile("phylodiversity.csv");
+        sys->AddEvolutionaryDistinctivenessDataNode();
+        sys->AddPairwiseDistanceDataNode();
+        sys->AddPhylogeneticDiversityDataNode();
+
+        phylodiversity_file.AddVar(update, "generation", "Generation");
+        phylodiversity_file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
+        phylodiversity_file.AddStats(*sys->GetDataNode("pairwise_distance"), "pairwise_distance", "pairwise distance for a single update", true, true);
+        phylodiversity_file.AddCurrent(*sys->GetDataNode("phylogenetic_diversity"), "current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
+        phylodiversity_file.PrintHeaderKeys();
+        phylodiversity_file.SetTimingRepeat(ECOLOGY_DATA_RES);
+
+        emp::DataFile & dominant_file = SetupFile("dominant.csv");
+        dominant_file.AddVar(update, "generation", "Generation");
+        dominant_file.AddVar(best_curr_fit, "dominant_fitness", "Fitness of the best org in the population");
+        dominant_file.AddFun<int>([this](){return best_curr->size();}, "dominant_size", "Size of dominant");
+        // dominant_file.AddFun<std::string>([this](){return best_curr->toString();}, "dominant_genome", "Genome of dominant");
+        dominant_file.PrintHeaderKeys();
+        dominant_file.SetTimingRepeat(FAST_DATA_RES);
+
+
         switch (PROBLEM){
             case (uint32_t) PROBLEM_TYPE::NK:
-                if constexpr (std::is_same<ORG, emp::BitVector>::value) {
+                if constexpr (std::is_same<ORG, bit_t>::value) {
                     // We need this if so we don't need to define SetupNK for every
                     // possible ORG type
                     SetupNK();
@@ -303,7 +448,11 @@ class EcologyWorld : public emp::World<ORG> {
                 break;
 
             case (uint32_t) PROBLEM_TYPE::PROGRAM_SYNTHESIS:
-                // TODO
+                if constexpr (std::is_same<ORG, gp_t>::value) {
+                    SetupProgramSynthesis();
+                } else {
+                    exit(1);
+                }
                 break;            
 
             case (uint32_t) PROBLEM_TYPE::REAL_VALUE:
@@ -311,11 +460,19 @@ class EcologyWorld : public emp::World<ORG> {
                 break;            
 
             case (uint32_t) PROBLEM_TYPE::SORTING_NETWORK:
-                // TODO
+                if constexpr (std::is_same<ORG, sorting_t>::value) {
+                    SetupSortingNetworks();
+                } else {
+                    exit(1);
+                }
                 break;            
 
             case (uint32_t) PROBLEM_TYPE::LOGIC_9:
-                // TODO
+                if constexpr (std::is_same<ORG, gp_t>::value) {
+                    SetupLogic9();
+                } else {
+                    exit(1);
+                }
                 break;            
 
             default:
@@ -358,22 +515,27 @@ class EcologyWorld : public emp::World<ORG> {
             SetCache();
         }
 
-        phenotypes.resize(POP_SIZE);
+        phenotypes.resize(START_POP_SIZE);
 
         OnUpdate([this](int ud){phenotypes.clear(); phenotypes.resize(POP_SIZE);});
         OnBeforePlacement([this](ORG & o, int pos){
             for (auto fun : fit_set) {
                 phenotypes[pos].push_back(fun(o));
             }
+            phen_map[o] = phenotypes[pos];
         }); 
 
         InitPop();
+        best_curr = pop[0];
     }
 
 
     void InitPop();
-
     void SetupNK();
+    void SetupProgramSynthesis();
+    void SetupLogic9();
+    void SetupSortingNetworks();
+    double RunTestcase(gp_t & org, test_case_t testcase);
 
     void RunStep() {
 
@@ -396,7 +558,7 @@ class EcologyWorld : public emp::World<ORG> {
                 break;
 
             case (uint32_t)SELECTION_METHOD::LEXICASE :
-                emp::LexicaseSelect(*this, fit_set, POP_SIZE);
+                emp::OptimizedLexicaseSelect(*this, fit_set, POP_SIZE);
                 break;
 
             default:
@@ -411,6 +573,15 @@ class EcologyWorld : public emp::World<ORG> {
         for (size_t u = 0; u <= MAX_GENS; u++) {
             RunStep();
         }  
+    }
+
+    void TimeCompetition() {
+        START_POP_SIZE = POP_SIZE;
+        phenotypes.clear();
+        phenotypes.resize(START_POP_SIZE);
+        pop.clear();
+        InitPop();
+        CalcCompetition(phenotypes, evaluate_competition_fun, attrs);        
     }
 
     void ComputeNetworks() {
@@ -438,64 +609,445 @@ class EcologyWorld : public emp::World<ORG> {
 
     }
 
+    // For logic-9
+    void ResetTasks() {
+        input_load_id = 0;
+        task_inputs[0] = random_ptr->GetUInt(MIN_LOGIC_TASK_INPUT, MAX_LOGIC_TASK_INPUT);
+        task_inputs[1] = random_ptr->GetUInt(MIN_LOGIC_TASK_INPUT, MAX_LOGIC_TASK_INPUT);
+        task_set.SetInputs(task_inputs);
+        while (task_set.IsCollision()) {
+            task_inputs[0] = random_ptr->GetUInt(MIN_LOGIC_TASK_INPUT, MAX_LOGIC_TASK_INPUT);
+            task_inputs[1] = random_ptr->GetUInt(MIN_LOGIC_TASK_INPUT, MAX_LOGIC_TASK_INPUT);
+            task_set.SetInputs(task_inputs);
+        }
+    }
+
 };
 
 template <>
-void EcologyWorld<emp::BitVector>::InitPop() {
+void EcologyWorld<sorting_t>::InitPop() {
+    sorter_mutator.MAX_NETWORK_SIZE = MAX_NETWORK_SIZE;
+    sorter_mutator.MIN_NETWORK_SIZE = MIN_NETWORK_SIZE;
+    sorter_mutator.SORT_SEQ_SIZE = NUM_BITS;
+    sorter_mutator.PER_INDEX_SUB = PER_INDEX_SUB;
+    sorter_mutator.PER_PAIR_DUP = PER_PAIR_DUP;
+    sorter_mutator.PER_PAIR_INS = PER_PAIR_INS;
+    sorter_mutator.PER_PAIR_DEL = PER_PAIR_DEL;
+    sorter_mutator.PER_PAIR_SWAP = PER_PAIR_SWAP;
+
+    SetMutFun([this](sorting_t & org, emp::Random & rnd) {
+        // return sorter_mutator.Mutate(rnd, org);
+        // std::cout << org.AsString() << org.GetSize() << std::endl;
+        return sorter_mutator.Mutate(rnd, org);
+        // std::cout << org.AsString() << org.GetSize() << std::endl << std::endl;
+        // return 1.0;
+    });
+
+    for (size_t i = 0; i < START_POP_SIZE; ++i) {
+        Inject(sorter_mutator.GenRandomBitSorter(*random_ptr));
+    }    
+
+}
+
+template <>
+void EcologyWorld<bit_t>::InitPop() {
+    // Setup the mutation function.
+    std::function<size_t(bit_t &, emp::Random &)> mut_fun =
+        [this](bit_t & org, emp::Random & random) {
+            size_t num_muts = 0;
+            for (uint32_t m = 0; m < N; m++) {
+                if (random_ptr->P(MUT_RATE)) {
+                    org[m] = random_ptr->P(.5); // Randomly assign 0 or 1 
+                    num_muts++;
+                }
+            }
+            return num_muts;
+        };
+    SetMutFun( mut_fun );
+
     // Build a random initial population
-    for (uint32_t i = 0; i < POP_SIZE; i++) {
-        emp::BitVector next_org(N);
+    for (uint32_t i = 0; i < START_POP_SIZE; i++) {
+        bit_t next_org(N);
         for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->P(0.5);
         Inject(next_org);
     }
 }
 
 template <>
-void EcologyWorld<emp::vector<double>>::InitPop() {
+void EcologyWorld<rv_t>::InitPop() {
+
+    // Setup the mutation function.
+    std::function<size_t(rv_t &, emp::Random &)> mut_fun =
+        [this](rv_t & org, emp::Random & random) {
+            for (uint32_t m = 0; m < N; m++) {
+                org[m] += random_ptr->GetRandNormal(0, MUT_RATE); 
+            }
+            return 1;
+        };
+    SetMutFun( mut_fun );
+
     // Build a random initial population
-    for (uint32_t i = 0; i < POP_SIZE; i++) {
-        emp::vector<double> next_org(N);
+    for (uint32_t i = 0; i < START_POP_SIZE; i++) {
+        rv_t next_org(N);
         for (uint32_t j = 0; j < N; j++) next_org[j] = random_ptr->GetDouble(1);
         Inject(next_org);
     }
 }
 
-
 template <>
-void EcologyWorld<emp::BitVector>::SetupNK() {
-        // Create landscape based on correct random seed
-        landscape = emp::NKLandscape(N, K, *random_ptr);
+void EcologyWorld<gp_t>::InitPop() {
 
-        // Set-up fitness function (queries NK Landscape)
-        evaluation_fun =
-            [this](emp::BitVector & org){ return landscape.GetFitness(org); };
-
-        if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
-            SetSharedFitFun(evaluation_fun, [](emp::BitVector & org1, emp::BitVector & org2){return calc_hamming_distance(org1, org2);}, SHARING_THRESHOLD, SHARING_ALPHA);
-        } else {
-            std::cout << "Setting fit fun" << std::endl;
-            SetFitFun(evaluation_fun);
-        }
-
-        // Make a fitness function for each gene (set of sites that determine a fitness contribution)
-        // in the bitstring
- 
-        for (size_t gene = 0; gene < N; gene++) {
-            fit_set.push_back([this, gene](emp::BitVector & org){return landscape.GetFitness(gene, org);});
-        }
-
-        // Setup the mutation function.
-        std::function<size_t(emp::BitVector &, emp::Random &)> mut_fun =
-            [this](emp::BitVector & org, emp::Random & random) {
-                size_t num_muts = 0;
-                for (uint32_t m = 0; m < N; m++) {
-                    if (random_ptr->P(MUT_RATE)) {
-                        org[m] = random_ptr->P(.5); // Randomly assign 0 or 1 
-                        num_muts++;
+    // Setup the mutation function.
+    std::function<size_t(gp_t &, emp::Random &)> mut_fun =
+        [this](gp_t & org, emp::Random & r){
+            int count = 0;
+            for (size_t i = 0; i < org.GetSize(); ++i) {
+                if (r.P(MUT_RATE)) {
+                    org.RandomizeInst(i, r);
+                    count++;
+                }
+                for (size_t j = 0; j < gp_t::base_t::INST_ARGS; j++) {
+                    if (r.P(ARG_SUB_RATE)) {
+                        org.genome.sequence[i].args[j] = r.GetUInt(org.CPU_SIZE);        
+                        count++;
                     }
                 }
-                return num_muts;
-            };
-        SetMutFun( mut_fun );
+                if (r.P(INS_MUT_RATE)) {
+                    if (org.GetSize() < MAX_GENOME_SIZE) {
+                        org.genome.sequence.insert(org.genome.sequence.begin() + (int)i, gp_t::gene_t());
+                        org.RandomizeInst(i, r);
+                        count++;
+                    }
+                }
+                if (r.P(DEL_MUT_RATE)) {
+                    if (org.GetSize() > 1) {
+                        org.genome.sequence.erase(org.genome.sequence.begin() + (int)i);
+                        count++;
+                    }
+                }
 
-    } 
+            }
+            return count;
+        }; 
+    SetMutFun(mut_fun);
+
+
+    emp::Random & random = GetRandom();
+    for (size_t i = 0; i < START_POP_SIZE; i++) {
+        gp_t cpu(&inst_set);
+        cpu.PushRandom(random, GENOME_SIZE);
+        Inject(cpu.GetGenome());
+    }
+}
+
+template <>
+void EcologyWorld<bit_t>::SetupNK() {
+    // Create landscape based on correct random seed
+    landscape = emp::NKLandscape(N, K, *random_ptr);
+
+    // Set-up fitness function (queries NK Landscape)
+    evaluation_fun =
+        [this](bit_t & org){ return landscape.GetFitness(org); };
+
+    if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
+        SetSharedFitFun(evaluation_fun, [this](bit_t & org1, bit_t & org2){return emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+    } else {
+        SetFitFun(evaluation_fun);
+    }
+
+    // Make a fitness function for each gene (set of sites that determine a fitness contribution)
+    // in the bitstring
+
+    for (size_t gene = 0; gene < N; gene++) {
+        fit_set.push_back([this, gene](bit_t & org){return landscape.GetFitness(gene, org);});
+    }
+} 
+
+template <>
+double EcologyWorld<gp_t>::RunTestcase(gp_t & org, test_case_t testcase) {
+    org.ResetHardware();
+    for (size_t i = 0; i < testcase.first.size(); i++) {
+        org.SetInput((int)i, testcase.first[i]);
+    }
+    org.Process(EVAL_TIME);
+    double divisor = testcase.second;
+    if (divisor == 0) {
+        divisor = 1;
+    }
+    const std::unordered_map<int, double> & outputs = org.GetOutputs();
+    int min_output = 100000;
+    double result;
+    for (auto out : outputs) {
+        if (out.first < min_output) {
+            min_output = out.first;
+        }
+    }
+
+    if (outputs.size() != 0) {
+        result = 1 / (std::abs(org.GetOutput(min_output) - testcase.second)/std::abs(divisor));
+    } else {
+        result = 0;
+    }
+
+    // emp_assert(std::abs(result) != INFINITY);
+    if (result > 1000) {
+        result = 1000;
+    }
+    return result;
+}
+
+template <>
+void EcologyWorld<gp_t>::SetupProgramSynthesis() {
+    testing_set.LoadTestcases(TESTSET_FILE);
+    training_set.LoadTestcases(TRAINSET_FILE);
+
+    inst_set = gp_t::inst_lib_t::DefaultInstLib();
+
+    inst_set.AddInst("Null", [](gp_t::hardware_t & hw, const gp_t::inst_t & inst) {
+        return;
+    } , 0, "Null instruction");
+
+    inst_set.AddInst("Dereference", [](gp_t::hardware_t & hw, const gp_t::inst_t & inst) {
+        if (hw.regs[inst.args[0]] >= 0 && hw.regs[inst.args[0]] < hw.regs.size()) {
+            hw.regs[inst.args[1]] = hw.regs[(size_t)hw.regs[inst.args[0]]];
+        }
+    } , 3, "Dereference register 0 and store result in register 1");
+
+    for (size_t testcase = 0; testcase < N_TEST_CASES; ++testcase) {
+        fit_set.push_back([testcase, this](gp_t & org) {
+            return RunTestcase(org, training_set[testcase]);
+        });
+    }
+
+    fun_calc_fitness_t goal_fun = [this](gp_t & org) {
+        double result = 0;
+        for (auto fun : fit_set) {
+            result += fun(org);
+        }
+        return result;
+    };
+
+    if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
+        SetSharedFitFun(goal_fun, [this](gp_t & org1, gp_t & org2) {return (double)emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+    } else {
+        SetFitFun(goal_fun);
+    }
+
+    evaluation_fun = [this](gp_t & org) {
+        double result = 0;
+        for (size_t testcase = 0; testcase < N_TEST_CASES; ++testcase) {
+            result += RunTestcase(org, testing_set[testcase]);
+        }
+        return result;
+    };
+
+}
+
+template <>
+void EcologyWorld<gp_t>::SetupLogic9() {
+    inst_set = gp_t::inst_lib_t::DefaultInstLib();
+
+    inst_set.AddInst("Null", [](gp_t::hardware_t & hw, const gp_t::inst_t & inst) {
+        return;
+    } , 0, "Null instruction");
+
+    // Configure the tasks. 
+    // Zero out task inputs.
+    for (size_t i = 0; i < MAX_LOGIC_TASK_NUM_INPUTS; ++i) task_inputs[i] = 0;
+    input_load_id = 0;
+
+    // Add tasks to set.
+    // NAND
+    task_set.AddTask("NAND", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(~(a&b));
+    }, "NAND task");
+    // NOT
+    task_set.AddTask("NOT", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(~a);
+        task.solutions.emplace_back(~b);
+    }, "NOT task");
+    // ORN
+    task_set.AddTask("ORN", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back((a|(~b)));
+        task.solutions.emplace_back((b|(~a)));
+    }, "ORN task");
+    // AND
+    task_set.AddTask("AND", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(a&b);
+    }, "AND task");
+    // OR
+    task_set.AddTask("OR", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(a|b);
+    }, "OR task");
+    // ANDN
+    task_set.AddTask("ANDN", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back((a&(~b)));
+        task.solutions.emplace_back((b&(~a)));
+    }, "ANDN task");
+    // NOR
+    task_set.AddTask("NOR", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(~(a|b));
+    }, "NOR task");
+    // XOR
+    task_set.AddTask("XOR", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(a^b);
+    }, "XOR task");
+    // EQU
+    task_set.AddTask("EQU", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(~(a^b));
+    }, "EQU task");
+    // ECHO
+    task_set.AddTask("ECHO", [](taskset_t::Task & task, const std::array<task_io_t, MAX_LOGIC_TASK_NUM_INPUTS> & inputs) {
+        const task_io_t a = inputs[0], b = inputs[1];
+        task.solutions.emplace_back(a);
+        task.solutions.emplace_back(b);
+    }, "ECHO task");
+
+    inst_set.AddInst("Nand", [](gp_t::hardware_t & hw, const gp_t::inst_t & inst) {
+        hw.regs[inst.args[2]] = ~((int)hw.regs[inst.args[0]]&(int)hw.regs[inst.args[1]]);
+    } , 3, "WM[ARG3]=~(WM[ARG1]&WM[ARG2])");
+
+    // setup score
+    evaluation_fun = [this](gp_t & org) {
+        // Num unique tasks completed + (TOTAL TIME - COMPLETED TIME)
+        ResetTasks();
+        org.ResetHardware();
+
+        for (size_t i = 0; i < MAX_LOGIC_TASK_NUM_INPUTS; i++) {
+            org.SetInput((int)i, task_inputs[i]);
+        }
+        for (size_t t = 0; t < EVAL_TIME; ++t) {
+            org.SingleProcess();
+
+            int min_output = 100000;
+            for (auto out : org.GetOutputs()) {
+                if (out.first < min_output) {
+                    min_output = out.first;
+                }
+            }
+
+            if (min_output < 100000) {
+                task_set.Submit((uint32_t)org.GetOutput(min_output), t);
+                if (task_set.AllTasksCompleted()) {
+                    break;
+                }
+            }
+        }
+
+        double score = task_set.GetUniqueTasksCompleted();
+        if (task_set.GetAllTasksCompletedTime() > 0) score += (EVAL_TIME - task_set.GetAllTasksCompletedTime());
+        return score;
+    };
+    
+    // Add fitness functions to fit_set
+    for (size_t task_num = 0; task_num < task_set.GetSize(); ++task_num) {
+        fit_set.push_back([this, task_num](gp_t & org) {
+
+            ResetTasks();
+            org.ResetHardware();
+
+            for (size_t i = 0; i < MAX_LOGIC_TASK_NUM_INPUTS; i++) {
+                org.SetInput((int)i, task_inputs[i]);
+            }
+            for (size_t t = 0; t < EVAL_TIME; ++t) {
+                org.SingleProcess();
+
+                int min_output = 100000;
+                for (auto out : org.GetOutputs()) {
+                    if (out.first < min_output) {
+                        min_output = out.first;
+                    }
+                }
+
+                if (min_output < 100000) {
+                    task_set.Submit((uint32_t)org.GetOutput(min_output), t);
+                    if (task_set.GetTask(task_num).GetCompletionCnt() > 0) {
+                        break;
+                    }
+                }
+            }
+
+            return (int) (task_set.GetTask(task_num).GetCompletionCnt() > 0);
+        });
+    }
+
+    fit_set.push_back([this](gp_t & org) {
+        ResetTasks();
+        org.ResetHardware();        
+
+        for (size_t i = 0; i < MAX_LOGIC_TASK_NUM_INPUTS; i++) {
+            org.SetInput((int)i, task_inputs[i]);
+        }
+
+        for (size_t t = 0; t < EVAL_TIME; ++t) {
+            org.SingleProcess();
+
+            int min_output = 100000;
+            for (auto out : org.GetOutputs()) {
+                if (out.first < min_output) {
+                    min_output = out.first;
+                }
+            }
+
+            if (min_output < 100000) {
+                task_set.Submit((uint32_t)org.GetOutput(min_output), t);
+                if (task_set.AllTasksCompleted()) {
+                    break;
+                }
+            }
+        }
+
+        double score = 0;
+        if (task_set.GetAllTasksCompletedTime() > 0) score += (EVAL_TIME - task_set.GetAllTasksCompletedTime())/(double)EVAL_TIME;
+        return score;
+    });
+
+    if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
+        SetSharedFitFun(evaluation_fun, [this](gp_t & org1, gp_t & org2) {return (double)emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+    } else {
+        SetFitFun(evaluation_fun);
+    }
+
+}
+
+template <>
+void EcologyWorld<sorting_t>::SetupSortingNetworks() {
+    std::cout << "Max passes: " << (1 << NUM_BITS) << std::endl;
+    evaluation_fun = [this](sorting_t & org){
+        double num_passes = org.CountSortable(NUM_BITS);
+        if (num_passes ==  1 << NUM_BITS) {
+            double size_bonus = ((double)MAX_NETWORK_SIZE - (double)org.GetSize())/(double)MAX_NETWORK_SIZE;
+            return num_passes + size_bonus;
+        } 
+        return num_passes;
+    };
+
+    if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
+        SetSharedFitFun(evaluation_fun, [this](sorting_t & org1, sorting_t & org2) {return (double)emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+    } else {
+        SetFitFun(evaluation_fun);
+    }
+
+    for (uint32_t i = 0; i < (uint32_t)(1 << NUM_BITS); i++) {
+        fit_set.push_back([this, i](sorting_t & org){
+            return org.TestSortable(i);
+        });
+    }
+    
+    fit_set.push_back([this](sorting_t & org){
+        if (org.CountSortable(NUM_BITS) == (size_t)(1 << NUM_BITS)) {
+            return ((double)MAX_NETWORK_SIZE - (double)org.GetSize())/(double)MAX_NETWORK_SIZE;
+        }
+        return 0.0;
+    });
+
+}
