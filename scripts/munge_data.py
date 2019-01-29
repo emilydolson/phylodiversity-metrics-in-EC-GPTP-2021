@@ -8,7 +8,7 @@ for path in glob.glob("*/*/[0-9]*"):
     if not os.path.exists(path+"/phylodiversity.csv"):
         continue
 
-    csvs = glob.glob(path+"*.csv")
+    csvs = glob.glob(path+"/"+"*.csv")
 
     local_dfs = []
     for csvfile in csvs:
