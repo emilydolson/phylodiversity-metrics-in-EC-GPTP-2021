@@ -8,7 +8,7 @@ time_solved_data = []
 for path in glob.glob("*/*/[0-9]*"):
     if not os.path.exists(path+"/phylodiversity.csv"):
         continue
-
+    print(path)
     csvs = glob.glob(path+"/"+"*.csv")
 
     local_dfs = []
@@ -17,6 +17,9 @@ for path in glob.glob("*/*/[0-9]*"):
         local_dfs.append(pd.read_csv(csvfile))
         if "generation" not in local_dfs[-1]:
             local_dfs[-1].rename(columns={"update":"generation"}, inplace=True)
+        if "generation" not in local_dfs[-1]:
+            local_dfs.pop()
+            continue
         local_dfs[-1].set_index("generation", inplace=True)
         if (csvfile.endswith("species_ecology.csv")):
             col_dict = {}
