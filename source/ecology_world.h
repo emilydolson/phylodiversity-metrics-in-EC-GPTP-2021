@@ -23,7 +23,7 @@
 
 #include "interaction_networks.h"
 
-#include "cec2013.h"
+// #include "cec2013.h"
 
 EMP_BUILD_CONFIG( EcologyConfig,
   GROUP(MAIN, "Global settings"),
@@ -236,12 +236,12 @@ class EcologyWorld : public emp::World<ORG> {
     BitSorterMutator sorter_mutator;
 
     // Real value
-    emp::Ptr<CEC2013> optim_function;
-    emp::vector<emp::vector<double>> key_points;
-    emp::vector<double> mid_point;
-    emp::vector<double> ubounds;
-    emp::vector<double> lbounds;
-    emp::vector<double> mut_std;
+    // emp::Ptr<CEC2013> optim_function;
+    // emp::vector<emp::vector<double>> key_points;
+    // emp::vector<double> mid_point;
+    // emp::vector<double> ubounds;
+    // emp::vector<double> lbounds;
+    // emp::vector<double> mut_std;
 
 
     std::map<ORG, phen_t> phen_map;
