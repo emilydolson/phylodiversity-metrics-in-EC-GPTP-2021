@@ -113,13 +113,17 @@ emp::vector<bool> Skeletonize(bit_t & org, std::function<double(bit_t&)> fun_cal
     return skeleton;
 }
 
+const emp::vector<size_t> PROBLEM_MAP = {4,5,6,7,10,11,12,13};
+const emp::vector<std::string> PROBLEM_DESC = {"F4 (2D)","F5 (2D)","F6 (2D)","F7 (2D)","F8 (2D)","F9 (2D)","F10 (2D)","F11 (2D)"};
+
 enum class PROBLEM_TYPE { NK=0, PROGRAM_SYNTHESIS=1, REAL_VALUE=2, SORTING_NETWORK=3, LOGIC_9=4 };
 
 template <typename ORG>
 class EcologyWorld : public emp::World<ORG> {
 
     using phen_t = emp::vector<double>;
-    using fit_map_t = std::map<phen_t, double>;
+    using fit_map_t = emp::vector<double>;
+    using phen_taxon_t = emp::Taxon<phen_t, emp::datastruct::mut_landscape_info<phen_t>>;
 
     // Logic-9 constants
     static constexpr double MIN_POSSIBLE_SCORE = -32767;
@@ -228,14 +232,21 @@ class EcologyWorld : public emp::World<ORG> {
     TestcaseSet<int, double> testing_set; // Program synthesis
     BitSorterMutator sorter_mutator;
 
+    // Real value
+    emp::Ptr<CEC2013> optim_function;
+    emp::vector<emp::vector<double>> key_points;
+    emp::vector<double> mid_point;
+    emp::vector<double> ubounds;
+    emp::vector<double> lbounds;
+    emp::vector<double> mut_std;
+
+
     std::map<ORG, phen_t> phen_map;
 
     // Function to determine actual performance on problem
     fun_calc_fitness_t evaluation_fun;
     std::function<fit_map_t(emp::vector<phen_t> &, all_attrs)> evaluate_competition_fun;
     all_attrs attrs = DEFAULT;
-
-    emp::vector<phen_t> phenotypes;
 
     // Set of fitness functions for lexicase and Eco-EA
     emp::vector<fun_calc_fitness_t> fit_set;
@@ -249,7 +260,8 @@ class EcologyWorld : public emp::World<ORG> {
     emp::DataNode<double, emp::data::Histogram, emp::data::Stats> neg_interaction_strengths;
     emp::DataNode<int, emp::data::Histogram, emp::data::Stats> node_in_degrees;
     emp::DataNode<int, emp::data::Histogram, emp::data::Stats> node_out_degrees;
-
+    emp::Ptr<emp::Systematics<ORG, ORG> > sys;
+    emp::Ptr<emp::Systematics<ORG, phen_t, emp::datastruct::mut_landscape_info<phen_t>> > phen_sys;
 
     emp::Ptr<ORG> best_curr;
     double best_curr_fit = 0;
@@ -315,7 +327,6 @@ class EcologyWorld : public emp::World<ORG> {
                                   TournamentSize(TOURNAMENT_SIZE), 
                                   Epsilon(LEXICASE_EPSILON));
 
-        emp::Ptr<emp::Systematics<ORG, ORG> > sys;
         sys.New([](const ORG & o){return o;});
         oee.New(sys, [this](ORG & org){
                 if constexpr (std::is_same<ORG, bit_t>::value) {
@@ -354,6 +365,20 @@ class EcologyWorld : public emp::World<ORG> {
         AddSystematics(sys);
         OnUpdate([this](int ud){oee->Update(ud);});
 
+        phen_sys.New([this](ORG & o){            
+            phen_t phen;
+            for (auto fun : fit_set) {
+                phen.push_back(fun(o));
+            }
+            return phen;});
+
+        AddSystematics(phen_sys);
+        std::function<void(emp::Ptr<phen_taxon_t>, ORG&)> record_taxon_data = [](emp::Ptr<phen_taxon_t> tax, ORG & o){
+            tax->GetData().RecordFitness(o.fitness);
+            tax->GetData().RecordPhenotype(o.phenotype);
+        };
+        phen_sys->OnNew(record_taxon_data);
+
         SetupFitnessFile().SetTimingRepeat(10);
         SetupSystematicsFile().SetTimingRepeat(10);
         SetupPopulationFile().SetTimingRepeat(10);
@@ -375,13 +400,16 @@ class EcologyWorld : public emp::World<ORG> {
                     best_curr_fit = fit;
                 }
             }
-            std::cout << *best_curr << std::endl;
+
+            if constexpr (std::is_same<ORG, rv_t>::value) {
+                std::cout << emp::to_string(*best_curr) << std::endl;
+            } else {
+                std::cout << *best_curr << std::endl;
+            }
         });
 
-        OnUpdate([this](size_t ud){if(ud % FAST_DATA_RES == 0) {evaluate_performance_sig.Trigger();}});
-        OnUpdate([this](size_t ud){if(ud % ECOLOGY_DATA_RES == 0) {ComputeNetworks();}});
-
         emp::DataFile & performance_file = SetupFile("performance.csv");
+        performance_file.AddPreFun([this](){evaluate_performance_sig.Trigger();});
         performance_file.AddVar(update, "update", "Update");
         performance_file.AddStats(*GetDataNode("performance"), "performance", "How well are programs actually solving the problem?");
         performance_file.PrintHeaderKeys();
@@ -403,6 +431,7 @@ class EcologyWorld : public emp::World<ORG> {
         node_in_degrees.SetupBins(0, POP_SIZE+1, 20);
 
         emp::DataFile & ecology_file = SetupFile("ecology.csv");
+        ecology_file.AddPreFun([this](){ComputeNetworks();});
         ecology_file.AddVar(update, "generation", "Generation");
         ecology_file.AddStats(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
         ecology_file.AddAllHistBins(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
@@ -415,15 +444,36 @@ class EcologyWorld : public emp::World<ORG> {
         ecology_file.PrintHeaderKeys();
         ecology_file.SetTimingRepeat(ECOLOGY_DATA_RES);
 
+        emp::DataFile & species_ecology_file = SetupFile("species_ecology.csv");
+        species_ecology_file.AddPreFun([this](){ComputeNetworks(true);});
+        species_ecology_file.AddVar(update, "generation", "Generation");
+        species_ecology_file.AddStats(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
+        species_ecology_file.AddAllHistBins(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
+        species_ecology_file.AddStats(neg_interaction_strengths, "neg_interaction_strength", "negative interaction strength");
+        species_ecology_file.AddAllHistBins(neg_interaction_strengths, "neg_interaction_strength", "negative interaction strength");
+        species_ecology_file.AddStats(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
+        species_ecology_file.AddAllHistBins(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
+        species_ecology_file.AddStats(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
+        species_ecology_file.AddAllHistBins(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
+        species_ecology_file.PrintHeaderKeys();
+        species_ecology_file.SetTimingRepeat(ECOLOGY_DATA_RES);
+
         emp::DataFile & phylodiversity_file = SetupFile("phylodiversity.csv");
         sys->AddEvolutionaryDistinctivenessDataNode();
         sys->AddPairwiseDistanceDataNode();
         sys->AddPhylogeneticDiversityDataNode();
 
+        phen_sys->AddEvolutionaryDistinctivenessDataNode();
+        phen_sys->AddPairwiseDistanceDataNode();
+        phen_sys->AddPhylogeneticDiversityDataNode();
+
         phylodiversity_file.AddVar(update, "generation", "Generation");
-        phylodiversity_file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
-        phylodiversity_file.AddStats(*sys->GetDataNode("pairwise_distance"), "pairwise_distance", "pairwise distance for a single update", true, true);
-        phylodiversity_file.AddCurrent(*sys->GetDataNode("phylogenetic_diversity"), "current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
+        phylodiversity_file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "genotype_evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
+        phylodiversity_file.AddStats(*sys->GetDataNode("pairwise_distance"), "genotype_pairwise_distance", "pairwise distance for a single update", true, true);
+        phylodiversity_file.AddCurrent(*sys->GetDataNode("phylogenetic_diversity"), "genotype_current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
+        phylodiversity_file.AddStats(*phen_sys->GetDataNode("evolutionary_distinctiveness") , "phenotype_evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
+        phylodiversity_file.AddStats(*phen_sys->GetDataNode("pairwise_distance"), "phenotype_pairwise_distance", "pairwise distance for a single update", true, true);
+        phylodiversity_file.AddCurrent(*phen_sys->GetDataNode("phylogenetic_diversity"), "phenotype_current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
         phylodiversity_file.PrintHeaderKeys();
         phylodiversity_file.SetTimingRepeat(ECOLOGY_DATA_RES);
 
@@ -431,10 +481,23 @@ class EcologyWorld : public emp::World<ORG> {
         dominant_file.AddVar(update, "generation", "Generation");
         dominant_file.AddVar(best_curr_fit, "dominant_fitness", "Fitness of the best org in the population");
         dominant_file.AddFun<int>([this](){return best_curr->size();}, "dominant_size", "Size of dominant");
-        // dominant_file.AddFun<std::string>([this](){return best_curr->toString();}, "dominant_genome", "Genome of dominant");
+        dominant_file.AddFun<int>([this](){return emp::LineageLength(phen_sys->GetTaxonAt(best_curr->pos));}, "dominant_phenotypic_volatilty", "Number of phenotypes on dominant's lineage");
+        dominant_file.AddFun<int>([this](){return emp::LineageLength(sys->GetTaxonAt(best_curr->pos));}, "dominant_lin_length", "Number of genotypes on dominant's lineage");
+        dominant_file.AddFun<int>([this](){return emp::CountDeleteriousSteps(phen_sys->GetTaxonAt(best_curr->pos));}, "dominant_deleterious_steps", "Number of deleterious steps on dominant's lineage");
+        dominant_file.AddFun<int>([this](){return emp::CountUniquePhenotypes(phen_sys->GetTaxonAt(best_curr->pos));}, "dominant_unique_phenotypes", "Number of unique phenotypes on dominant's lineage");
         dominant_file.PrintHeaderKeys();
         dominant_file.SetTimingRepeat(FAST_DATA_RES);
 
+        emp::DataFile & lineage_file = SetupFile("lineage.csv");
+        phen_sys->AddDeleteriousStepDataNode();
+        phen_sys->AddVolatilityDataNode();
+        phen_sys->AddUniqueTaxaDataNode();
+
+        lineage_file.AddStats(*phen_sys->GetDataNode("deleterious_steps"), "deleterious_steps", "counts of deleterious steps along each lineage", true, true);
+        lineage_file.AddStats(*phen_sys->GetDataNode("volatility"), "taxon_volatility", "counts of changes in taxon along each lineage", true, true);
+        lineage_file.AddStats(*phen_sys->GetDataNode("unique_taxa"), "unique_taxa", "counts of unique taxa along each lineage", true, true);
+        lineage_file.PrintHeaderKeys();
+        lineage_file.SetTimingRepeat(FAST_DATA_RES);
 
         switch (PROBLEM){
             case (uint32_t) PROBLEM_TYPE::NK:
@@ -515,14 +578,13 @@ class EcologyWorld : public emp::World<ORG> {
             SetCache();
         }
 
-        phenotypes.resize(START_POP_SIZE);
-
-        OnUpdate([this](int ud){phenotypes.clear(); phenotypes.resize(POP_SIZE);});
         OnBeforePlacement([this](ORG & o, int pos){
+            o.phenotype.resize(0);
             for (auto fun : fit_set) {
-                phenotypes[pos].push_back(fun(o));
+                o.phenotype.push_back(fun(o));
             }
-            phen_map[o] = phenotypes[pos];
+            o.pos = pos;
+            o.fitness = emp::Sum(o.phenotype);
         }); 
 
         InitPop();
@@ -534,6 +596,7 @@ class EcologyWorld : public emp::World<ORG> {
     void SetupNK();
     void SetupProgramSynthesis();
     void SetupLogic9();
+    void SetupRealValue();
     void SetupSortingNetworks();
     double RunTestcase(gp_t & org, test_case_t testcase);
 
@@ -577,14 +640,25 @@ class EcologyWorld : public emp::World<ORG> {
 
     void TimeCompetition() {
         START_POP_SIZE = POP_SIZE;
-        phenotypes.clear();
-        phenotypes.resize(START_POP_SIZE);
         pop.clear();
         InitPop();
+        emp::vector<phen_t> phenotypes;
+        for (emp::Ptr<ORG> org : pop) {
+            phenotypes.push_back(org->phenotype);
+        }
         CalcCompetition(phenotypes, evaluate_competition_fun, attrs);        
     }
 
-    void ComputeNetworks() {
+    void ComputeNetworks(bool species_level = false) {
+        emp::vector<phen_t> phenotypes;
+        for (emp::Ptr<ORG> org : pop) {
+            phenotypes.push_back(org->phenotype);
+        }
+
+        if (species_level) {
+            phenotypes = emp::RemoveDuplicates(phenotypes);
+        }
+
         emp::WeightedGraph i_network = CalcCompetition(phenotypes, evaluate_competition_fun, attrs);
         neg_interaction_strengths.Reset();
         pos_interaction_strengths.Reset();
@@ -741,16 +815,61 @@ void EcologyWorld<gp_t>::InitPop() {
 }
 
 template <>
+void EcologyWorld<rv_t>::SetupRealValue() {
+    // emp::vector<emp::vector<double>> grid_anchors(DIMENSIONS);
+    // mid_point.resize(DIMENSIONS);
+    // ubounds.resize(DIMENSIONS);
+    // lbounds.resize(DIMENSIONS);
+    // mut_std.resize(DIMENSIONS);
+
+    // for (size_t dim = 0; dim < DIMENSIONS; ++dim) {
+    //   grid_anchors[dim].resize(HINT_GRID_RES, 0.0);
+    //   double l = eval_function->get_lbound(dim);
+    //   double u = eval_function->get_ubound(dim);
+    //   double step = (u - l)/(HINT_GRID_RES - 1);
+    //   mid_point[dim] = l + ((u - l)/2);
+    //   ubounds[dim] = u;
+    //   lbounds[dim] = l;
+    //   mut_std[dim] = (u - l)*MUTATION_STD;
+    //   for (size_t i = 0; i < HINT_GRID_RES; ++i) {
+    //     grid_anchors[dim][i] = l + (i*step);
+    //   }
+    // }
+    // max_dist = CalcDist(ubounds, lbounds);
+
+    // // Fill out key_points. (NOTE: currently not generic for more than 2 dimensions...)
+    // score_ceil = eval_function->get_fitness_goptima();
+    // score_floor = score_ceil;
+    // for (size_t i = 0; i < HINT_GRID_RES; ++i) {
+    //   for (size_t j = 0; j < HINT_GRID_RES; ++j) {
+    //     key_points.emplace_back();
+    //     key_points.back().resize(DIMENSIONS);
+    //     key_points.back()[0] = grid_anchors[0][i];
+    //     key_points.back()[1] = grid_anchors[1][j];
+    //     const double key_point_score = eval_function->evaluate(key_points.back());
+    //     score_floor = (key_point_score < score_floor) ? key_point_score : score_floor;
+    //   }
+    // }
+
+    // for (size_t i = 0; i < key_points.size(); ++i) {
+    //   phen.distances[i] = CalcDist(key_points[i], agent.genome); // Don't want to end up with divide-by-zero error.
+    //   // phen.testcase_scores[i] = (phen.score < 0) ? (1+phen.distances[i]/max_dist)*phen.score : (1 - phen.distances[i]/max_dist)*phen.score;
+    //   phen.testcase_scores[i] = (1 - (phen.distances[i]/max_dist)) * phen.transformed_score;
+    // }
+
+}
+
+template <>
 void EcologyWorld<bit_t>::SetupNK() {
     // Create landscape based on correct random seed
     landscape = emp::NKLandscape(N, K, *random_ptr);
 
     // Set-up fitness function (queries NK Landscape)
     evaluation_fun =
-        [this](bit_t & org){ return landscape.GetFitness(org); };
+        [](bit_t & org){ return emp::Sum(org.phenotype); };
 
     if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
-        SetSharedFitFun(evaluation_fun, [this](bit_t & org1, bit_t & org2){return emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+        SetSharedFitFun(evaluation_fun, [](bit_t & org1, bit_t & org2){return emp::calc_hamming_distance(org1.phenotype, org2.phenotype);}, SHARING_THRESHOLD, SHARING_ALPHA);
     } else {
         SetFitFun(evaluation_fun);
     }
@@ -819,16 +938,12 @@ void EcologyWorld<gp_t>::SetupProgramSynthesis() {
         });
     }
 
-    fun_calc_fitness_t goal_fun = [this](gp_t & org) {
-        double result = 0;
-        for (auto fun : fit_set) {
-            result += fun(org);
-        }
-        return result;
+    fun_calc_fitness_t goal_fun = [](gp_t & org) {
+        return emp::Sum(org.phenotype);
     };
 
     if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
-        SetSharedFitFun(goal_fun, [this](gp_t & org1, gp_t & org2) {return (double)emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+        SetSharedFitFun(goal_fun, [](gp_t & org1, gp_t & org2) {return (double)emp::calc_hamming_distance(org1.phenotype, org2.phenotype);}, SHARING_THRESHOLD, SHARING_ALPHA);
     } else {
         SetFitFun(goal_fun);
     }
@@ -1012,7 +1127,7 @@ void EcologyWorld<gp_t>::SetupLogic9() {
     });
 
     if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
-        SetSharedFitFun(evaluation_fun, [this](gp_t & org1, gp_t & org2) {return (double)emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+        SetSharedFitFun(evaluation_fun, [](gp_t & org1, gp_t & org2) {return (double)emp::calc_hamming_distance(org1.phenotype, org2.phenotype);}, SHARING_THRESHOLD, SHARING_ALPHA);
     } else {
         SetFitFun(evaluation_fun);
     }
@@ -1022,23 +1137,18 @@ void EcologyWorld<gp_t>::SetupLogic9() {
 template <>
 void EcologyWorld<sorting_t>::SetupSortingNetworks() {
     std::cout << "Max passes: " << (1 << NUM_BITS) << std::endl;
-    evaluation_fun = [this](sorting_t & org){
-        double num_passes = org.CountSortable(NUM_BITS);
-        if (num_passes ==  1 << NUM_BITS) {
-            double size_bonus = ((double)MAX_NETWORK_SIZE - (double)org.GetSize())/(double)MAX_NETWORK_SIZE;
-            return num_passes + size_bonus;
-        } 
-        return num_passes;
+    evaluation_fun = [](sorting_t & org){
+        return emp::Sum(org.phenotype);
     };
 
     if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
-        SetSharedFitFun(evaluation_fun, [this](sorting_t & org1, sorting_t & org2) {return (double)emp::calc_hamming_distance(phen_map[org1], phen_map[org2]);}, SHARING_THRESHOLD, SHARING_ALPHA);
+        SetSharedFitFun(evaluation_fun, [](sorting_t & org1, sorting_t & org2) {return (double)emp::calc_hamming_distance(org1.phenotype, org2.phenotype);}, SHARING_THRESHOLD, SHARING_ALPHA);
     } else {
         SetFitFun(evaluation_fun);
     }
 
     for (uint32_t i = 0; i < (uint32_t)(1 << NUM_BITS); i++) {
-        fit_set.push_back([this, i](sorting_t & org){
+        fit_set.push_back([i](sorting_t & org){
             return org.TestSortable(i);
         });
     }
