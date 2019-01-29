@@ -4,7 +4,7 @@ import pandas as pd
 
 all_data = []
 
-for path in glob.glob("*/[0-9]*"):
+for path in glob.glob("*/*/[0-9]*"):
     if not os.path.exists(path+"/phylodiversity.csv"):
         continue
 
@@ -12,7 +12,7 @@ for path in glob.glob("*/[0-9]*"):
 
     local_dfs = []
     for csvfile in csvs:
-        local_dfs.append(pd.read_csv(path+"/oee.csv", index_col="generation"))
+        local_dfs.append(pd.read_csv(csvfile, index_col="generation"))
 
     df = pd.concat(local_dfs, axis=1)    
     local_data = {}
@@ -33,4 +33,4 @@ for path in glob.glob("*/[0-9]*"):
 
 res = pd.concat(all_data)
 
-res.to_csv("../data/all_data.csv")
+res.to_csv("all_data.csv")
