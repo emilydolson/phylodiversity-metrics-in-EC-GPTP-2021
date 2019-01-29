@@ -12,7 +12,10 @@ for path in glob.glob("*/*/[0-9]*"):
 
     local_dfs = []
     for csvfile in csvs:
-        local_dfs.append(pd.read_csv(csvfile, index_col="generation"))
+        local_dfs.append(pd.read_csv(csvfile))
+        if "generation" not in local_dfs[-1]:
+            local_dfs[-1].rename(columns={"update":"generation"}, inplace=True)
+        local_dfs[-1].set_index("generation", inplace=True)
 
     df = pd.concat(local_dfs, axis=1)    
     local_data = {}
