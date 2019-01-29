@@ -170,10 +170,13 @@ class EcologyWorld : public emp::World<ORG> {
     using emp::World<ORG>::SetupFile;
     using emp::World<ORG>::GetFitFun;
     using emp::World<ORG>::GetNumOrgs;
+    using emp::World<ORG>::files;
 
     enum class SELECTION_METHOD { TOURNAMENT=0, SHARING=1, LEXICASE=2, ECOEA=3, RANDOM=4 };
 
     emp::Signal<void(void)> evaluate_performance_sig;    ///< Triggered when we want to evaluate performance
+    emp::Signal<void(ORG & org)> problem_solved_signal;    ///< Triggered when we want to evaluate performance
+    bool problem_solved = false;
 
     uint32_t N;
     uint32_t K;
@@ -379,9 +382,10 @@ class EcologyWorld : public emp::World<ORG> {
         };
         phen_sys->OnNew(record_taxon_data);
 
-        SetupFitnessFile().SetTimingRepeat(10);
-        SetupSystematicsFile().SetTimingRepeat(10);
-        SetupPopulationFile().SetTimingRepeat(10);
+        SetupFitnessFile().SetTimingRepeat(FAST_DATA_RES);
+        SetupSystematicsFile(0, "genotype_systematics.csv").SetTimingRepeat(FAST_DATA_RES);
+        SetupSystematicsFile(1, "phenotype_systematics.csv").SetTimingRepeat(FAST_DATA_RES);
+        SetupPopulationFile().SetTimingRepeat(FAST_DATA_RES);
         SetPopStruct_Mixed(true);
         SetSynchronousSystematics(true);
 
@@ -447,14 +451,14 @@ class EcologyWorld : public emp::World<ORG> {
         emp::DataFile & species_ecology_file = SetupFile("species_ecology.csv");
         species_ecology_file.AddPreFun([this](){ComputeNetworks(true);});
         species_ecology_file.AddVar(update, "generation", "Generation");
-        species_ecology_file.AddStats(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
-        species_ecology_file.AddAllHistBins(pos_interaction_strengths, "pos_interaction_strength", "positive interaction strength");
-        species_ecology_file.AddStats(neg_interaction_strengths, "neg_interaction_strength", "negative interaction strength");
-        species_ecology_file.AddAllHistBins(neg_interaction_strengths, "neg_interaction_strength", "negative interaction strength");
-        species_ecology_file.AddStats(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
-        species_ecology_file.AddAllHistBins(node_out_degrees, "interaction_node_out_degree", "interaction node out degree"); 
-        species_ecology_file.AddStats(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
-        species_ecology_file.AddAllHistBins(node_in_degrees, "interaction_node_in_degree", "interaction node in degree");
+        species_ecology_file.AddStats(pos_interaction_strengths, "species_pos_interaction_strength", "positive interaction strength");
+        species_ecology_file.AddAllHistBins(pos_interaction_strengths, "species_pos_interaction_strength", "positive interaction strength");
+        species_ecology_file.AddStats(neg_interaction_strengths, "species_neg_interaction_strength", "negative interaction strength");
+        species_ecology_file.AddAllHistBins(neg_interaction_strengths, "species_neg_interaction_strength", "negative interaction strength");
+        species_ecology_file.AddStats(node_out_degrees, "species_interaction_node_out_degree", "interaction node out degree"); 
+        species_ecology_file.AddAllHistBins(node_out_degrees, "species_interaction_node_out_degree", "interaction node out degree"); 
+        species_ecology_file.AddStats(node_in_degrees, "species_interaction_node_in_degree", "interaction node in degree");
+        species_ecology_file.AddAllHistBins(node_in_degrees, "species_interaction_node_in_degree", "interaction node in degree");
         species_ecology_file.PrintHeaderKeys();
         species_ecology_file.SetTimingRepeat(ECOLOGY_DATA_RES);
 
@@ -493,11 +497,23 @@ class EcologyWorld : public emp::World<ORG> {
         phen_sys->AddVolatilityDataNode();
         phen_sys->AddUniqueTaxaDataNode();
 
+        lineage_file.AddVar(update, "generation", "Generation");
         lineage_file.AddStats(*phen_sys->GetDataNode("deleterious_steps"), "deleterious_steps", "counts of deleterious steps along each lineage", true, true);
         lineage_file.AddStats(*phen_sys->GetDataNode("volatility"), "taxon_volatility", "counts of changes in taxon along each lineage", true, true);
         lineage_file.AddStats(*phen_sys->GetDataNode("unique_taxa"), "unique_taxa", "counts of unique taxa along each lineage", true, true);
         lineage_file.PrintHeaderKeys();
         lineage_file.SetTimingRepeat(FAST_DATA_RES);
+
+        problem_solved_signal.AddAction([this](ORG & org){
+            for (emp::Ptr<emp::DataFile> file : files) {
+                file->Update();
+            }
+            std::ofstream outfile;
+            outfile.open("time_solved");
+            outfile << update << std::endl;
+            outfile.close();
+            problem_solved = true;
+        });
 
         switch (PROBLEM){
             case (uint32_t) PROBLEM_TYPE::NK:
@@ -938,8 +954,13 @@ void EcologyWorld<gp_t>::SetupProgramSynthesis() {
         });
     }
 
-    fun_calc_fitness_t goal_fun = [](gp_t & org) {
-        return emp::Sum(org.phenotype);
+    fun_calc_fitness_t goal_fun = [this](gp_t & org) {
+
+        double res = emp::Sum(org.phenotype);
+        if (!problem_solved && res > 0 && almost_equal(res, 1000*org.phenotype.size(), 10)){
+            problem_solved_signal.Trigger(org);
+        }
+        return res;
     };
 
     if (SELECTION == (uint32_t) SELECTION_METHOD::SHARING) {
@@ -1122,7 +1143,12 @@ void EcologyWorld<gp_t>::SetupLogic9() {
         }
 
         double score = 0;
-        if (task_set.GetAllTasksCompletedTime() > 0) score += (EVAL_TIME - task_set.GetAllTasksCompletedTime())/(double)EVAL_TIME;
+        if (task_set.GetAllTasksCompletedTime() > 0) {
+            if (!problem_solved) {
+                problem_solved_signal.Trigger(org);
+            }
+            score += (EVAL_TIME - task_set.GetAllTasksCompletedTime())/(double)EVAL_TIME;
+        }
         return score;
     });
 
@@ -1155,6 +1181,9 @@ void EcologyWorld<sorting_t>::SetupSortingNetworks() {
     
     fit_set.push_back([this](sorting_t & org){
         if (org.CountSortable(NUM_BITS) == (size_t)(1 << NUM_BITS)) {
+            if (!problem_solved) {
+                problem_solved_signal.Trigger(org);
+            }
             return ((double)MAX_NETWORK_SIZE - (double)org.GetSize())/(double)MAX_NETWORK_SIZE;
         }
         return 0.0;
