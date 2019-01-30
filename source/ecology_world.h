@@ -579,7 +579,7 @@ class EcologyWorld : public emp::World<ORG> {
                 evaluate_competition_fun = do_eco_ea<phen_t>;
 
                 resources.resize(0);
-                for (size_t i=0; i<N_TEST_CASES; i++) {
+                for (size_t i=0; i<fit_set.size(); i++) {
                     resources.push_back(emp::Resource(RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_INFLOW, .01));
                 }
                 break;
