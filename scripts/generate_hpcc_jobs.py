@@ -21,7 +21,7 @@ mkdir $SLURM_ARRAY_TASK_ID
 cd $SLURM_ARRAY_TASK_ID
 
 cp {executable} .
-./ecology_parameter_sweep -SEED $SLURM_ARRAY_TASK_ID -PROBLEM {problem} -POP_SIZE {pop_size} -SELECTION {selection} -MODES_RESOLUTION 100 -FILTER_LENGTH {pop_size} {additional_args}
+./ecology_parameter_sweep -SEED $SLURM_ARRAY_TASK_ID -PROBLEM {problem} -POP_SIZE {pop_size} -SELECTION {selection} -MODES_RESOLUTION 100 -FILTER_LENGTH {pop_size} {additional_args} > run.log
 """)
     os.system(f"sbatch {filename}")
     time.sleep(2)
@@ -47,7 +47,7 @@ do
     cd $seed
 
     cp {executable} .
-    ./ecology_parameter_sweep -SEED $seed -PROBLEM {problem} -POP_SIZE {pop_size} -SELECTION {selection} -MODES_RESOLUTION 100 -FILTER_LENGTH {pop_size} {additional_args}
+    ./ecology_parameter_sweep -SEED $seed -PROBLEM {problem} -POP_SIZE {pop_size} -SELECTION {selection} -MODES_RESOLUTION 100 -FILTER_LENGTH {pop_size} {additional_args} > run.log
 done
 """)
     os.system(f"sbatch {filename}")
