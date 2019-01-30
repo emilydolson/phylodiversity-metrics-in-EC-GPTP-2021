@@ -48,6 +48,7 @@ do
 
     cp {executable} .
     ./ecology_parameter_sweep -SEED $seed -PROBLEM {problem} -POP_SIZE {pop_size} -SELECTION {selection} -MODES_RESOLUTION 100 -FILTER_LENGTH {pop_size} {additional_args} > run.log
+    cd ..
 done
 """)
     os.system(f"sbatch {filename}")
