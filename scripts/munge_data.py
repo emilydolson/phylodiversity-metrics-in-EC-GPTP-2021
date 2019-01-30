@@ -53,7 +53,7 @@ for path in glob.glob("*/*/[0-9]*"):
     time_solved_series = df.loc[time_solved, :]
     time_solved_series["solved"] = is_solved
     time_solved_series["solved_or_finished"] = is_solved or (time_solved == local_data["MAX_GENS"])
-    time_solved_data.append()
+    time_solved_data.append(time_solved_series)
 
     all_data.append(df)
 
