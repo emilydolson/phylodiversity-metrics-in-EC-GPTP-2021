@@ -42,13 +42,19 @@ for path in glob.glob("*/*/[0-9]*"):
     for val in local_data:
         df[val] = local_data[val]
 
-    time_solved = local_data["MAX_GENS"]
+    time_solved = max(local_data.index)
+    is_solved = False
     if os.path.exists(path+"/time_solved"):
         with open(path+"/time_solved") as time_file:
             time_solved = time_file.readlines()[0]
+            is_solved = True
 
     time_solved = int(time_solved)
-    time_solved_data.append(df.loc[time_solved, :])
+    time_solved_series = df.loc[time_solved, :]
+    time_solved_series["solved"] = is_solved
+    time_solved_series["solved_or_finished"] = is_solved or (time_solved == local_data["MAX_GENS"])
+    time_solved_data.append()
+
     all_data.append(df)
 
 res = pd.concat(all_data)
