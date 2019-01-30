@@ -5,8 +5,7 @@ import argparse
 def submit_job():
     filename = str(start_seed)+".sb"
     with open(filename, "w") as outfile:
-        outfile.write(f"""
-#!/bin/bash --login
+        outfile.write(f"""#!/bin/bash --login
 ########## SBATCH Lines for Resource Request ##########
     
 #SBATCH --time=04:00:00             # limit of wall clock time - how long the job will run (same as -t)
@@ -30,8 +29,7 @@ cp {executable} .
 def submit_tournament_job():
     filename = str(start_seed)+".sb"
     with open(filename, "w") as outfile:
-        outfile.write(f"""
-#!/bin/bash --login
+        outfile.write(f"""#!/bin/bash --login
 ########## SBATCH Lines for Resource Request ##########
     
 #SBATCH --time=04:00:00             # limit of wall clock time - how long the job will run (same as -t)
