@@ -60,9 +60,12 @@ for path in glob.glob("*/*/[0-9]*"):
     for val in local_data:
         df[val] = local_data[val]
 
+    if df.empty:
+        continue
+
     all_data.append(df)
 
-    time_solved = max(df.index)
+    time_solved = df.index.max()
     is_solved = False
     if os.path.exists(path+"/time_solved"):
         with open(path+"/time_solved") as time_file:
