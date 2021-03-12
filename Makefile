@@ -1,6 +1,6 @@
 # Project-specific settings
 PROJECT := ecology_parameter_sweep
-EMP_DIR := ../Empirical/source
+EMP_DIR := ../Empirical/include/emp
 ECO_DIR := ../ec_ecology_toolbox/source
 
 # Flags to use regardless of compiler

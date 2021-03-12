@@ -10,11 +10,11 @@
 #include <set>
 #include <algorithm>
 
-#include "base/array.h"
-#include "base/vector.h"
-#include "tools/string_utils.h"
-#include "tools/Random.h"
-#include "tools/random_utils.h"
+#include "base/array.hpp"
+#include "base/vector.hpp"
+#include "tools/string_utils.hpp"
+#include "math/Random.hpp"
+#include "math/random_utils.hpp"
 
 template <typename INPUT_TYPE, typename OUTPUT_TYPE>
 class TestcaseSet {

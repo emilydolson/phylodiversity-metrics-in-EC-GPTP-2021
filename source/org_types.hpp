@@ -1,12 +1,12 @@
 #ifndef ECO_EC_ORG_TYPES_H
 #define ECO_EC_ORG_TYPES_H
 
-#include "hardware/AvidaGP.h"
-#include "hardware/BitSorter.h"
-#include "tools/BitVector.h"
-#include "tools/string_utils.h"
-#include "base/vector.h"
-#include "base/Ptr.h"
+#include "hardware/AvidaGP.hpp"
+#include "hardware/BitSorter.hpp"
+#include "bits/BitVector.hpp"
+#include "tools/string_utils.hpp"
+#include "base/vector.hpp"
+#include "base/Ptr.hpp"
 
 class BitSorterOrg : public emp::BitSorter {
 public:

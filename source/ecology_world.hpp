@@ -6,22 +6,22 @@
 
 #include <iostream>
 
-#include "config/ArgManager.h"
-#include "Evolve/NK.h"
-#include "Evolve/World.h"
-#include "Evolve/Resource.h"
-#include "tools/Random.h"
-#include "tools/sequence_utils.h"
-#include "Evolve/OEE.h"
-#include "tools/vector_utils.h"
-#include "tools/Graph.h"
+#include "config/ArgManager.hpp"
+#include "Evolve/NK.hpp"
+#include "Evolve/World.hpp"
+#include "Evolve/Resource.hpp"
+#include "math/Random.hpp"
+#include "math/sequence_utils.hpp"
+#include "Evolve/OEE.hpp"
+#include "datastructs/vector_utils.hpp"
+#include "datastructs/Graph.hpp"
 
-#include "org_types.h"
-#include "TaskSet.h"
-#include "TestcaseSet.h"
-#include "BitSorterMutators.h"
+#include "org_types.hpp"
+#include "TaskSet.hpp"
+#include "TestcaseSet.hpp"
+#include "BitSorterMutators.hpp"
 
-#include "interaction_networks.h"
+#include "interaction_networks.hpp"
 
 // #include "cec2013.h"
 
@@ -30,7 +30,7 @@ EMP_BUILD_CONFIG( EcologyConfig,
   VALUE(MODE, int, 0, "0 = run experiment, 1 = Just run ecology stats so we can time it."),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
   VALUE(START_POP_SIZE, uint32_t, 1, "Number of organisms to seed population with."),
-  VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the population."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
   VALUE(MUT_RATE, double, .005, "Probability of each site being mutated. For real-valued problems, the standard deviation of of the distribution from which mutations are pulled. For program, the probability of instruction mutation to a different one."),
   VALUE(PROBLEM, uint32_t, 0, "Which problem to use? 0 = NK, 1 = Program synthesis, 2 = Real-valued, 3 = Sorting network, 4 = Logic-9"),
@@ -39,7 +39,7 @@ EMP_BUILD_CONFIG( EcologyConfig,
   VALUE(K, uint32_t, 10, "Level of epistasis in the NK model"),
   VALUE(N, uint32_t, 200, "Number of bits in each organisms (must be > K)"),
 
-  GROUP(REAL_VALUED, "Settings for real-valued optimzation problems"),
+  GROUP(REAL_VALUED, "Settings for real-valued optimization problems"),
   VALUE(FUNCTION_NUMBER, uint32_t, 0, "Problem to use"),
   VALUE(DIMS, uint32_t, 200, "Number of dimensions in orgs"),
 
@@ -269,13 +269,24 @@ class EcologyWorld : public emp::World<ORG> {
     emp::Ptr<ORG> best_curr;
     double best_curr_fit = 0;
 
+    std::ofstream outfile_edges;
+    std::ofstream outfile_nodes;
+
     public:
 
     EcologyWorld() {;}
     EcologyWorld(emp::Random & rnd) : emp::World<ORG>(rnd) {;}
-    ~EcologyWorld(){if (oee){oee.Delete();}}
+    ~EcologyWorld(){if (oee){oee.Delete(); outfile_edges.close(); outfile_nodes.close();}}
 
     void Setup(EcologyConfig & config) {
+        std::string filename_edges = "interaction_network_edges.csv";
+        outfile_edges.open(filename_edges);
+        outfile_edges << "from, to, weight, update" << std::endl;
+
+        std::string filename_nodes = "interaction_network_nodes.csv";
+        outfile_nodes.open(filename_nodes);
+        outfile_nodes << "name, update, population, fitness" << std::endl;
+
         N = config.N();
         K = config.K();
         POP_SIZE = config.POP_SIZE();
@@ -580,7 +591,7 @@ class EcologyWorld : public emp::World<ORG> {
 
                 resources.resize(0);
                 for (size_t i=0; i<fit_set.size(); i++) {
-                    resources.push_back(emp::Resource(RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_INFLOW, .01));
+                    resources.push_back(emp::Resource(RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_OUTFLOW));
                 }
                 break;
 
@@ -601,6 +612,7 @@ class EcologyWorld : public emp::World<ORG> {
             }
             o.pos = pos;
             o.fitness = emp::Sum(o.phenotype);
+            // std::cout << emp::to_string(o.phenotype) << std::endl;
         }); 
 
         InitPop();
@@ -619,6 +631,11 @@ class EcologyWorld : public emp::World<ORG> {
     void RunStep() {
 
         std::cout << update << std::endl;
+        // for (auto res : resources) {
+        //     std::cout << res.GetAmount() << " ";
+        // }
+        // std::cout << std::endl;
+        
         switch(SELECTION) {
             case (uint32_t)SELECTION_METHOD::TOURNAMENT :
                emp::TournamentSelect(*this, TOURNAMENT_SIZE, POP_SIZE);
@@ -630,6 +647,7 @@ class EcologyWorld : public emp::World<ORG> {
 
             case (uint32_t)SELECTION_METHOD::ECOEA :
                 emp::ResourceSelect(*this, fit_set, resources, TOURNAMENT_SIZE, POP_SIZE, RESOURCE_SELECT_FRAC, RESOURCE_SELECT_MAX_BONUS,RESOURCE_SELECT_COST, true, RESOURCE_SELECT_NICHE_WIDTH);
+                // emp::EcoSelect(*this, fit_set, RESOURCE_SELECT_RES_INFLOW, TOURNAMENT_SIZE, POP_SIZE);    
                 break;
 
             case (uint32_t)SELECTION_METHOD::RANDOM :
@@ -641,7 +659,7 @@ class EcologyWorld : public emp::World<ORG> {
                 break;
 
             default:
-                emp_assert(false && "INVALID SELECTION SCEHME", SELECTION);
+                emp_assert(false && "INVALID SELECTION SCHEME", SELECTION);
                 exit(1);
                 break;
         }
@@ -667,8 +685,17 @@ class EcologyWorld : public emp::World<ORG> {
 
     void ComputeNetworks(bool species_level = false) {
         emp::vector<phen_t> phenotypes;
+        std::map<std::string, int> freq_dict;
         for (emp::Ptr<ORG> org : pop) {
             phenotypes.push_back(org->phenotype);
+            if (species_level) {
+                std::string phen_str = emp::to_string(org->phenotype);
+                if (emp::Has(freq_dict, phen_str)) {
+                    freq_dict[phen_str]++;
+                } else {
+                    freq_dict[phen_str] = 1;
+                }
+            }
         }
 
         if (species_level) {
@@ -695,6 +722,30 @@ class EcologyWorld : public emp::World<ORG> {
             node_out_degrees.Add(i_network.GetDegree(i));
             node_in_degrees.Add(i_network.GetInDegree(i));
         }
+
+        // std::ofstream outfile;
+        // std::string filename = emp::to_string(update) + "_" + emp::to_string(species_level) + "_interaction_network.dot";
+        // outfile.open(filename);
+        // i_network.PrintDirectedDotFormat(outfile);
+        // outfile.close();
+
+        if (species_level) {
+            // Recalculate phenotypes
+            emp::vector<double> fitnesses = evaluate_competition_fun(phenotypes, attrs);
+            emp::vector<emp::Graph::Node> nodes = i_network.GetNodes();
+            for (size_t n = 0; n < nodes.size(); n++) {
+                outfile_nodes << nodes[n].GetLabel() << ", " << update << ", " << freq_dict[nodes[n].GetLabel()] << ", " << fitnesses[n] << std::endl;
+            }
+
+            for (size_t n1 = 0; n1 < nodes.size(); n1++) {
+                for (size_t n2 = 0; n2 < nodes.size(); n2++) {
+                    if (i_network.HasEdge(n1, n2)) {
+                        outfile_edges << nodes[n1].GetLabel() << ", " << nodes[n2].GetLabel() << ", " << i_network.GetWeight(n1, n2) << ", " << update << std::endl;
+                    }
+                }
+            }
+        }
+
 
 
     }
@@ -894,7 +945,7 @@ void EcologyWorld<bit_t>::SetupNK() {
     // in the bitstring
 
     for (size_t gene = 0; gene < N; gene++) {
-        fit_set.push_back([this, gene](bit_t & org){return landscape.GetFitness(gene, org);});
+        fit_set.push_back([this, gene](bit_t & org){return landscape.GetSiteFitness(gene, org);});
     }
 } 
 

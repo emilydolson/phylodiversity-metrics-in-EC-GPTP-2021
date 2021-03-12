@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "../ecology_world.h"
+#include "../ecology_world.hpp"
 
-#include "base/vector.h"
-#include "config/command_line.h"
+#include "base/vector.hpp"
+#include "config/command_line.hpp"
 
 int main(int argc, char* argv[])
 {

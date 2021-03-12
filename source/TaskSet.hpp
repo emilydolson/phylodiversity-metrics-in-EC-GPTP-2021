@@ -8,15 +8,15 @@
 #include <map>
 #include <unordered_set>
 
-#include "base/Ptr.h"
-#include "base/vector.h"
-#include "control/Signal.h"
-#include "tools/BitVector.h"
-#include "tools/Random.h"
-#include "tools/random_utils.h"
-#include "tools/math.h"
-#include "tools/string_utils.h"
-#include "tools/map_utils.h"
+#include "base/Ptr.hpp"
+#include "base/vector.hpp"
+#include "control/Signal.hpp"
+#include "bits/BitVector.hpp"
+#include "math/Random.hpp"
+#include "math/random_utils.hpp"
+#include "math/math.hpp"
+#include "tools/string_utils.hpp"
+#include "datastructs/map_utils.hpp"
 
 
 /// Task library for logic9 changing environment experiments.

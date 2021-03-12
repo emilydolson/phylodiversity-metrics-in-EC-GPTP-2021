@@ -3,11 +3,11 @@
 #ifndef ALEX_BITSORTER_MUTATORS_H
 #define ALEX_BITSORTER_MUTATORS_H
 
-#include "base/vector.h"
-#include "tools/Random.h"
-#include "tools/random_utils.h"
+#include "base/vector.hpp"
+#include "math/Random.hpp"
+#include "math/random_utils.hpp"
 
-#include "org_types.h"
+#include "org_types.hpp"
 
 /// Bit sorter organism mutator
 struct BitSorterMutator {
