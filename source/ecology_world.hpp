@@ -508,6 +508,8 @@ class EcologyWorld : public emp::World<ORG> {
         phen_sys->AddVolatilityDataNode();
         phen_sys->AddUniqueTaxaDataNode();
 
+        phen_sys->AddSnapshotFun([](const phen_taxon_t & t){return emp::to_string(t.GetInfo());}, "phenotype", "");
+
         lineage_file.AddVar(update, "generation", "Generation");
         lineage_file.AddStats(*phen_sys->GetDataNode("deleterious_steps"), "deleterious_steps", "counts of deleterious steps along each lineage", true, true);
         lineage_file.AddStats(*phen_sys->GetDataNode("volatility"), "taxon_volatility", "counts of changes in taxon along each lineage", true, true);
@@ -593,6 +595,10 @@ class EcologyWorld : public emp::World<ORG> {
                 for (size_t i=0; i<fit_set.size(); i++) {
                     resources.push_back(emp::Resource(RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_INFLOW, RESOURCE_SELECT_RES_OUTFLOW));
                 }
+                break;
+
+            case ( (uint32_t) SELECTION_METHOD::RANDOM):
+                evaluate_competition_fun = do_random<phen_t>;
                 break;
 
             default:
@@ -744,6 +750,8 @@ class EcologyWorld : public emp::World<ORG> {
                     }
                 }
             }
+
+            phen_sys->Snapshot("snapshot_" + emp::to_string(update) + ".csv");
         }
 
 
