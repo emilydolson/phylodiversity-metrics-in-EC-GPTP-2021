@@ -36,14 +36,14 @@ def process_file(csvfile):
 all_data = []
 time_solved_data = []
 
-for path in glob.glob("*/*/[0-9]*"):
+for path in glob.glob("data/*/*/[0-9]*"):
     if not os.path.exists(path+"/phylodiversity.csv"):
         continue
     print(path)
     csvs = glob.glob(path+"/"+"*.csv")
 
     # Doing this as a list comprehension is allegedly faster
-    local_dfs = [process_file(csvfile) for csvfile in csvs]
+    local_dfs = [process_file(csvfile) for csvfile in csvs if not "snapshot" in csvfile]
 
     df = pd.concat(local_dfs, axis=1)    
     local_data = {}
@@ -66,6 +66,8 @@ for path in glob.glob("*/*/[0-9]*"):
     all_data.append(df)
 
     time_solved = df.index.max()
+    if time_solved > 10:
+        time_solved -= 10
     is_solved = False
     if os.path.exists(path+"/time_solved"):
         with open(path+"/time_solved") as time_file:

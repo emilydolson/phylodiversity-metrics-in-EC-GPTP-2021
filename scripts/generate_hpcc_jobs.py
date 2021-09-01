@@ -45,6 +45,7 @@ do
 done
 """)
 
+# -SELECTION 4 -POP_SIZE 100 -START_POP_SIZE 100 -PROBLEM 4 -N 10 -RESOURCE_SELECT_COST 3 -RESOURCE_SELECT_NICHE_WIDTH .5  -MAX_GENS 5000 -MUT_RATE .01 -RESOURCE_SELECT_FRAC .01 -RESOURCE_SELECT_RES_INFLOW 50 -ECOLOGY_DATA_RES 1
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--selections', type=int, nargs='+', help='selection types to use')
@@ -63,7 +64,7 @@ if os.path.exists(".next_seed"):
 sel_map = {0:"tournament", 1:"sharing", 2:"lexicase", 3:"ecoea"}
 problem_map = {0:"nk", 3:"sorting", 4:"logic", 1:"programsynthesis", 2:"realvalue"}
 
-reps = 30
+reps = 10
 executable = "/mnt/scratch/dolsonem/ecology_in_EC_parameter_sweep/ecology_parameter_sweep"
 if args.local:
     executable = "../../../../ecology_parameter_sweep"

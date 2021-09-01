@@ -21,8 +21,8 @@ library(dplyr)
 
 
 ```{r }
-nodes <- read_csv("~/repos/ecology_in_EC_parameter_sweep/interaction_network_nodes.csv")# %>% filter(update < 1000)
-edges <- read_csv("~/repos/ecology_in_EC_parameter_sweep/interaction_network_edges.csv")# %>% filter(update < 1000)
+nodes <- read_csv("~/repos/ecology_in_EC_parameter_sweep/interaction_network_nodes.csv") #%>% filter(update < 1000)
+edges <- read_csv("~/repos/ecology_in_EC_parameter_sweep/interaction_network_edges.csv") #%>% filter(update < 1000)
 g <- tbl_graph(nodes=nodes, edges=edges)
 
 layout_g <- tbl_graph(nodes=nodes %>% group_by(name)  %>% select(-c(update, fitness, population)) %>% summarise(name=first(name)), edges = edges %>% group_by(to,from)  %>% select(-c(update, weight)) %>% summarise(to=first(to), from=first(from)))
