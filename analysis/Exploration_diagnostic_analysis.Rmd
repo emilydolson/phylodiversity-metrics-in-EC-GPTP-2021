@@ -28,13 +28,13 @@ library(rstatix)
 library(ggsignif)      # For adding pairwise significance to plots
 library(Hmisc)         # For bootstrapping condifence internvals
 library(kableExtra)    # For displaying nice tables
-#source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R") # For raincloud plots
-source("~/Downloads/geom_flat_violin.R")
+source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R") # For raincloud plots
 library(readr)        # For reading in data
 library(stringr)      # For manipulating string data
 library(ggpubr)       # For displaying correlation statistics on plots
 library(infotheo)     # For causality analysis
 library(scales)       # For displaying scales nicely in facetted plots
+library(osfr)         # For downloading the data for this project
 ```
 
 These analyses were conducted in the following computing environment:
@@ -71,10 +71,8 @@ theme_set(theme_cowplot())
 
 ```{r, data_import, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy = FALSE}
 # Read in data
-
-#data_loc <- "../high_n_timeseries.csv"
-#data_loc <- "~/repos/GPTP-2021-exploration-diagnostic-phylodiversity/high_n_timeseries.csv"
-data_loc <- "../long_timeseries.csv"
+osf_retrieve_file("esm4r") %>% osf_download(conflicts = "skip")  # Download data from osf
+data_loc <- "final_exploration_diagnostic_data.csv"
 
 data <- read_csv(data_loc, na=c("NONE", "NA", ""))
 

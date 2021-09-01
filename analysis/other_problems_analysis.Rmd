@@ -9,13 +9,13 @@ output:
 
 # Setup
 
-```{r, setupknitr, include=FALSE}
+```{r, complex_landscape_setupknitr, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(cache = TRUE, warning = FALSE, 
                       message = FALSE)
 ```
 
-```{r, dependencies, message=FALSE, cache=FALSE, warning=FALSE}
+```{r, complex_landscape_dependencies, message=FALSE, cache=FALSE, warning=FALSE}
 library(ggplot2)
 library(tidyverse)
 library(knitr)
@@ -26,21 +26,21 @@ library(rstatix)
 library(ggsignif)
 library(Hmisc)
 library(kableExtra)
-#source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
-source("~/Downloads/geom_flat_violin.R")
+source("https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R")
 library(readr)
 library(stringr)
 library(ggpubr)
 library(infotheo)
+library(osfr)
 ```
 
 These analyses were conducted in the following computing environment:
 
-```{r, version_info}
+```{r, complex_landscape_version_info}
 print(version)
 ```
 
-```{r, settings, cache=FALSE}
+```{r, complex_landscape_settings, cache=FALSE}
 
 # Labeler for stats annotations
 p_label <- function(p_value) {
@@ -60,10 +60,9 @@ alpha <- 0.05
 theme_set(theme_cowplot())
 ```
 
-```{r, data_import, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy = FALSE}
-#data_loc <- "../high_n_timeseries.csv"
-#data_loc <- "~/repos/GPTP-2021-exploration-diagnostic-phylodiversity/high_n_timeseries.csv"
-data_loc <- "~/repos/ecology_in_EC_parameter_sweep/all_data.csv"
+```{r, complex_landscape_data_import, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy = FALSE}
+osf_retrieve_file("p79hx") %>% osf_download(conflicts = "skip")  # Download data from osf
+data_loc <- "complex_fitness_landscapes.csv"
 
 data <- read_csv(data_loc, na=c("NONE", "NA", ""))
 
@@ -97,7 +96,7 @@ final_data <- filter(data, generation==max(data$generation))
 
 ## Over time
 
-```{r, performance_over_time, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
+```{r, complex_landscape_performance_over_time, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
     data,
     aes(
@@ -130,7 +129,7 @@ ggplot(
 ## Final 
 
 
-```{r, final_performance_stats, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_final_performance_stats, message=FALSE, cache=TRUE, warning=FALSE}
 # Compute manual labels for geom_signif
 stat.test <- final_data %>%
   wilcox_test(max_performance ~ selection_name) %>%
@@ -142,7 +141,7 @@ stat.test <- final_data %>%
 stat.test$label <- mapply(p_label,stat.test$p.adj)
 ```
 
-```{r, final_performance_plot, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_final_performance_plot, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     final_data,
     aes(
@@ -168,7 +167,7 @@ ggplot(
   facet_wrap(~problem_name, scales="free")
 ```
 
-```{r, performance_stats_report, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_performance_stats_report, message=FALSE, cache=TRUE, warning=FALSE}
 stat.test %>%
   kbl() %>%
   kable_styling(
@@ -188,7 +187,7 @@ stat.test %>%
 
 ## Over time
 
-```{r, phylogeny_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
+```{r, complex_landscape_phylogeny_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
     data,
     aes(
@@ -220,7 +219,7 @@ ggplot(
 
 ## Final
 
-```{r, final_phylogeny_stats, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_final_phylogeny_stats, message=FALSE, cache=TRUE, warning=FALSE}
 # Compute manual labels for geom_signif
 stat.test <- final_data %>%
   wilcox_test(mean_phenotype_pairwise_distance ~ selection_name) %>%
@@ -232,7 +231,7 @@ stat.test <- final_data %>%
 stat.test$label <- mapply(p_label,stat.test$p.adj)
 ```
 
-```{r, final_phylogeny_plot, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_final_phylogeny_plot, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     final_data,
     aes(
@@ -259,7 +258,7 @@ ggplot(
 
 ```
 
-```{r, phylogeny_stats_report, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_phylogeny_stats_report, message=FALSE, cache=TRUE, warning=FALSE}
 stat.test %>%
   kbl() %>%
   kable_styling(
@@ -279,7 +278,7 @@ stat.test %>%
 
 ## Over time
 
-```{r, phenotypic_diversity_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
+```{r, complex_landscape_phenotypic_diversity_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
     data,
     aes(
@@ -312,7 +311,7 @@ ggplot(
 
 ## Final
 
-```{r, final_phenotypic_stats, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_final_phenotypic_stats, message=FALSE, cache=TRUE, warning=FALSE}
 # Compute manual labels for geom_signif
 stat.test <- final_data %>%
   wilcox_test(phenotype_num_taxa ~ selection_name) %>%
@@ -324,7 +323,7 @@ stat.test <- final_data %>%
 stat.test$label <- mapply(p_label,stat.test$p.adj)
 ```
 
-```{r, final_phenotypic_plot, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_final_phenotypic_plot, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     final_data,
     aes(
@@ -351,7 +350,7 @@ ggplot(
 
 ```
 
-```{r, phenotypic_stats_report, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_phenotypic_stats_report, message=FALSE, cache=TRUE, warning=FALSE}
 stat.test %>%
   kbl() %>%
   kable_styling(
@@ -367,7 +366,7 @@ stat.test %>%
 
 # Relationship between phenotypic and phylogenetic diversity
 
-```{r, phen_vs_phylo, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_phen_vs_phylo, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     final_data,
     aes(
@@ -404,7 +403,7 @@ ggplot(
 
 ## Earlier in run
 
-```{r, phylogeny_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_phylogeny_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     data %>% filter(generation==500),
     aes(
@@ -435,7 +434,7 @@ ggplot(
 
 ```
 
-```{r, richness_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_richness_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     data %>% filter(generation==500),
     aes(
@@ -465,7 +464,7 @@ ggplot(
  
 ```
 
-```{r, phylogeny_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_phylogeny_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
 phylogney_vs_performance <- ggplot(
     data %>% filter(generation==1000),
     aes(
@@ -497,7 +496,7 @@ phylogney_vs_performance
 
 ```
 
-```{r, richness_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_richness_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     data %>% filter(generation==1000),
     aes(
@@ -530,7 +529,7 @@ ggplot(
 
 ## End of run
 
-```{r, phylogeny_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_phylogeny_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     final_data,
     aes(
@@ -561,7 +560,7 @@ ggplot(
 
 ```
 
-```{r, richness_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_richness_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     final_data,
     aes(
@@ -596,7 +595,7 @@ ggplot(
 # Causality analysis
 
 
-```{r, information_theory, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_information_theory, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(max_phenotype_pairwise_distance, 1)), discretize(lag(max_performance, 1))),
@@ -628,7 +627,7 @@ ggplot(
 
 ```
 
-```{r, information_theory_mpd, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_information_theory_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 1)), discretize(lag(max_performance, 1))),
@@ -660,7 +659,7 @@ ggplot(
 
 ```
 
-```{r, information_theory_mean_evolutionary_distinctivess, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_information_theory_mean_evolutionary_distinctivess, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(max_performance, 1))),
@@ -694,7 +693,7 @@ ggplot(
 
 
 
-```{r, information_theory_variance_evolutionary_distinctivess, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_information_theory_variance_evolutionary_distinctivess, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(variance_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(max_performance, 1))),
@@ -727,7 +726,7 @@ ggplot(
 ```
 
 
-```{r, information_theory_pheno_phylo, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_information_theory_pheno_phylo, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   phen_phylo_10 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_pairwise_distance, 1)), discretize(lag(phenotype_num_taxa, 1))),
@@ -759,7 +758,7 @@ ggplot(
 
 ```
 
-```{r, information_theory_pheno_phylo_evolutionary_distinctiveness, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, complex_landscape_information_theory_pheno_phylo_evolutionary_distinctiveness, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   phen_phylo_10 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(phenotype_num_taxa, 1))),
@@ -789,59 +788,4 @@ ggplot(
   scale_color_discrete("") + 
   theme(legend.position = "bottom")
 
-```
-
-# Manuscript figures
-
-```{r, manuscript_figures, message=FALSE, cache=TRUE, warning=FALSE}
-# legend <- cowplot::get_legend(
-#     elite_ave_performance_fig +
-#       guides(
-#         color=guide_legend(nrow=1),
-#         fill=guide_legend(nrow=1)
-#       ) +
-#       theme(
-#         legend.position = "bottom",
-#         legend.box="horizontal",
-#         legend.justification="center"
-#       )
-#   )
-# 
-# grid <- plot_grid(
-#   elite_ave_performance_fig +
-#     ggtitle("Performance over time") +
-#     labs(subtitle="") +
-#     theme(legend.position="none"),
-#   elite_final_performance_fig +
-#     ggtitle("Final performance") +
-#     theme(),
-#   unique_start_position_coverage_fig +
-#     ggtitle("Activation position coverage over time") +
-#     labs(subtitle="") +
-#     theme(legend.position="none"),
-#   unique_start_positions_coverage_final_fig +
-#     ggtitle("Final activation position coverage") +
-#     theme(),
-#   nrow=2,
-#   ncol=2,
-#   rel_widths=c(3,2),
-#   labels="auto"
-# )
-# 
-# grid <- plot_grid(
-#   grid,
-#   legend,
-#   nrow=2,
-#   ncol=1,
-#   rel_heights=c(1, 0.1)
-# )
-# 
-# save_plot(
-#   "tournament-vs-lexicase-panel.pdf",
-#   grid,
-#   base_width=12,
-#   base_height=8
-# )
-# 
-# grid
 ```
