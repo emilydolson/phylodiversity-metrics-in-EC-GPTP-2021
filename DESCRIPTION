@@ -1,4 +1,12 @@
 Package: gptp-2021-phylodiversity-analysis
+Title: GPTP 2021 Phylodiversity Analysis
+Version: 0.1
+Authors@R: person("Emily", "Dolson", email = "emilydolson@gmail.com",
+                  role = c("aut", "cre"))
+Description: Just some Rmarkdown files for analyzing data from this project
+Depends: R (>= 3.1.0)
+License: MIT
+LazyData: true
 Imports:
     ggplot2,
     rmarkdown,
