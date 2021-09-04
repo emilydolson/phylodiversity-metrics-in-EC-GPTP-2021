@@ -1,0 +1,20 @@
+Package: gptp-2021-phylodiversity-analysis
+Imports:
+    ggplot2,
+    rmarkdown,
+    bookdown,
+    tidyverse,
+    knitr,
+    cowplot,
+    viridis,
+    RColorBrewer,
+    rstatix,
+    ggsignif,
+    Hmisc,
+    kableExtra,
+    readr,
+    stringr,
+    ggpubr,
+    infotheo,
+    scales,
+    osfr

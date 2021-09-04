@@ -27,26 +27,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
       - uses: r-lib/actions/setup-pandoc@v1
       - uses: r-lib/actions/setup-r-dependencies@v1
-        with:
-          extra-packages: |
-            ggplot2
-            rmarkdown
-            bookdown
-            tidyverse
-            knitr
-            cowplot
-            viridis
-            RColorBrewer
-            rstatix
-            ggsignif
-            Hmisc
-            kableExtra
-            readr
-            stringr
-            ggpubr
-            infotheo
-            scales
-            osfr
+
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("index.Rmd")'
       - uses: actions/upload-artifact@v1
