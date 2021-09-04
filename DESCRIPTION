@@ -1,4 +1,4 @@
-Package: gptp-2021-phylodiversity-analysis
+Package: gptpphylodiversityanalysis
 Title: GPTP 2021 Phylodiversity Analysis
 Version: 0.1
 Authors@R: person("Emily", "Dolson", email = "emilydolson@gmail.com",
