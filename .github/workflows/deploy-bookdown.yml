@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
