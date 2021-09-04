@@ -1,5 +1,5 @@
 ---
-title: "An automatically deploying ebook"
+title: "Supplemental info about phylodiversity in evolutionary computation"
 author: "Jose Guadalupe Hernandez, Alexander Lalejini, Emily Dolson"
 date: "`r Sys.Date()`"
 output: bookdown::gitbook
