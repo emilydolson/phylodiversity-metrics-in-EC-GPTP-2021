@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Other fitness landscapes | Supplemental info about phylodiversity in evolutionary computation</title>
+  <meta name="description" content="Supplemental info for ‘What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?’" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Other fitness landscapes | Supplemental info about phylodiversity in evolutionary computation" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Supplemental info for ‘What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?’" />
+  <meta name="github-repo" content="emilydolson/phylodiversity-metrics-in-EC-GPTP-2021" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Other fitness landscapes | Supplemental info about phylodiversity in evolutionary computation" />
+  
+  <meta name="twitter:description" content="Supplemental info for ‘What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?’" />
+  
+
+<meta name="author" content="Jose Guadalupe Hernandez, Alexander Lalejini, Emily Dolson" />
+
+
+<meta name="date" content="2021-09-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="exploration-diagnostic.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+<script src="libs/bsTable-3.3.7/bootstrapTable.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Supplemental info</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html"><i class="fa fa-check"></i><b>2</b> Exploration Diagnostic</a><ul>
+<li class="chapter" data-level="2.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#setup"><i class="fa fa-check"></i><b>2.1</b> Setup</a></li>
+<li class="chapter" data-level="2.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#performance"><i class="fa fa-check"></i><b>2.2</b> Performance</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#over-time"><i class="fa fa-check"></i><b>2.2.1</b> Over time</a><ul>
+<li class="chapter" data-level="2.2.1.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#trait-performance"><i class="fa fa-check"></i><b>2.2.1.1</b> Trait performance</a></li>
+<li class="chapter" data-level="2.2.1.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#activation-position-coverage"><i class="fa fa-check"></i><b>2.2.1.2</b> Activation position coverage</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#final"><i class="fa fa-check"></i><b>2.2.2</b> Final</a><ul>
+<li class="chapter" data-level="2.2.2.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#trait-performance-1"><i class="fa fa-check"></i><b>2.2.2.1</b> Trait performance</a></li>
+<li class="chapter" data-level="2.2.2.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#final-activation-position-coverage"><i class="fa fa-check"></i><b>2.2.2.2</b> Final activation position Coverage</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#phylogenetic-diversity"><i class="fa fa-check"></i><b>2.3</b> Phylogenetic diversity</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#over-time-1"><i class="fa fa-check"></i><b>2.3.1</b> Over time</a></li>
+<li class="chapter" data-level="2.3.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#final-1"><i class="fa fa-check"></i><b>2.3.2</b> Final</a><ul>
+<li class="chapter" data-level="2.3.2.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-pairwise-distance"><i class="fa fa-check"></i><b>2.3.2.1</b> Mean pairwise distance</a></li>
+<li class="chapter" data-level="2.3.2.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-evolutionary-distinctiveness"><i class="fa fa-check"></i><b>2.3.2.2</b> Mean evolutionary distinctiveness</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#phenotypic-diversity"><i class="fa fa-check"></i><b>2.4</b> Phenotypic diversity</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#relationship-between-different-types-of-phenotypic-diversity"><i class="fa fa-check"></i><b>2.4.1</b> Relationship between different types of phenotypic diversity</a></li>
+<li class="chapter" data-level="2.4.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#over-time-2"><i class="fa fa-check"></i><b>2.4.2</b> Over time</a></li>
+<li class="chapter" data-level="2.4.3" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#final-2"><i class="fa fa-check"></i><b>2.4.3</b> Final</a><ul>
+<li class="chapter" data-level="2.4.3.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#richness"><i class="fa fa-check"></i><b>2.4.3.1</b> Richness</a></li>
+<li class="chapter" data-level="2.4.3.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#shannon-diversity"><i class="fa fa-check"></i><b>2.4.3.2</b> Shannon diversity</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#relationship-between-phenotypic-and-phylogenetic-diversity"><i class="fa fa-check"></i><b>2.5</b> Relationship between phenotypic and phylogenetic diversity</a></li>
+<li class="chapter" data-level="2.6" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#relationship-between-diversity-and-success"><i class="fa fa-check"></i><b>2.6</b> Relationship between diversity and success</a><ul>
+<li class="chapter" data-level="2.6.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#earlier-in-run"><i class="fa fa-check"></i><b>2.6.1</b> Earlier in run</a></li>
+<li class="chapter" data-level="2.6.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#end-of-run"><i class="fa fa-check"></i><b>2.6.2</b> End of run</a></li>
+</ul></li>
+<li class="chapter" data-level="2.7" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#causality-analysis"><i class="fa fa-check"></i><b>2.7</b> Causality analysis</a><ul>
+<li class="chapter" data-level="2.7.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#transfer-entropy-from-diversity-to-fitness"><i class="fa fa-check"></i><b>2.7.1</b> Transfer entropy from diversity to fitness</a><ul>
+<li class="chapter" data-level="2.7.1.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#max-pairwise-distance-vs.phenotypic-richness"><i class="fa fa-check"></i><b>2.7.1.1</b> Max pairwise distance vs. phenotypic richness</a></li>
+<li class="chapter" data-level="2.7.1.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-pairwise-distance-vs.phenotypic-richness"><i class="fa fa-check"></i><b>2.7.1.2</b> Mean pairwise distance vs. phenotypic richness</a></li>
+<li class="chapter" data-level="2.7.1.3" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-pairwise-distance-vs.shannon-entropy"><i class="fa fa-check"></i><b>2.7.1.3</b> Mean pairwise distance vs. shannon entropy</a></li>
+<li class="chapter" data-level="2.7.1.4" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-evolutionary-distinctiveness-vs.phenotypic-richness"><i class="fa fa-check"></i><b>2.7.1.4</b> Mean evolutionary distinctiveness vs. phenotypic richness</a></li>
+<li class="chapter" data-level="2.7.1.5" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-evolutionary-distinctiveness-vs.shannon-entropy"><i class="fa fa-check"></i><b>2.7.1.5</b> Mean evolutionary distinctiveness vs. shannon entropy</a></li>
+</ul></li>
+<li class="chapter" data-level="2.7.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#transfer-entropy-between-types-of-diversity"><i class="fa fa-check"></i><b>2.7.2</b> Transfer entropy between types of diversity</a><ul>
+<li class="chapter" data-level="2.7.2.1" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#max-pairwise-distance-and-phenotypic-richness"><i class="fa fa-check"></i><b>2.7.2.1</b> Max pairwise distance and phenotypic richness</a></li>
+<li class="chapter" data-level="2.7.2.2" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-pairwise-distance-and-phenotypic-richness"><i class="fa fa-check"></i><b>2.7.2.2</b> Mean pairwise distance and phenotypic richness</a></li>
+<li class="chapter" data-level="2.7.2.3" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-pairwise-distance-and-shannon-diversity"><i class="fa fa-check"></i><b>2.7.2.3</b> Mean pairwise distance and shannon diversity</a></li>
+<li class="chapter" data-level="2.7.2.4" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-evolutionary-distinctiveness-and-phenotypic-richness"><i class="fa fa-check"></i><b>2.7.2.4</b> Mean evolutionary distinctiveness and phenotypic richness</a></li>
+<li class="chapter" data-level="2.7.2.5" data-path="exploration-diagnostic.html"><a href="exploration-diagnostic.html#mean-evolutionary-distinctiveness-and-shannon-diversity"><i class="fa fa-check"></i><b>2.7.2.5</b> Mean evolutionary distinctiveness and shannon diversity</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html"><i class="fa fa-check"></i><b>3</b> Other fitness landscapes</a><ul>
+<li class="chapter" data-level="3.1" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#setup-1"><i class="fa fa-check"></i><b>3.1</b> Setup</a></li>
+<li class="chapter" data-level="3.2" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#performance-1"><i class="fa fa-check"></i><b>3.2</b> Performance</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#over-time-3"><i class="fa fa-check"></i><b>3.2.1</b> Over time</a></li>
+<li class="chapter" data-level="3.2.2" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#final-3"><i class="fa fa-check"></i><b>3.2.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#phylogenetic-diversity-1"><i class="fa fa-check"></i><b>3.3</b> Phylogenetic diversity</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#over-time-4"><i class="fa fa-check"></i><b>3.3.1</b> Over time</a></li>
+<li class="chapter" data-level="3.3.2" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#final-4"><i class="fa fa-check"></i><b>3.3.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#phenotypic-diversity-1"><i class="fa fa-check"></i><b>3.4</b> Phenotypic diversity</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#over-time-5"><i class="fa fa-check"></i><b>3.4.1</b> Over time</a></li>
+<li class="chapter" data-level="3.4.2" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#final-5"><i class="fa fa-check"></i><b>3.4.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#relationship-between-phenotypic-and-phylogenetic-diversity-1"><i class="fa fa-check"></i><b>3.5</b> Relationship between phenotypic and phylogenetic diversity</a></li>
+<li class="chapter" data-level="3.6" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#relationship-between-diversity-and-success-1"><i class="fa fa-check"></i><b>3.6</b> Relationship between diversity and success</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#earlier-in-run-1"><i class="fa fa-check"></i><b>3.6.1</b> Earlier in run</a></li>
+<li class="chapter" data-level="3.6.2" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#end-of-run-1"><i class="fa fa-check"></i><b>3.6.2</b> End of run</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="other-fitness-landscapes.html"><a href="other-fitness-landscapes.html#causality-analysis-1"><i class="fa fa-check"></i><b>3.7</b> Causality analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with ❤ and bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Supplemental info about phylodiversity in evolutionary computation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="other-fitness-landscapes" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Other fitness landscapes</h1>
+<div id="setup-1" class="section level2">
+<h2><span class="header-section-number">3.1</span> Setup</h2>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb49-2" data-line-number="2"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb49-3" data-line-number="3"><span class="kw">library</span>(knitr)</a>
+<a class="sourceLine" id="cb49-4" data-line-number="4"><span class="kw">library</span>(cowplot)</a>
+<a class="sourceLine" id="cb49-5" data-line-number="5"><span class="kw">library</span>(viridis)</a>
+<a class="sourceLine" id="cb49-6" data-line-number="6"><span class="kw">library</span>(RColorBrewer)</a>
+<a class="sourceLine" id="cb49-7" data-line-number="7"><span class="kw">library</span>(rstatix)</a>
+<a class="sourceLine" id="cb49-8" data-line-number="8"><span class="kw">library</span>(ggsignif)</a>
+<a class="sourceLine" id="cb49-9" data-line-number="9"><span class="kw">library</span>(Hmisc)</a>
+<a class="sourceLine" id="cb49-10" data-line-number="10"><span class="kw">library</span>(kableExtra)</a>
+<a class="sourceLine" id="cb49-11" data-line-number="11"><span class="kw">source</span>(<span class="st">&quot;https://gist.githubusercontent.com/benmarwick/2a1bb0133ff568cbe28d/raw/fb53bd97121f7f9ce947837ef1a4c65a73bffb3f/geom_flat_violin.R&quot;</span>)</a>
+<a class="sourceLine" id="cb49-12" data-line-number="12"><span class="kw">library</span>(readr)</a>
+<a class="sourceLine" id="cb49-13" data-line-number="13"><span class="kw">library</span>(stringr)</a>
+<a class="sourceLine" id="cb49-14" data-line-number="14"><span class="kw">library</span>(ggpubr)</a>
+<a class="sourceLine" id="cb49-15" data-line-number="15"><span class="kw">library</span>(infotheo)</a>
+<a class="sourceLine" id="cb49-16" data-line-number="16"><span class="kw">library</span>(osfr)</a></code></pre></div>
+<p>These analyses were conducted in the following computing environment:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw">print</span>(version)</a></code></pre></div>
+<pre><code>##                _                           
+## platform       x86_64-pc-linux-gnu         
+## arch           x86_64                      
+## os             linux-gnu                   
+## system         x86_64, linux-gnu           
+## status                                     
+## major          4                           
+## minor          0.4                         
+## year           2021                        
+## month          02                          
+## day            15                          
+## svn rev        80002                       
+## language       R                           
+## version.string R version 4.0.4 (2021-02-15)
+## nickname       Lost Library Book</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="co"># Labeler for stats annotations</span></a>
+<a class="sourceLine" id="cb52-2" data-line-number="2">p_label &lt;-<span class="st"> </span><span class="cf">function</span>(p_value) {</a>
+<a class="sourceLine" id="cb52-3" data-line-number="3">  threshold =<span class="st"> </span><span class="fl">0.0001</span></a>
+<a class="sourceLine" id="cb52-4" data-line-number="4">  <span class="cf">if</span> (p_value <span class="op">&lt;</span><span class="st"> </span>threshold) {</a>
+<a class="sourceLine" id="cb52-5" data-line-number="5">    <span class="kw">return</span>(<span class="kw">paste0</span>(<span class="st">&quot;p &lt; &quot;</span>, threshold))</a>
+<a class="sourceLine" id="cb52-6" data-line-number="6">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb52-7" data-line-number="7">    <span class="kw">return</span>(<span class="kw">paste0</span>(<span class="st">&quot;p = &quot;</span>, p_value))</a>
+<a class="sourceLine" id="cb52-8" data-line-number="8">  }</a>
+<a class="sourceLine" id="cb52-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb52-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb52-11" data-line-number="11"><span class="co"># Significance threshold</span></a>
+<a class="sourceLine" id="cb52-12" data-line-number="12">alpha &lt;-<span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb52-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb52-14" data-line-number="14"><span class="co">####### misc #######</span></a>
+<a class="sourceLine" id="cb52-15" data-line-number="15"><span class="co"># Configure our default graphing theme</span></a>
+<a class="sourceLine" id="cb52-16" data-line-number="16"><span class="kw">theme_set</span>(<span class="kw">theme_cowplot</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw">osf_retrieve_file</span>(<span class="st">&quot;p79hx&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">osf_download</span>(<span class="dt">conflicts =</span> <span class="st">&quot;skip&quot;</span>)  <span class="co"># Download data from osf</span></a></code></pre></div>
+<pre><code>## # A tibble: 1 x 4
+##   name                   id                local_path               meta        
+##   &lt;chr&gt;                  &lt;chr&gt;             &lt;chr&gt;                    &lt;list&gt;      
+## 1 complex_fitness_lands… 612fe4d84e5ee501… ./complex_fitness_lands… &lt;named list…</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1">data_loc &lt;-<span class="st"> &quot;complex_fitness_landscapes.csv&quot;</span></a>
+<a class="sourceLine" id="cb55-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb55-3" data-line-number="3">data &lt;-<span class="st"> </span><span class="kw">read_csv</span>(data_loc, <span class="dt">na=</span><span class="kw">c</span>(<span class="st">&quot;NONE&quot;</span>, <span class="st">&quot;NA&quot;</span>, <span class="st">&quot;&quot;</span>))</a>
+<a class="sourceLine" id="cb55-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb55-5" data-line-number="5">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb55-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(N<span class="op">==</span><span class="dv">20</span>, generation <span class="op">%%</span><span class="dv">10</span> <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb55-7" data-line-number="7"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb55-8" data-line-number="8">  <span class="dt">selection_name =</span> <span class="kw">as.factor</span>(<span class="kw">case_when</span>(</a>
+<a class="sourceLine" id="cb55-9" data-line-number="9">    SELECTION <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">~</span><span class="st"> &quot;Tournament&quot;</span>,</a>
+<a class="sourceLine" id="cb55-10" data-line-number="10">    SELECTION <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;Fitness sharing&quot;</span>,</a>
+<a class="sourceLine" id="cb55-11" data-line-number="11">    SELECTION <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;Lexicase&quot;</span>,</a>
+<a class="sourceLine" id="cb55-12" data-line-number="12">    SELECTION <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> &quot;Eco-EA&quot;</span>,</a>
+<a class="sourceLine" id="cb55-13" data-line-number="13">    SELECTION <span class="op">==</span><span class="st"> </span><span class="dv">4</span> <span class="op">~</span><span class="st"> &quot;Random&quot;</span>,</a>
+<a class="sourceLine" id="cb55-14" data-line-number="14">  )), </a>
+<a class="sourceLine" id="cb55-15" data-line-number="15">  <span class="dt">problem_name =</span> <span class="kw">as.factor</span>(<span class="kw">case_when</span>(</a>
+<a class="sourceLine" id="cb55-16" data-line-number="16">    PROBLEM <span class="op">==</span><span class="st"> </span><span class="dv">0</span> <span class="op">~</span><span class="st"> &quot;NK Landscape&quot;</span>,</a>
+<a class="sourceLine" id="cb55-17" data-line-number="17">    PROBLEM <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">~</span><span class="st"> &quot;Count Odds&quot;</span>,</a>
+<a class="sourceLine" id="cb55-18" data-line-number="18">    PROBLEM <span class="op">==</span><span class="st"> </span><span class="dv">2</span> <span class="op">~</span><span class="st"> &quot;Real-valued optimization&quot;</span>,</a>
+<a class="sourceLine" id="cb55-19" data-line-number="19">    PROBLEM <span class="op">==</span><span class="st"> </span><span class="dv">3</span> <span class="op">~</span><span class="st"> &quot;Sorting network&quot;</span>,</a>
+<a class="sourceLine" id="cb55-20" data-line-number="20">    PROBLEM <span class="op">==</span><span class="st"> </span><span class="dv">4</span> <span class="op">~</span><span class="st"> &quot;Logic-9&quot;</span>    </a>
+<a class="sourceLine" id="cb55-21" data-line-number="21">  ))</a>
+<a class="sourceLine" id="cb55-22" data-line-number="22">)</a>
+<a class="sourceLine" id="cb55-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb55-24" data-line-number="24">final_data &lt;-<span class="st"> </span><span class="kw">filter</span>(data, generation<span class="op">==</span><span class="kw">max</span>(data<span class="op">$</span>generation))</a></code></pre></div>
+</div>
+<div id="performance-1" class="section level2">
+<h2><span class="header-section-number">3.2</span> Performance</h2>
+<div id="over-time-3" class="section level3">
+<h3><span class="header-section-number">3.2.1</span> Over time</h3>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb56-2" data-line-number="2">    data,</a>
+<a class="sourceLine" id="cb56-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb56-4" data-line-number="4">      <span class="dt">x=</span>generation,</a>
+<a class="sourceLine" id="cb56-5" data-line-number="5">      <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb56-6" data-line-number="6">      <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb56-7" data-line-number="7">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb56-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb56-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-10" data-line-number="10"><span class="st">  </span><span class="kw">stat_summary</span>(<span class="dt">geom=</span><span class="st">&quot;line&quot;</span>, <span class="dt">fun=</span>mean) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-11" data-line-number="11"><span class="st">  </span><span class="kw">stat_summary</span>(</a>
+<a class="sourceLine" id="cb56-12" data-line-number="12">    <span class="dt">geom=</span><span class="st">&quot;ribbon&quot;</span>,</a>
+<a class="sourceLine" id="cb56-13" data-line-number="13">    <span class="dt">fun.data=</span><span class="st">&quot;mean_cl_boot&quot;</span>,</a>
+<a class="sourceLine" id="cb56-14" data-line-number="14">    <span class="dt">fun.args=</span><span class="kw">list</span>(<span class="dt">conf.int=</span><span class="fl">0.95</span>),</a>
+<a class="sourceLine" id="cb56-15" data-line-number="15">    <span class="dt">alpha=</span><span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb56-16" data-line-number="16">    <span class="dt">linetype=</span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb56-17" data-line-number="17">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-18" data-line-number="18"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb56-19" data-line-number="19">    <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb56-20" data-line-number="20">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-21" data-line-number="21"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb56-22" data-line-number="22">    <span class="dt">name=</span><span class="st">&quot;Generation&quot;</span></a>
+<a class="sourceLine" id="cb56-23" data-line-number="23">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-24" data-line-number="24"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb56-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb56-26" data-line-number="26"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_performance_over_time-1.png" width="672" /></p>
+</div>
+<div id="final-3" class="section level3">
+<h3><span class="header-section-number">3.2.2</span> Final</h3>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1"><span class="co"># Compute manual labels for geom_signif</span></a>
+<a class="sourceLine" id="cb57-2" data-line-number="2">stat.test &lt;-<span class="st"> </span>final_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb57-3" data-line-number="3"><span class="st">  </span><span class="kw">wilcox_test</span>(max_performance <span class="op">~</span><span class="st"> </span>selection_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb57-4" data-line-number="4"><span class="st">  </span><span class="kw">adjust_pvalue</span>(<span class="dt">method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb57-5" data-line-number="5"><span class="st">  </span><span class="kw">add_significance</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb57-6" data-line-number="6"><span class="st">  </span><span class="kw">add_xy_position</span>(<span class="dt">x=</span><span class="st">&quot;selection_name&quot;</span>,<span class="dt">step.increase=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb57-7" data-line-number="7"><span class="co">#stat.test$manual_position &lt;- stat.test$y.position * .5</span></a>
+<a class="sourceLine" id="cb57-8" data-line-number="8"><span class="co">#stat.test$manual_position &lt;- c(110, 150, 170, 170, 130, 110)</span></a>
+<a class="sourceLine" id="cb57-9" data-line-number="9">stat.test<span class="op">$</span>label &lt;-<span class="st"> </span><span class="kw">mapply</span>(p_label,stat.test<span class="op">$</span>p.adj)</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb58-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb58-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb58-4" data-line-number="4">      <span class="dt">x=</span>selection_name,</a>
+<a class="sourceLine" id="cb58-5" data-line-number="5">      <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb58-6" data-line-number="6">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb58-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb58-8" data-line-number="8">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-10" data-line-number="10"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb58-11" data-line-number="11">    <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb58-12" data-line-number="12">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-13" data-line-number="13"><span class="st">  </span><span class="kw">scale_x_discrete</span>(</a>
+<a class="sourceLine" id="cb58-14" data-line-number="14">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb58-15" data-line-number="15">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-16" data-line-number="16"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(</a>
+<a class="sourceLine" id="cb58-17" data-line-number="17">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb58-18" data-line-number="18">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-19" data-line-number="19"><span class="st">  </span><span class="kw">scale_color_discrete</span>(</a>
+<a class="sourceLine" id="cb58-20" data-line-number="20">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb58-21" data-line-number="21">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb58-22" data-line-number="22"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-23" data-line-number="23"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_final_performance_plot-1.png" width="672" /></p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1">stat.test <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb59-2" data-line-number="2"><span class="st">  </span><span class="kw">kbl</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb59-3" data-line-number="3"><span class="st">  </span><span class="kw">kable_styling</span>(</a>
+<a class="sourceLine" id="cb59-4" data-line-number="4">    <span class="dt">bootstrap_options =</span> <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb59-5" data-line-number="5">      <span class="st">&quot;striped&quot;</span>,</a>
+<a class="sourceLine" id="cb59-6" data-line-number="6">      <span class="st">&quot;hover&quot;</span>,</a>
+<a class="sourceLine" id="cb59-7" data-line-number="7">      <span class="st">&quot;condensed&quot;</span>,</a>
+<a class="sourceLine" id="cb59-8" data-line-number="8">      <span class="st">&quot;responsive&quot;</span></a>
+<a class="sourceLine" id="cb59-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb59-10" data-line-number="10">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb59-11" data-line-number="11"><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width=</span><span class="st">&quot;600px&quot;</span>)</a></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:600px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+.y.
+</th>
+<th style="text-align:left;">
+group1
+</th>
+<th style="text-align:left;">
+group2
+</th>
+<th style="text-align:right;">
+n1
+</th>
+<th style="text-align:right;">
+n2
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+p.adj
+</th>
+<th style="text-align:left;">
+p.adj.signif
+</th>
+<th style="text-align:right;">
+y.position
+</th>
+<th style="text-align:left;">
+groups
+</th>
+<th style="text-align:right;">
+xmin
+</th>
+<th style="text-align:right;">
+xmax
+</th>
+<th style="text-align:left;">
+label
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+29310.5
+</td>
+<td style="text-align:right;">
+7.37e-01
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+125237.4
+</td>
+<td style="text-align:left;">
+Eco-EA , Fitness sharing
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+p = 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+23075.0
+</td>
+<td style="text-align:right;">
+1.46e-04
+</td>
+<td style="text-align:right;">
+0.001460
+</td>
+<td style="text-align:left;">
+**
+</td>
+<td style="text-align:right;">
+178661.5
+</td>
+<td style="text-align:left;">
+Eco-EA , Lexicase
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p = 0.00146
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+39696.5
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+232085.6
+</td>
+<td style="text-align:left;">
+Eco-EA, Random
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+29346.0
+</td>
+<td style="text-align:right;">
+7.18e-01
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+285509.7
+</td>
+<td style="text-align:left;">
+Eco-EA , Tournament
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+22328.5
+</td>
+<td style="text-align:right;">
+2.01e-05
+</td>
+<td style="text-align:right;">
+0.000201
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+338933.8
+</td>
+<td style="text-align:left;">
+Fitness sharing, Lexicase
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p = 0.000201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+41293.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+392358.0
+</td>
+<td style="text-align:left;">
+Fitness sharing, Random
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+27500.5
+</td>
+<td style="text-align:right;">
+3.92e-01
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+445782.1
+</td>
+<td style="text-align:left;">
+Fitness sharing, Tournament
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+44132.5
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+499206.2
+</td>
+<td style="text-align:left;">
+Lexicase, Random
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+34831.5
+</td>
+<td style="text-align:right;">
+6.61e-05
+</td>
+<td style="text-align:right;">
+0.000661
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+552630.3
+</td>
+<td style="text-align:left;">
+Lexicase , Tournament
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 0.000661
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+max_performance
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+18254.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+606054.4
+</td>
+<td style="text-align:left;">
+Random , Tournament
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="phylogenetic-diversity-1" class="section level2">
+<h2><span class="header-section-number">3.3</span> Phylogenetic diversity</h2>
+<div id="over-time-4" class="section level3">
+<h3><span class="header-section-number">3.3.1</span> Over time</h3>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb60-2" data-line-number="2">    data,</a>
+<a class="sourceLine" id="cb60-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb60-4" data-line-number="4">      <span class="dt">x=</span>generation,</a>
+<a class="sourceLine" id="cb60-5" data-line-number="5">      <span class="dt">y=</span>mean_phenotype_pairwise_distance,</a>
+<a class="sourceLine" id="cb60-6" data-line-number="6">      <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb60-7" data-line-number="7">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb60-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb60-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-10" data-line-number="10"><span class="st">  </span><span class="kw">stat_summary</span>(<span class="dt">geom=</span><span class="st">&quot;line&quot;</span>, <span class="dt">fun=</span>mean) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-11" data-line-number="11"><span class="st">  </span><span class="kw">stat_summary</span>(</a>
+<a class="sourceLine" id="cb60-12" data-line-number="12">    <span class="dt">geom=</span><span class="st">&quot;ribbon&quot;</span>,</a>
+<a class="sourceLine" id="cb60-13" data-line-number="13">    <span class="dt">fun.data=</span><span class="st">&quot;mean_cl_boot&quot;</span>,</a>
+<a class="sourceLine" id="cb60-14" data-line-number="14">    <span class="dt">fun.args=</span><span class="kw">list</span>(<span class="dt">conf.int=</span><span class="fl">0.95</span>),</a>
+<a class="sourceLine" id="cb60-15" data-line-number="15">    <span class="dt">alpha=</span><span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb60-16" data-line-number="16">    <span class="dt">linetype=</span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb60-17" data-line-number="17">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-18" data-line-number="18"><span class="st">  </span><span class="kw">scale_y_log10</span>(</a>
+<a class="sourceLine" id="cb60-19" data-line-number="19">    <span class="dt">name=</span><span class="st">&quot;Mean pairwise distance&quot;</span></a>
+<a class="sourceLine" id="cb60-20" data-line-number="20">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-21" data-line-number="21"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb60-22" data-line-number="22">    <span class="dt">name=</span><span class="st">&quot;Generation&quot;</span></a>
+<a class="sourceLine" id="cb60-23" data-line-number="23">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-24" data-line-number="24"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb60-26" data-line-number="26"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name, <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_phylogeny_over_time_plot-1.png" width="672" /></p>
+</div>
+<div id="final-4" class="section level3">
+<h3><span class="header-section-number">3.3.2</span> Final</h3>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1"><span class="co"># Compute manual labels for geom_signif</span></a>
+<a class="sourceLine" id="cb61-2" data-line-number="2">stat.test &lt;-<span class="st"> </span>final_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb61-3" data-line-number="3"><span class="st">  </span><span class="kw">wilcox_test</span>(mean_phenotype_pairwise_distance <span class="op">~</span><span class="st"> </span>selection_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb61-4" data-line-number="4"><span class="st">  </span><span class="kw">adjust_pvalue</span>(<span class="dt">method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb61-5" data-line-number="5"><span class="st">  </span><span class="kw">add_significance</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb61-6" data-line-number="6"><span class="st">  </span><span class="kw">add_xy_position</span>(<span class="dt">x=</span><span class="st">&quot;selection_name&quot;</span>,<span class="dt">step.increase=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb61-7" data-line-number="7"><span class="co">#stat.test$manual_position &lt;- stat.test$y.position * .5</span></a>
+<a class="sourceLine" id="cb61-8" data-line-number="8"><span class="co">#stat.test$manual_position &lt;- c(110, 150, 170, 170, 130, 110)</span></a>
+<a class="sourceLine" id="cb61-9" data-line-number="9">stat.test<span class="op">$</span>label &lt;-<span class="st"> </span><span class="kw">mapply</span>(p_label,stat.test<span class="op">$</span>p.adj)</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb62-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb62-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb62-4" data-line-number="4">      <span class="dt">x=</span>selection_name,</a>
+<a class="sourceLine" id="cb62-5" data-line-number="5">      <span class="dt">y=</span>mean_phenotype_pairwise_distance,</a>
+<a class="sourceLine" id="cb62-6" data-line-number="6">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb62-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb62-8" data-line-number="8">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-10" data-line-number="10"><span class="st">  </span><span class="kw">scale_y_log10</span>(</a>
+<a class="sourceLine" id="cb62-11" data-line-number="11">    <span class="dt">name=</span><span class="st">&quot;Mean pairwise distance&quot;</span></a>
+<a class="sourceLine" id="cb62-12" data-line-number="12">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-13" data-line-number="13"><span class="st">  </span><span class="kw">scale_x_discrete</span>(</a>
+<a class="sourceLine" id="cb62-14" data-line-number="14">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb62-15" data-line-number="15">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-16" data-line-number="16"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(</a>
+<a class="sourceLine" id="cb62-17" data-line-number="17">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb62-18" data-line-number="18">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-19" data-line-number="19"><span class="st">  </span><span class="kw">scale_color_discrete</span>(</a>
+<a class="sourceLine" id="cb62-20" data-line-number="20">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb62-21" data-line-number="21">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb62-22" data-line-number="22"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-23" data-line-number="23"><span class="st">    </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name, <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_final_phylogeny_plot-1.png" width="672" /></p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1">stat.test <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2"><span class="st">  </span><span class="kw">kbl</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-3" data-line-number="3"><span class="st">  </span><span class="kw">kable_styling</span>(</a>
+<a class="sourceLine" id="cb63-4" data-line-number="4">    <span class="dt">bootstrap_options =</span> <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb63-5" data-line-number="5">      <span class="st">&quot;striped&quot;</span>,</a>
+<a class="sourceLine" id="cb63-6" data-line-number="6">      <span class="st">&quot;hover&quot;</span>,</a>
+<a class="sourceLine" id="cb63-7" data-line-number="7">      <span class="st">&quot;condensed&quot;</span>,</a>
+<a class="sourceLine" id="cb63-8" data-line-number="8">      <span class="st">&quot;responsive&quot;</span></a>
+<a class="sourceLine" id="cb63-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb63-10" data-line-number="10">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-11" data-line-number="11"><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width=</span><span class="st">&quot;600px&quot;</span>)</a></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:600px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+.y.
+</th>
+<th style="text-align:left;">
+group1
+</th>
+<th style="text-align:left;">
+group2
+</th>
+<th style="text-align:right;">
+n1
+</th>
+<th style="text-align:right;">
+n2
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+p.adj
+</th>
+<th style="text-align:left;">
+p.adj.signif
+</th>
+<th style="text-align:right;">
+y.position
+</th>
+<th style="text-align:left;">
+groups
+</th>
+<th style="text-align:right;">
+xmin
+</th>
+<th style="text-align:right;">
+xmax
+</th>
+<th style="text-align:left;">
+label
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+2831.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+9718.758
+</td>
+<td style="text-align:left;">
+Eco-EA , Fitness sharing
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+25159.0
+</td>
+<td style="text-align:right;">
+1.70e-02
+</td>
+<td style="text-align:right;">
+0.170000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+15104.178
+</td>
+<td style="text-align:left;">
+Eco-EA , Lexicase
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p = 0.17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+9552.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+20489.598
+</td>
+<td style="text-align:left;">
+Eco-EA, Random
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+43052.5
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+25875.018
+</td>
+<td style="text-align:left;">
+Eco-EA , Tournament
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+33683.0
+</td>
+<td style="text-align:right;">
+1.00e-03
+</td>
+<td style="text-align:right;">
+0.010000
+</td>
+<td style="text-align:left;">
+**
+</td>
+<td style="text-align:right;">
+31260.438
+</td>
+<td style="text-align:left;">
+Fitness sharing, Lexicase
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p = 0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+40738.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+36645.858
+</td>
+<td style="text-align:left;">
+Fitness sharing, Random
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+57314.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+42031.278
+</td>
+<td style="text-align:left;">
+Fitness sharing, Tournament
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+28272.0
+</td>
+<td style="text-align:right;">
+8.49e-01
+</td>
+<td style="text-align:right;">
+1.000000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+47416.698
+</td>
+<td style="text-align:left;">
+Lexicase, Random
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p = 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+34801.0
+</td>
+<td style="text-align:right;">
+7.84e-05
+</td>
+<td style="text-align:right;">
+0.000784
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+52802.118
+</td>
+<td style="text-align:left;">
+Lexicase , Tournament
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 0.000784
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mean_phenotype_pairwise_distance
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+54927.0
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+58187.538
+</td>
+<td style="text-align:left;">
+Random , Tournament
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="phenotypic-diversity-1" class="section level2">
+<h2><span class="header-section-number">3.4</span> Phenotypic diversity</h2>
+<div id="over-time-5" class="section level3">
+<h3><span class="header-section-number">3.4.1</span> Over time</h3>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb64-2" data-line-number="2">    data,</a>
+<a class="sourceLine" id="cb64-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb64-4" data-line-number="4">      <span class="dt">x=</span>generation,</a>
+<a class="sourceLine" id="cb64-5" data-line-number="5">      <span class="dt">y=</span>phenotype_num_taxa,</a>
+<a class="sourceLine" id="cb64-6" data-line-number="6">      <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb64-7" data-line-number="7">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb64-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb64-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-10" data-line-number="10"><span class="st">  </span><span class="kw">stat_summary</span>(<span class="dt">geom=</span><span class="st">&quot;line&quot;</span>, <span class="dt">fun=</span>mean) <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-11" data-line-number="11"><span class="st">  </span><span class="kw">stat_summary</span>(</a>
+<a class="sourceLine" id="cb64-12" data-line-number="12">    <span class="dt">geom=</span><span class="st">&quot;ribbon&quot;</span>,</a>
+<a class="sourceLine" id="cb64-13" data-line-number="13">    <span class="dt">fun.data=</span><span class="st">&quot;mean_cl_boot&quot;</span>,</a>
+<a class="sourceLine" id="cb64-14" data-line-number="14">    <span class="dt">fun.args=</span><span class="kw">list</span>(<span class="dt">conf.int=</span><span class="fl">0.95</span>),</a>
+<a class="sourceLine" id="cb64-15" data-line-number="15">    <span class="dt">alpha=</span><span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb64-16" data-line-number="16">    <span class="dt">linetype=</span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb64-17" data-line-number="17">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-18" data-line-number="18"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb64-19" data-line-number="19">    <span class="dt">name=</span><span class="st">&quot;Phenotypic richness&quot;</span></a>
+<a class="sourceLine" id="cb64-20" data-line-number="20">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-21" data-line-number="21"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb64-22" data-line-number="22">    <span class="dt">name=</span><span class="st">&quot;Generation&quot;</span></a>
+<a class="sourceLine" id="cb64-23" data-line-number="23">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-24" data-line-number="24"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb64-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb64-26" data-line-number="26"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name, <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_phenotypic_diversity_over_time_plot-1.png" width="672" /></p>
+</div>
+<div id="final-5" class="section level3">
+<h3><span class="header-section-number">3.4.2</span> Final</h3>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="co"># Compute manual labels for geom_signif</span></a>
+<a class="sourceLine" id="cb65-2" data-line-number="2">stat.test &lt;-<span class="st"> </span>final_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-3" data-line-number="3"><span class="st">  </span><span class="kw">wilcox_test</span>(phenotype_num_taxa <span class="op">~</span><span class="st"> </span>selection_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-4" data-line-number="4"><span class="st">  </span><span class="kw">adjust_pvalue</span>(<span class="dt">method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-5" data-line-number="5"><span class="st">  </span><span class="kw">add_significance</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-6" data-line-number="6"><span class="st">  </span><span class="kw">add_xy_position</span>(<span class="dt">x=</span><span class="st">&quot;selection_name&quot;</span>,<span class="dt">step.increase=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb65-7" data-line-number="7"><span class="co">#stat.test$manual_position &lt;- stat.test$y.position * .5</span></a>
+<a class="sourceLine" id="cb65-8" data-line-number="8"><span class="co">#stat.test$manual_position &lt;- c(110, 150, 170, 170, 130, 110)</span></a>
+<a class="sourceLine" id="cb65-9" data-line-number="9">stat.test<span class="op">$</span>label &lt;-<span class="st"> </span><span class="kw">mapply</span>(p_label,stat.test<span class="op">$</span>p.adj)</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb66-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb66-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb66-4" data-line-number="4">      <span class="dt">x=</span>selection_name,</a>
+<a class="sourceLine" id="cb66-5" data-line-number="5">      <span class="dt">y=</span>phenotype_num_taxa,</a>
+<a class="sourceLine" id="cb66-6" data-line-number="6">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb66-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb66-8" data-line-number="8">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-10" data-line-number="10"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb66-11" data-line-number="11">    <span class="dt">name=</span><span class="st">&quot;Phenotypic Richness&quot;</span></a>
+<a class="sourceLine" id="cb66-12" data-line-number="12">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-13" data-line-number="13"><span class="st">  </span><span class="kw">scale_x_discrete</span>(</a>
+<a class="sourceLine" id="cb66-14" data-line-number="14">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb66-15" data-line-number="15">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-16" data-line-number="16"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(</a>
+<a class="sourceLine" id="cb66-17" data-line-number="17">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb66-18" data-line-number="18">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-19" data-line-number="19"><span class="st">  </span><span class="kw">scale_color_discrete</span>(</a>
+<a class="sourceLine" id="cb66-20" data-line-number="20">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb66-21" data-line-number="21">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-22" data-line-number="22"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb66-23" data-line-number="23"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name, <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_final_phenotypic_plot-1.png" width="672" /></p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1">stat.test <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-2" data-line-number="2"><span class="st">  </span><span class="kw">kbl</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-3" data-line-number="3"><span class="st">  </span><span class="kw">kable_styling</span>(</a>
+<a class="sourceLine" id="cb67-4" data-line-number="4">    <span class="dt">bootstrap_options =</span> <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb67-5" data-line-number="5">      <span class="st">&quot;striped&quot;</span>,</a>
+<a class="sourceLine" id="cb67-6" data-line-number="6">      <span class="st">&quot;hover&quot;</span>,</a>
+<a class="sourceLine" id="cb67-7" data-line-number="7">      <span class="st">&quot;condensed&quot;</span>,</a>
+<a class="sourceLine" id="cb67-8" data-line-number="8">      <span class="st">&quot;responsive&quot;</span></a>
+<a class="sourceLine" id="cb67-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb67-10" data-line-number="10">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-11" data-line-number="11"><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width=</span><span class="st">&quot;600px&quot;</span>)</a></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:600px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+.y.
+</th>
+<th style="text-align:left;">
+group1
+</th>
+<th style="text-align:left;">
+group2
+</th>
+<th style="text-align:right;">
+n1
+</th>
+<th style="text-align:right;">
+n2
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+p.adj
+</th>
+<th style="text-align:left;">
+p.adj.signif
+</th>
+<th style="text-align:right;">
+y.position
+</th>
+<th style="text-align:left;">
+groups
+</th>
+<th style="text-align:right;">
+xmin
+</th>
+<th style="text-align:right;">
+xmax
+</th>
+<th style="text-align:left;">
+label
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+2406.0
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+1507.000
+</td>
+<td style="text-align:left;">
+Eco-EA , Fitness sharing
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+14833.5
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+2070.333
+</td>
+<td style="text-align:left;">
+Eco-EA , Lexicase
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+34261.5
+</td>
+<td style="text-align:right;">
+0.000326
+</td>
+<td style="text-align:right;">
+0.00326
+</td>
+<td style="text-align:left;">
+**
+</td>
+<td style="text-align:right;">
+2633.667
+</td>
+<td style="text-align:left;">
+Eco-EA, Random
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p = 0.00326
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Eco-EA
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+29587.5
+</td>
+<td style="text-align:right;">
+0.604000
+</td>
+<td style="text-align:right;">
+1.00000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+3197.000
+</td>
+<td style="text-align:left;">
+Eco-EA , Tournament
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+42195.5
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+3760.333
+</td>
+<td style="text-align:left;">
+Fitness sharing, Lexicase
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+57231.0
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+4323.667
+</td>
+<td style="text-align:left;">
+Fitness sharing, Random
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Fitness sharing
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+51342.0
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+4887.000
+</td>
+<td style="text-align:left;">
+Fitness sharing, Tournament
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+47218.0
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+5450.333
+</td>
+<td style="text-align:left;">
+Lexicase, Random
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+43850.0
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+6013.667
+</td>
+<td style="text-align:left;">
+Lexicase , Tournament
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+phenotype_num_taxa
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+240
+</td>
+<td style="text-align:right;">
+25692.5
+</td>
+<td style="text-align:right;">
+0.041000
+</td>
+<td style="text-align:right;">
+0.41000
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+6577.000
+</td>
+<td style="text-align:left;">
+Random , Tournament
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 0.41
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="relationship-between-phenotypic-and-phylogenetic-diversity-1" class="section level2">
+<h2><span class="header-section-number">3.5</span> Relationship between phenotypic and phylogenetic diversity</h2>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb68-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb68-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb68-4" data-line-number="4">        <span class="dt">y=</span>phenotype_num_taxa,</a>
+<a class="sourceLine" id="cb68-5" data-line-number="5">        <span class="dt">x=</span>mean_phenotype_pairwise_distance,</a>
+<a class="sourceLine" id="cb68-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb68-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb68-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb68-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb68-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb68-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb68-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Phenotypic richness&quot;</span></a>
+<a class="sourceLine" id="cb68-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb68-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb68-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Mean pairwise distance&quot;</span></a>
+<a class="sourceLine" id="cb68-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb68-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb68-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb68-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb68-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb68-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb68-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb68-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb68-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb68-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb68-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_phen_vs_phylo-1.png" width="672" /></p>
+</div>
+<div id="relationship-between-diversity-and-success-1" class="section level2">
+<h2><span class="header-section-number">3.6</span> Relationship between diversity and success</h2>
+<div id="earlier-in-run-1" class="section level3">
+<h3><span class="header-section-number">3.6.1</span> Earlier in run</h3>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb69-2" data-line-number="2">    data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(generation<span class="op">==</span><span class="dv">500</span>),</a>
+<a class="sourceLine" id="cb69-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb69-4" data-line-number="4">        <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb69-5" data-line-number="5">        <span class="dt">x=</span>mean_phenotype_pairwise_distance,</a>
+<a class="sourceLine" id="cb69-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb69-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb69-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb69-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb69-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb69-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb69-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb69-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb69-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb69-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Mean pairwise distance&quot;</span></a>
+<a class="sourceLine" id="cb69-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb69-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb69-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb69-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb69-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb69-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb69-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb69-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb69-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb69-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb69-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_phylogeny_vs_performance_very_early-1.png" width="672" /></p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb70-2" data-line-number="2">    data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(generation<span class="op">==</span><span class="dv">500</span>),</a>
+<a class="sourceLine" id="cb70-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb70-4" data-line-number="4">        <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb70-5" data-line-number="5">        <span class="dt">x=</span>phenotype_num_taxa,</a>
+<a class="sourceLine" id="cb70-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb70-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb70-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb70-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb70-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb70-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb70-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb70-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb70-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb70-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Phenotypic richness&quot;</span></a>
+<a class="sourceLine" id="cb70-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb70-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb70-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb70-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb70-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb70-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb70-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb70-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb70-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb70-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb70-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_richness_vs_performance_very_early-1.png" width="672" /></p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1">phylogney_vs_performance &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb71-2" data-line-number="2">    data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(generation<span class="op">==</span><span class="dv">1000</span>),</a>
+<a class="sourceLine" id="cb71-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb71-4" data-line-number="4">        <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb71-5" data-line-number="5">        <span class="dt">x=</span>mean_phenotype_pairwise_distance,</a>
+<a class="sourceLine" id="cb71-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb71-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb71-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb71-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb71-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb71-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb71-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Mean pairwise distance&quot;</span></a>
+<a class="sourceLine" id="cb71-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb71-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb71-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb71-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb71-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb71-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb71-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb71-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb71-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb71-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb71-27" data-line-number="27">  </a>
+<a class="sourceLine" id="cb71-28" data-line-number="28">phylogney_vs_performance</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_phylogeny_vs_performance_early-1.png" width="672" /></p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb72-2" data-line-number="2">    data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(generation<span class="op">==</span><span class="dv">1000</span>),</a>
+<a class="sourceLine" id="cb72-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb72-4" data-line-number="4">        <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb72-5" data-line-number="5">        <span class="dt">x=</span>phenotype_num_taxa,</a>
+<a class="sourceLine" id="cb72-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb72-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb72-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb72-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb72-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb72-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb72-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb72-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb72-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb72-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Phenotypic richness&quot;</span></a>
+<a class="sourceLine" id="cb72-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb72-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb72-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb72-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb72-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb72-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb72-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb72-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb72-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb72-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb72-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_richness_vs_performance_early-1.png" width="672" /></p>
+</div>
+<div id="end-of-run-1" class="section level3">
+<h3><span class="header-section-number">3.6.2</span> End of run</h3>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb73-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb73-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb73-4" data-line-number="4">        <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb73-5" data-line-number="5">        <span class="dt">x=</span>mean_phenotype_pairwise_distance,</a>
+<a class="sourceLine" id="cb73-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb73-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb73-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb73-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb73-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb73-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb73-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb73-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb73-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb73-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Mean pairwise distance&quot;</span></a>
+<a class="sourceLine" id="cb73-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb73-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb73-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb73-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb73-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb73-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb73-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb73-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb73-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb73-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb73-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_phylogeny_vs_performance-1.png" width="672" /></p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb74-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb74-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb74-4" data-line-number="4">        <span class="dt">y=</span>max_performance,</a>
+<a class="sourceLine" id="cb74-5" data-line-number="5">        <span class="dt">x=</span>phenotype_num_taxa,</a>
+<a class="sourceLine" id="cb74-6" data-line-number="6">        <span class="dt">color=</span>selection_name,</a>
+<a class="sourceLine" id="cb74-7" data-line-number="7">        <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb74-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb74-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-11" data-line-number="11"><span class="st">    </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb74-12" data-line-number="12">        <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span></a>
+<a class="sourceLine" id="cb74-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(</a>
+<a class="sourceLine" id="cb74-15" data-line-number="15">        <span class="dt">name=</span><span class="st">&quot;Phenotypic richness&quot;</span></a>
+<a class="sourceLine" id="cb74-16" data-line-number="16">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb74-17" data-line-number="17"><span class="st">  </span><span class="kw">facet_wrap</span>(</a>
+<a class="sourceLine" id="cb74-18" data-line-number="18">      <span class="op">~</span>selection_name<span class="op">*</span>problem_name, <span class="dt">scales=</span><span class="st">&quot;free&quot;</span></a>
+<a class="sourceLine" id="cb74-19" data-line-number="19">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb74-20" data-line-number="20"><span class="st">  </span><span class="kw">stat_smooth</span>(</a>
+<a class="sourceLine" id="cb74-21" data-line-number="21">    <span class="dt">method=</span><span class="st">&quot;lm&quot;</span></a>
+<a class="sourceLine" id="cb74-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb74-23" data-line-number="23"><span class="st">  </span><span class="kw">stat_cor</span>(</a>
+<a class="sourceLine" id="cb74-24" data-line-number="24">    <span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>, <span class="dt">cor.coef.name =</span> <span class="st">&quot;rho&quot;</span>, <span class="dt">color=</span><span class="st">&quot;black&quot;</span></a>
+<a class="sourceLine" id="cb74-25" data-line-number="25">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-26" data-line-number="26"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_richness_vs_performance-1.png" width="672" /></p>
+</div>
+</div>
+<div id="causality-analysis-1" class="section level2">
+<h2><span class="header-section-number">3.7</span> Causality analysis</h2>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1">res &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(SEED, selection_name, problem_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb75-2" data-line-number="2"><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb75-3" data-line-number="3">  <span class="dt">fit_phylo_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb75-4" data-line-number="4">  <span class="dt">fit_phylo_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb75-5" data-line-number="5">  <span class="dt">fit_phylo_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>))),</a>
+<a class="sourceLine" id="cb75-6" data-line-number="6">    <span class="dt">fit_pheno_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb75-7" data-line-number="7">      <span class="dt">fit_pheno_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb75-8" data-line-number="8">      <span class="dt">fit_pheno_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>)))</a>
+<a class="sourceLine" id="cb75-9" data-line-number="9">      )</a>
+<a class="sourceLine" id="cb75-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb75-11" data-line-number="11">res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pivot_longer</span>(<span class="dt">cols=</span><span class="kw">contains</span>(<span class="st">&quot;o_10&quot;</span>))</a>
+<a class="sourceLine" id="cb75-12" data-line-number="12">res<span class="op">$</span>offset &lt;-<span class="st"> </span><span class="kw">str_extract</span>(res<span class="op">$</span>name, <span class="st">&quot;[:digit:]*$&quot;</span>)</a>
+<a class="sourceLine" id="cb75-13" data-line-number="13">res<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">case_when</span>(<span class="kw">str_detect</span>(res<span class="op">$</span>name, <span class="st">&quot;phylo&quot;</span>) <span class="op">~</span><span class="st"> &quot;Phylogenetic&quot;</span>, <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;Phenotypic&quot;</span>)</a>
+<a class="sourceLine" id="cb75-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb75-15" data-line-number="15"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb75-16" data-line-number="16">  res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="kw">str_detect</span>(name, <span class="st">&quot;fit_ph*&quot;</span>)), </a>
+<a class="sourceLine" id="cb75-17" data-line-number="17">  <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb75-18" data-line-number="18">    <span class="dt">x=</span><span class="kw">as.factor</span>(offset), </a>
+<a class="sourceLine" id="cb75-19" data-line-number="19">    <span class="dt">y=</span>value, </a>
+<a class="sourceLine" id="cb75-20" data-line-number="20">    <span class="dt">color=</span>Type</a>
+<a class="sourceLine" id="cb75-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb75-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-23" data-line-number="23"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-24" data-line-number="24"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name<span class="op">*</span>selection_name) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="st">&quot;Lag&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">&quot;Transfer Entropy&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-27" data-line-number="27"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-28" data-line-number="28"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_information_theory-1.png" width="672" /></p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1">res &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(SEED, selection_name, problem_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb76-2" data-line-number="2"><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb76-3" data-line-number="3">  <span class="dt">fit_phylo_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(mean_phenotype_pairwise_distance, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb76-4" data-line-number="4">  <span class="dt">fit_phylo_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(mean_phenotype_pairwise_distance, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb76-5" data-line-number="5">  <span class="dt">fit_phylo_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(mean_phenotype_pairwise_distance, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>))),</a>
+<a class="sourceLine" id="cb76-6" data-line-number="6">    <span class="dt">fit_pheno_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb76-7" data-line-number="7">      <span class="dt">fit_pheno_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb76-8" data-line-number="8">      <span class="dt">fit_pheno_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>)))</a>
+<a class="sourceLine" id="cb76-9" data-line-number="9">      )</a>
+<a class="sourceLine" id="cb76-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb76-11" data-line-number="11">res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pivot_longer</span>(<span class="dt">cols=</span><span class="kw">contains</span>(<span class="st">&quot;o_10&quot;</span>))</a>
+<a class="sourceLine" id="cb76-12" data-line-number="12">res<span class="op">$</span>offset &lt;-<span class="st"> </span><span class="kw">str_extract</span>(res<span class="op">$</span>name, <span class="st">&quot;[:digit:]*$&quot;</span>)</a>
+<a class="sourceLine" id="cb76-13" data-line-number="13">res<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">case_when</span>(<span class="kw">str_detect</span>(res<span class="op">$</span>name, <span class="st">&quot;phylo&quot;</span>) <span class="op">~</span><span class="st"> &quot;Phylogenetic&quot;</span>, <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;Phenotypic&quot;</span>)</a>
+<a class="sourceLine" id="cb76-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb76-15" data-line-number="15"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb76-16" data-line-number="16">  res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="kw">str_detect</span>(name, <span class="st">&quot;fit_ph*&quot;</span>)), </a>
+<a class="sourceLine" id="cb76-17" data-line-number="17">  <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb76-18" data-line-number="18">    <span class="dt">x=</span><span class="kw">as.factor</span>(offset), </a>
+<a class="sourceLine" id="cb76-19" data-line-number="19">    <span class="dt">y=</span>value, </a>
+<a class="sourceLine" id="cb76-20" data-line-number="20">    <span class="dt">color=</span>Type</a>
+<a class="sourceLine" id="cb76-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb76-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb76-23" data-line-number="23"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb76-24" data-line-number="24"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name<span class="op">*</span>selection_name) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb76-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="st">&quot;Lag&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb76-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">&quot;Transfer Entropy&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb76-27" data-line-number="27"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb76-28" data-line-number="28"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_information_theory_mpd-1.png" width="672" /></p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1">res &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(SEED, selection_name, problem_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb77-2" data-line-number="2"><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb77-3" data-line-number="3">  <span class="dt">fit_phylo_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(mean_phenotype_evolutionary_distinctiveness, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb77-4" data-line-number="4">  <span class="dt">fit_phylo_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(mean_phenotype_evolutionary_distinctiveness, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb77-5" data-line-number="5">  <span class="dt">fit_phylo_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(mean_phenotype_evolutionary_distinctiveness, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>))),</a>
+<a class="sourceLine" id="cb77-6" data-line-number="6">    <span class="dt">fit_pheno_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb77-7" data-line-number="7">      <span class="dt">fit_pheno_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb77-8" data-line-number="8">      <span class="dt">fit_pheno_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>)))</a>
+<a class="sourceLine" id="cb77-9" data-line-number="9">      )</a>
+<a class="sourceLine" id="cb77-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb77-11" data-line-number="11">res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pivot_longer</span>(<span class="dt">cols=</span><span class="kw">contains</span>(<span class="st">&quot;o_10&quot;</span>))</a>
+<a class="sourceLine" id="cb77-12" data-line-number="12">res<span class="op">$</span>offset &lt;-<span class="st"> </span><span class="kw">str_extract</span>(res<span class="op">$</span>name, <span class="st">&quot;[:digit:]*$&quot;</span>)</a>
+<a class="sourceLine" id="cb77-13" data-line-number="13">res<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">case_when</span>(<span class="kw">str_detect</span>(res<span class="op">$</span>name, <span class="st">&quot;phylo&quot;</span>) <span class="op">~</span><span class="st"> &quot;Phylogenetic&quot;</span>, <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;Phenotypic&quot;</span>)</a>
+<a class="sourceLine" id="cb77-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb77-15" data-line-number="15"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb77-16" data-line-number="16">  res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="kw">str_detect</span>(name, <span class="st">&quot;fit_ph*&quot;</span>)), </a>
+<a class="sourceLine" id="cb77-17" data-line-number="17">  <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb77-18" data-line-number="18">    <span class="dt">x=</span><span class="kw">as.factor</span>(offset), </a>
+<a class="sourceLine" id="cb77-19" data-line-number="19">    <span class="dt">y=</span>value, </a>
+<a class="sourceLine" id="cb77-20" data-line-number="20">    <span class="dt">color=</span>Type</a>
+<a class="sourceLine" id="cb77-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb77-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb77-23" data-line-number="23"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb77-24" data-line-number="24"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name<span class="op">*</span>selection_name) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb77-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="st">&quot;Lag&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb77-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">&quot;Transfer Entropy&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb77-27" data-line-number="27"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb77-28" data-line-number="28"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_information_theory_mean_evolutionary_distinctivess-1.png" width="672" /></p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1">res &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(SEED, selection_name, problem_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb78-2" data-line-number="2"><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb78-3" data-line-number="3">  <span class="dt">fit_phylo_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(variance_phenotype_evolutionary_distinctiveness, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb78-4" data-line-number="4">  <span class="dt">fit_phylo_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(variance_phenotype_evolutionary_distinctiveness, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb78-5" data-line-number="5">  <span class="dt">fit_phylo_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(variance_phenotype_evolutionary_distinctiveness, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>))),</a>
+<a class="sourceLine" id="cb78-6" data-line-number="6">    <span class="dt">fit_pheno_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb78-7" data-line-number="7">      <span class="dt">fit_pheno_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb78-8" data-line-number="8">      <span class="dt">fit_pheno_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_performance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_performance, <span class="dv">100</span>)))</a>
+<a class="sourceLine" id="cb78-9" data-line-number="9">      )</a>
+<a class="sourceLine" id="cb78-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb78-11" data-line-number="11">res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pivot_longer</span>(<span class="dt">cols=</span><span class="kw">contains</span>(<span class="st">&quot;o_10&quot;</span>))</a>
+<a class="sourceLine" id="cb78-12" data-line-number="12">res<span class="op">$</span>offset &lt;-<span class="st"> </span><span class="kw">str_extract</span>(res<span class="op">$</span>name, <span class="st">&quot;[:digit:]*$&quot;</span>)</a>
+<a class="sourceLine" id="cb78-13" data-line-number="13">res<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">case_when</span>(<span class="kw">str_detect</span>(res<span class="op">$</span>name, <span class="st">&quot;phylo&quot;</span>) <span class="op">~</span><span class="st"> &quot;Phylogenetic&quot;</span>, <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;Phenotypic&quot;</span>)</a>
+<a class="sourceLine" id="cb78-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb78-15" data-line-number="15"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb78-16" data-line-number="16">  res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="kw">str_detect</span>(name, <span class="st">&quot;fit_ph*&quot;</span>)), </a>
+<a class="sourceLine" id="cb78-17" data-line-number="17">  <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb78-18" data-line-number="18">    <span class="dt">x=</span><span class="kw">as.factor</span>(offset), </a>
+<a class="sourceLine" id="cb78-19" data-line-number="19">    <span class="dt">y=</span>value, </a>
+<a class="sourceLine" id="cb78-20" data-line-number="20">    <span class="dt">color=</span>Type</a>
+<a class="sourceLine" id="cb78-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb78-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb78-23" data-line-number="23"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb78-24" data-line-number="24"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name<span class="op">*</span>selection_name) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb78-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="st">&quot;Lag&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb78-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">&quot;Transfer Entropy&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb78-27" data-line-number="27"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb78-28" data-line-number="28"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_information_theory_variance_evolutionary_distinctivess-1.png" width="672" /></p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">res &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(SEED, selection_name, problem_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb79-2" data-line-number="2"><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb79-3" data-line-number="3">  <span class="dt">phen_phylo_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(phenotype_num_taxa), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb79-4" data-line-number="4">  <span class="dt">phen_phylo_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(phenotype_num_taxa), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb79-5" data-line-number="5">  <span class="dt">pheno_phylo_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(phenotype_num_taxa), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>))),</a>
+<a class="sourceLine" id="cb79-6" data-line-number="6">    <span class="dt">phylo_pheno_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_phenotype_pairwise_distance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb79-7" data-line-number="7">      <span class="dt">phylo_pheno_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_phenotype_pairwise_distance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb79-8" data-line-number="8">      <span class="dt">phylo_pheno_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_phenotype_pairwise_distance), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_pairwise_distance, <span class="dv">100</span>)))</a>
+<a class="sourceLine" id="cb79-9" data-line-number="9">      )</a>
+<a class="sourceLine" id="cb79-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb79-11" data-line-number="11">res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pivot_longer</span>(<span class="dt">cols=</span><span class="kw">contains</span>(<span class="st">&quot;phylo&quot;</span>))</a>
+<a class="sourceLine" id="cb79-12" data-line-number="12">res<span class="op">$</span>offset &lt;-<span class="st"> </span><span class="kw">str_extract</span>(res<span class="op">$</span>name, <span class="st">&quot;[:digit:]*$&quot;</span>)</a>
+<a class="sourceLine" id="cb79-13" data-line-number="13">res<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">case_when</span>(<span class="kw">str_detect</span>(res<span class="op">$</span>name, <span class="st">&quot;phylo_pheno&quot;</span>) <span class="op">~</span><span class="st"> &quot;Phenotypic -&gt; Phylogenetic&quot;</span>, <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;Phylogenetic -&gt; Phenotypic&quot;</span>)</a>
+<a class="sourceLine" id="cb79-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb79-15" data-line-number="15"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb79-16" data-line-number="16">  res, </a>
+<a class="sourceLine" id="cb79-17" data-line-number="17">  <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb79-18" data-line-number="18">    <span class="dt">x=</span><span class="kw">as.factor</span>(offset), </a>
+<a class="sourceLine" id="cb79-19" data-line-number="19">    <span class="dt">y=</span>value, </a>
+<a class="sourceLine" id="cb79-20" data-line-number="20">    <span class="dt">color=</span>Type</a>
+<a class="sourceLine" id="cb79-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb79-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb79-23" data-line-number="23"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb79-24" data-line-number="24"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name<span class="op">*</span>selection_name) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb79-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="st">&quot;Lag&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb79-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">&quot;Transfer Entropy&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb79-27" data-line-number="27"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb79-28" data-line-number="28"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_information_theory_pheno_phylo-1.png" width="672" /></p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">res &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(SEED, selection_name, problem_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb80-2" data-line-number="2"><span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb80-3" data-line-number="3">  <span class="dt">phen_phylo_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(phenotype_num_taxa), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_evolutionary_distinctiveness, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb80-4" data-line-number="4">  <span class="dt">phen_phylo_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(phenotype_num_taxa), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_evolutionary_distinctiveness, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb80-5" data-line-number="5">  <span class="dt">pheno_phylo_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(phenotype_num_taxa), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_evolutionary_distinctiveness, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>))),</a>
+<a class="sourceLine" id="cb80-6" data-line-number="6">    <span class="dt">phylo_pheno_10 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_phenotype_evolutionary_distinctiveness), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">1</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_evolutionary_distinctiveness, <span class="dv">1</span>))),</a>
+<a class="sourceLine" id="cb80-7" data-line-number="7">      <span class="dt">phylo_pheno_100 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_phenotype_evolutionary_distinctiveness), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">10</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_evolutionary_distinctiveness, <span class="dv">10</span>))),</a>
+<a class="sourceLine" id="cb80-8" data-line-number="8">      <span class="dt">phylo_pheno_1000 =</span> <span class="kw">condinformation</span>(<span class="kw">discretize</span>(max_phenotype_evolutionary_distinctiveness), <span class="kw">discretize</span>(<span class="kw">lag</span>(phenotype_num_taxa, <span class="dv">100</span>)), <span class="kw">discretize</span>(<span class="kw">lag</span>(max_phenotype_evolutionary_distinctiveness, <span class="dv">100</span>)))</a>
+<a class="sourceLine" id="cb80-9" data-line-number="9">      )</a>
+<a class="sourceLine" id="cb80-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb80-11" data-line-number="11">res &lt;-<span class="st"> </span>res <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pivot_longer</span>(<span class="dt">cols=</span><span class="kw">contains</span>(<span class="st">&quot;phylo&quot;</span>))</a>
+<a class="sourceLine" id="cb80-12" data-line-number="12">res<span class="op">$</span>offset &lt;-<span class="st"> </span><span class="kw">str_extract</span>(res<span class="op">$</span>name, <span class="st">&quot;[:digit:]*$&quot;</span>)</a>
+<a class="sourceLine" id="cb80-13" data-line-number="13">res<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">case_when</span>(<span class="kw">str_detect</span>(res<span class="op">$</span>name, <span class="st">&quot;phylo_pheno&quot;</span>) <span class="op">~</span><span class="st"> &quot;Phenotypic -&gt; Phylogenetic&quot;</span>, <span class="ot">TRUE</span> <span class="op">~</span><span class="st"> &quot;Phylogenetic -&gt; Phenotypic&quot;</span>)</a>
+<a class="sourceLine" id="cb80-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb80-15" data-line-number="15"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb80-16" data-line-number="16">  res, </a>
+<a class="sourceLine" id="cb80-17" data-line-number="17">  <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb80-18" data-line-number="18">    <span class="dt">x=</span><span class="kw">as.factor</span>(offset), </a>
+<a class="sourceLine" id="cb80-19" data-line-number="19">    <span class="dt">y=</span>value, </a>
+<a class="sourceLine" id="cb80-20" data-line-number="20">    <span class="dt">color=</span>Type</a>
+<a class="sourceLine" id="cb80-21" data-line-number="21">    )</a>
+<a class="sourceLine" id="cb80-22" data-line-number="22">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb80-23" data-line-number="23"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb80-24" data-line-number="24"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>problem_name<span class="op">*</span>selection_name) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb80-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="st">&quot;Lag&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb80-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">&quot;Transfer Entropy&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb80-27" data-line-number="27"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb80-28" data-line-number="28"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/complex_landscape_information_theory_pheno_phylo_evolutionary_distinctiveness-1.png" width="672" /></p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="exploration-diagnostic.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021/tree/master/analysis/other_problems_analysis.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["phylodiversity-in-EC-supplement.pdf"],
+"search": {
+"engine": "lunr",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

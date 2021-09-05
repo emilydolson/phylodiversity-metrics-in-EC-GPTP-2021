@@ -7,7 +7,9 @@ output:
     toc_float: true
 ---
 
-# Setup
+# Exploration Diagnostic
+
+## Setup
 
 ```{r, setupknitr, include=FALSE}
 library(knitr)
@@ -102,11 +104,11 @@ final_data <- filter(data, evaluations==max(data$evaluations))
 
 ```
 
-# Performance
+## Performance
 
 For context, it's important to know how each selection scheme performed on the exploration diagnostic.
 
-## Over time
+### Over time
 
 First we look at the dynamics of performance over time.
 
@@ -172,7 +174,7 @@ ggplot(data, aes(x=gen, y=unique_start_positions_coverage, color=selection_name,
 
 We see that lexicase selection maintains by far that largest number of unique start positions, even surpassing the number maintained by random drift. This suggests that lexicase selection is actively selecting for maintaining a diversity of start positions. Tournament selection and fitness sharing perform virtually identically, with Eco-EA falling in between.
 
-## Final
+### Final
 
 While trends over time are more informative, it can be hard to visualize the full distribution (particularly the extent of variation). Thus, we also conduct a more detailed analysis of performance at the final time point.
 
@@ -333,11 +335,11 @@ stat.test %>%
   scroll_box(width="600px")
 ```
 
-# Phylogenetic diversity
+## Phylogenetic diversity
 
 Next, we analyze the behavior of phylogenetic diversity on the exploration diagnostic.
 
-## Over time
+### Over time
 
 First we plot mean pairwise distance over time. We log the y axis because there is such variation in mean pairwise distance across selection schemes.
 
@@ -403,7 +405,7 @@ ggplot(
 
 ```
 
-## Final
+### Final
 
 Next, we perform a more in-depth analysis of phylodiversity distributions at the final time point.
 
@@ -544,9 +546,9 @@ ggplot(
 
 ```
 
-# Phenotypic diversity
+## Phenotypic diversity
 
-## Relationship between different types of phenotypic diversity
+### Relationship between different types of phenotypic diversity
 
 ```{r, richness_vs_shannon, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -579,7 +581,7 @@ ggplot(
   theme(legend.position = "none")
 ```
 
-## Over time
+### Over time
 
 ```{r, phenotypic_diversity_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -643,7 +645,7 @@ ggplot(
 
 ```
 
-## Final
+### Final
 
 #### Richness
 
@@ -779,7 +781,7 @@ ggplot(
 
 ```
 
-# Relationship between phenotypic and phylogenetic diversity
+## Relationship between phenotypic and phylogenetic diversity
 
 ```{r, phen_vs_phylo_richness_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -913,9 +915,9 @@ ggplot(
 
 ```
 
-# Relationship between diversity and success
+## Relationship between diversity and success
 
-## Earlier in run
+### Earlier in run
 
 ```{r, phylogeny_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
@@ -1042,7 +1044,7 @@ richness_vs_performance
 
 ```
 
-## End of run
+### End of run
 
 ```{r, phylogeny_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
 final_phylogney_vs_performance <- ggplot(
@@ -1108,9 +1110,9 @@ final_richness_vs_performance
 
 ```
 
-# Causality analysis
+## Causality analysis
 
-## Transfer entropy from diversity to fitness
+### Transfer entropy from diversity to fitness
 
 #### Max pairwise distance vs. phenotypic richness
 
@@ -1467,7 +1469,7 @@ ggplot(
 
 ```
 
-## Transfer entropy between types of diversity
+### Transfer entropy between types of diversity
 
 #### Max pairwise distance and phenotypic richness
 

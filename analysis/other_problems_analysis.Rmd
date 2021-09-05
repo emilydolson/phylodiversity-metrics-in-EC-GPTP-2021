@@ -7,7 +7,9 @@ output:
     toc_float: true
 ---
 
-# Setup
+# Other fitness landscapes
+
+## Setup
 
 ```{r, complex_landscape_setupknitr, include=FALSE}
 library(knitr)
@@ -91,10 +93,10 @@ final_data <- filter(data, generation==max(data$generation))
 
 
 
-# Performance
+## Performance
 
 
-## Over time
+### Over time
 
 ```{r, complex_landscape_performance_over_time, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -126,7 +128,7 @@ ggplot(
 ```
 
 
-## Final 
+### Final 
 
 
 ```{r, complex_landscape_final_performance_stats, message=FALSE, cache=TRUE, warning=FALSE}
@@ -183,9 +185,9 @@ stat.test %>%
 
 
 
-# Phylogenetic diversity
+## Phylogenetic diversity
 
-## Over time
+### Over time
 
 ```{r, complex_landscape_phylogeny_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -217,7 +219,7 @@ ggplot(
 
 ```
 
-## Final
+### Final
 
 ```{r, complex_landscape_final_phylogeny_stats, message=FALSE, cache=TRUE, warning=FALSE}
 # Compute manual labels for geom_signif
@@ -274,9 +276,9 @@ stat.test %>%
 
 
 
-# Phenotypic diversity
+## Phenotypic diversity
 
-## Over time
+### Over time
 
 ```{r, complex_landscape_phenotypic_diversity_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -309,7 +311,7 @@ ggplot(
 ```
 
 
-## Final
+### Final
 
 ```{r, complex_landscape_final_phenotypic_stats, message=FALSE, cache=TRUE, warning=FALSE}
 # Compute manual labels for geom_signif
@@ -364,7 +366,7 @@ stat.test %>%
   scroll_box(width="600px")
 ```
 
-# Relationship between phenotypic and phylogenetic diversity
+## Relationship between phenotypic and phylogenetic diversity
 
 ```{r, complex_landscape_phen_vs_phylo, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
@@ -399,9 +401,9 @@ ggplot(
 
 
 
-# Relationship between diversity and success
+## Relationship between diversity and success
 
-## Earlier in run
+### Earlier in run
 
 ```{r, complex_landscape_phylogeny_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
@@ -527,7 +529,7 @@ ggplot(
 
 ```
 
-## End of run
+### End of run
 
 ```{r, complex_landscape_phylogeny_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
@@ -592,7 +594,7 @@ ggplot(
 
 
 
-# Causality analysis
+## Causality analysis
 
 
 ```{r, complex_landscape_information_theory, message=FALSE, cache=TRUE, warning=FALSE}
