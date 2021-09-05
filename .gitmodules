@@ -1,0 +1,3 @@
+[submodule "exploration_diagnostic"]
+	path = exploration_diagnostic
+	url = https://github.com/emilydolson/GPTP-2021-exploration-diagnostic-phylodiversity.git

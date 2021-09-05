@@ -1,0 +1,41 @@
+---
+title: "Ecology Graphs"
+author: "Emily Dolson"
+date: "3/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(igraph)
+library(tidygraph)
+library(ggraph)
+library(gganimate)
+library(readr)
+library(tidyr)
+library(dplyr)
+```
+
+## R Markdown
+
+
+
+```{r }
+nodes <- read_csv("~/repos/ecology_in_EC_parameter_sweep/interaction_network_nodes.csv") #%>% filter(update < 1000)
+edges <- read_csv("~/repos/ecology_in_EC_parameter_sweep/interaction_network_edges.csv") #%>% filter(update < 1000)
+g <- tbl_graph(nodes=nodes, edges=edges)
+
+layout_g <- tbl_graph(nodes=nodes %>% group_by(name)  %>% select(-c(update, fitness, population)) %>% summarise(name=first(name)), edges = edges %>% group_by(to,from)  %>% select(-c(update, weight)) %>% summarise(to=first(to), from=first(from)))
+full_layout <- create_layout(layout_g, layout="linear", circular=TRUE)
+data_layout <- full_join(nodes, full_layout, by = "name")
+attr(data_layout, "graph") <- g
+attr(data_layout, "circular") <- attr(full_layout, "circular")
+attr(data_layout, "class") <- attr(full_layout, "class")
+
+
+anim <- ggraph(data_layout) + scale_edge_color_gradient2() +  geom_edge_link(aes( color=weight), arrow = arrow(length = unit(3, 'mm'), type = "closed")) + geom_node_point(aes(size=population, color=fitness)) + theme_graph() + scale_color_viridis() + transition_time(update)
+animate(anim, nframes = 5000, renderer = magick_renderer())
+
+
+```
+

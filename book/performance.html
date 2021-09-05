@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Performance | Supplemental info about phylodiversity in evolutionary computation</title>
+  <meta name="description" content="Supplemental info for ‘What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?’" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Performance | Supplemental info about phylodiversity in evolutionary computation" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Supplemental info for ‘What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?’" />
+  <meta name="github-repo" content="emilydolson/phylodiversity-metrics-in-EC-GPTP-2021" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Performance | Supplemental info about phylodiversity in evolutionary computation" />
+  
+  <meta name="twitter:description" content="Supplemental info for ‘What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?’" />
+  
+
+<meta name="author" content="Jose Guadalupe Hernandez, Alexander Lalejini, Emily Dolson" />
+
+
+<meta name="date" content="2021-09-05" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="setup.html"/>
+<link rel="next" href="phylogenetic-diversity.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="libs/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+<script src="libs/bsTable-3.3.7/bootstrapTable.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Supplemental info</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="part"><span><b>I Exploration diagnostic</b></span></li>
+<li class="chapter" data-level="2" data-path="setup.html"><a href="setup.html"><i class="fa fa-check"></i><b>2</b> Setup</a></li>
+<li class="chapter" data-level="3" data-path="performance.html"><a href="performance.html"><i class="fa fa-check"></i><b>3</b> Performance</a><ul>
+<li class="chapter" data-level="3.1" data-path="performance.html"><a href="performance.html#over-time"><i class="fa fa-check"></i><b>3.1</b> Over time</a></li>
+<li class="chapter" data-level="3.2" data-path="performance.html"><a href="performance.html#final"><i class="fa fa-check"></i><b>3.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="phylogenetic-diversity.html"><a href="phylogenetic-diversity.html"><i class="fa fa-check"></i><b>4</b> Phylogenetic diversity</a><ul>
+<li class="chapter" data-level="4.1" data-path="phylogenetic-diversity.html"><a href="phylogenetic-diversity.html#over-time-1"><i class="fa fa-check"></i><b>4.1</b> Over time</a></li>
+<li class="chapter" data-level="4.2" data-path="phylogenetic-diversity.html"><a href="phylogenetic-diversity.html#final-1"><i class="fa fa-check"></i><b>4.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="phenotypic-diversity.html"><a href="phenotypic-diversity.html"><i class="fa fa-check"></i><b>5</b> Phenotypic diversity</a><ul>
+<li class="chapter" data-level="5.1" data-path="phenotypic-diversity.html"><a href="phenotypic-diversity.html#relationship-between-different-types-of-phenotypic-diversity"><i class="fa fa-check"></i><b>5.1</b> Relationship between different types of phenotypic diversity</a></li>
+<li class="chapter" data-level="5.2" data-path="phenotypic-diversity.html"><a href="phenotypic-diversity.html#over-time-2"><i class="fa fa-check"></i><b>5.2</b> Over time</a></li>
+<li class="chapter" data-level="5.3" data-path="phenotypic-diversity.html"><a href="phenotypic-diversity.html#final-2"><i class="fa fa-check"></i><b>5.3</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="relationship-between-phenotypic-and-phylogenetic-diversity.html"><a href="relationship-between-phenotypic-and-phylogenetic-diversity.html"><i class="fa fa-check"></i><b>6</b> Relationship between phenotypic and phylogenetic diversity</a></li>
+<li class="chapter" data-level="7" data-path="relationship-between-diversity-and-success.html"><a href="relationship-between-diversity-and-success.html"><i class="fa fa-check"></i><b>7</b> Relationship between diversity and success</a><ul>
+<li class="chapter" data-level="7.1" data-path="relationship-between-diversity-and-success.html"><a href="relationship-between-diversity-and-success.html#earlier-in-run"><i class="fa fa-check"></i><b>7.1</b> Earlier in run</a></li>
+<li class="chapter" data-level="7.2" data-path="relationship-between-diversity-and-success.html"><a href="relationship-between-diversity-and-success.html#end-of-run"><i class="fa fa-check"></i><b>7.2</b> End of run</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="causality-analysis.html"><a href="causality-analysis.html"><i class="fa fa-check"></i><b>8</b> Causality analysis</a><ul>
+<li class="chapter" data-level="8.1" data-path="causality-analysis.html"><a href="causality-analysis.html#transfer-entropy-from-diversity-to-fitness"><i class="fa fa-check"></i><b>8.1</b> Transfer entropy from diversity to fitness</a></li>
+<li class="chapter" data-level="8.2" data-path="causality-analysis.html"><a href="causality-analysis.html#transfer-entropy-between-types-of-diversity"><i class="fa fa-check"></i><b>8.2</b> Transfer entropy between types of diversity</a></li>
+</ul></li>
+<li class="part"><span><b>II Other fitness landscapes</b></span></li>
+<li class="chapter" data-level="9" data-path="setup-1.html"><a href="setup-1.html"><i class="fa fa-check"></i><b>9</b> Setup</a></li>
+<li class="chapter" data-level="10" data-path="performance-1.html"><a href="performance-1.html"><i class="fa fa-check"></i><b>10</b> Performance</a><ul>
+<li class="chapter" data-level="10.1" data-path="performance-1.html"><a href="performance-1.html#over-time-3"><i class="fa fa-check"></i><b>10.1</b> Over time</a></li>
+<li class="chapter" data-level="10.2" data-path="performance-1.html"><a href="performance-1.html#final-3"><i class="fa fa-check"></i><b>10.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="phylogenetic-diversity-1.html"><a href="phylogenetic-diversity-1.html"><i class="fa fa-check"></i><b>11</b> Phylogenetic diversity</a><ul>
+<li class="chapter" data-level="11.1" data-path="phylogenetic-diversity-1.html"><a href="phylogenetic-diversity-1.html#over-time-4"><i class="fa fa-check"></i><b>11.1</b> Over time</a></li>
+<li class="chapter" data-level="11.2" data-path="phylogenetic-diversity-1.html"><a href="phylogenetic-diversity-1.html#final-4"><i class="fa fa-check"></i><b>11.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="phenotypic-diversity-1.html"><a href="phenotypic-diversity-1.html"><i class="fa fa-check"></i><b>12</b> Phenotypic diversity</a><ul>
+<li class="chapter" data-level="12.1" data-path="phenotypic-diversity-1.html"><a href="phenotypic-diversity-1.html#over-time-5"><i class="fa fa-check"></i><b>12.1</b> Over time</a></li>
+<li class="chapter" data-level="12.2" data-path="phenotypic-diversity-1.html"><a href="phenotypic-diversity-1.html#final-5"><i class="fa fa-check"></i><b>12.2</b> Final</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="relationship-between-phenotypic-and-phylogenetic-diversity-1.html"><a href="relationship-between-phenotypic-and-phylogenetic-diversity-1.html"><i class="fa fa-check"></i><b>13</b> Relationship between phenotypic and phylogenetic diversity</a></li>
+<li class="chapter" data-level="14" data-path="relationship-between-diversity-and-success-1.html"><a href="relationship-between-diversity-and-success-1.html"><i class="fa fa-check"></i><b>14</b> Relationship between diversity and success</a><ul>
+<li class="chapter" data-level="14.1" data-path="relationship-between-diversity-and-success-1.html"><a href="relationship-between-diversity-and-success-1.html#earlier-in-run-1"><i class="fa fa-check"></i><b>14.1</b> Earlier in run</a></li>
+<li class="chapter" data-level="14.2" data-path="relationship-between-diversity-and-success-1.html"><a href="relationship-between-diversity-and-success-1.html#end-of-run-1"><i class="fa fa-check"></i><b>14.2</b> End of run</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="causality-analysis-1.html"><a href="causality-analysis-1.html"><i class="fa fa-check"></i><b>15</b> Causality analysis</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with ❤ and bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Supplemental info about phylodiversity in evolutionary computation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="performance" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Performance</h1>
+<p>For context, it’s important to know how each selection scheme performed on the exploration diagnostic.</p>
+<div id="over-time" class="section level2">
+<h2><span class="header-section-number">3.1</span> Over time</h2>
+<p>First we look at the dynamics of performance over time.</p>
+<div id="trait-performance" class="section level4">
+<h4><span class="header-section-number">3.1.0.1</span> Trait performance</h4>
+<p>Plot average trait performance (i.e. fitness) over time for each selection scheme. We log the x-axis because Eco-EA gains fitness over a very long time scale, whereas the interesting dynamics for the other selection schemes occur relatively quickly.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">    data,</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">      <span class="dt">x=</span>gen,                 <span class="co"># Generations</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">      <span class="dt">y=</span>elite_trait_avg,     <span class="co"># Performance</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">      <span class="dt">color=</span>selection_name,  <span class="co"># Selection scheme</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">    )</a>
+<a class="sourceLine" id="cb8-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="st">  </span><span class="kw">stat_summary</span>(<span class="dt">geom=</span><span class="st">&quot;line&quot;</span>, <span class="dt">fun=</span>mean) <span class="op">+</span><span class="st"> </span><span class="co"># Plot line showing mean for each selection scheme</span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="st">  </span><span class="kw">stat_summary</span>(  <span class="co"># Add shading around each line indicating 95% confiedence interval</span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12">    <span class="dt">geom=</span><span class="st">&quot;ribbon&quot;</span>,</a>
+<a class="sourceLine" id="cb8-13" data-line-number="13">    <span class="dt">fun.data=</span><span class="st">&quot;mean_cl_boot&quot;</span>,</a>
+<a class="sourceLine" id="cb8-14" data-line-number="14">    <span class="dt">fun.args=</span><span class="kw">list</span>(<span class="dt">conf.int=</span><span class="fl">0.95</span>),</a>
+<a class="sourceLine" id="cb8-15" data-line-number="15">    <span class="dt">alpha=</span><span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb8-16" data-line-number="16">    <span class="dt">linetype=</span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb8-17" data-line-number="17">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb8-19" data-line-number="19">    <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span>, <span class="co"># Set y axis title</span></a>
+<a class="sourceLine" id="cb8-20" data-line-number="20">    <span class="dt">limits=</span><span class="kw">c</span>(<span class="dv">0</span>, performance_ylim)  <span class="co"># Set y axis range to include all possible performance values</span></a>
+<a class="sourceLine" id="cb8-21" data-line-number="21">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="st">  </span><span class="kw">scale_x_log10</span>(  <span class="co"># Log x axis</span></a>
+<a class="sourceLine" id="cb8-23" data-line-number="23">    <span class="dt">name=</span><span class="st">&quot;Generation&quot;</span> <span class="co"># Set x axis title</span></a>
+<a class="sourceLine" id="cb8-24" data-line-number="24">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;Selection&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="co"># Set legend title</span></a>
+<a class="sourceLine" id="cb8-26" data-line-number="26"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(<span class="st">&quot;Selection&quot;</span>)    <span class="co"># Set legend title</span></a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/performance_over_time-1.png" width="672" /></p>
+<p>As observed by Hernandez et al. in their original paper on the exploration diagnostic, fitness in tournament selection initially increases quickly and then plateaus. Fitness in lexicase selection increases slightly slower but plateaus at a much higher value (nearly 100%). Fitness sharing behaves similarly to tournament selection, but maintains a slight upward trajectory (note that, because the x axis is on a log scale, this trajectory is very gradual). Eco-EA takes substantially longer to increase in fitness but ultimately surpasses fitness sharing and tournament selection. It is unclear whether it would pass lexicase selection if these runs were allowed to continue for slightly longer; they do not appear to have plateaued yet. We chose to cut them off at 500,000 generations due to resource constraints and the fact that the questions we’re asking here are not really about final fitness.</p>
+</div>
+<div id="activation-position-coverage" class="section level4">
+<h4><span class="header-section-number">3.1.0.2</span> Activation position coverage</h4>
+<p>Out of curiosity, we also ran the analysis of unique activation positions present in the population, used by Hernandez et. al. This analysis tells us about the diversity of start positions for the coding region represented in the population. As the set of start positions in the population tends to represent a meaningful constraint on the number of paths through the fitness landscape that are currently accessible, this is in some sense a metric of useful diversity in the population</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>gen, <span class="dt">y=</span>unique_start_positions_coverage, <span class="dt">color=</span>selection_name, <span class="dt">fill=</span>selection_name)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span><span class="kw">stat_summary</span>(<span class="dt">geom=</span><span class="st">&quot;line&quot;</span>, <span class="dt">fun=</span>mean) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">stat_summary</span>(</a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">    <span class="dt">geom=</span><span class="st">&quot;ribbon&quot;</span>,</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">    <span class="dt">fun.data=</span><span class="st">&quot;mean_cl_boot&quot;</span>,</a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">    <span class="dt">fun.args=</span><span class="kw">list</span>(<span class="dt">conf.int=</span><span class="fl">0.95</span>),</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">    <span class="dt">alpha=</span><span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8">    <span class="dt">linetype=</span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">    <span class="dt">name=</span><span class="st">&quot;Activation position coverage&quot;</span>,</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">    <span class="dt">limits=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb9-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_log10</span>(</a>
+<a class="sourceLine" id="cb9-15" data-line-number="15">    <span class="dt">name=</span><span class="st">&quot;Generation&quot;</span></a>
+<a class="sourceLine" id="cb9-16" data-line-number="16">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-17" data-line-number="17"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="st">&quot;Selection&quot;</span>)<span class="op">+</span></a>
+<a class="sourceLine" id="cb9-18" data-line-number="18"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(<span class="st">&quot;Selection&quot;</span>)</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/unique_start_positions-1.png" width="672" /></p>
+<p>We see that lexicase selection maintains by far that largest number of unique start positions, even surpassing the number maintained by random drift. This suggests that lexicase selection is actively selecting for maintaining a diversity of start positions. Tournament selection and fitness sharing perform virtually identically, with Eco-EA falling in between.</p>
+</div>
+</div>
+<div id="final" class="section level2">
+<h2><span class="header-section-number">3.2</span> Final</h2>
+<p>While trends over time are more informative, it can be hard to visualize the full distribution (particularly the extent of variation). Thus, we also conduct a more detailed analysis of performance at the final time point.</p>
+<div id="trait-performance-1" class="section level4">
+<h4><span class="header-section-number">3.2.0.1</span> Trait performance</h4>
+<p>First we conduct statistics to identify which selection schemes are significantly different from each other.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># Compute manual labels for geom_signif</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">stat.test &lt;-<span class="st"> </span>final_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="st">  </span><span class="kw">wilcox_test</span>(elite_trait_avg <span class="op">~</span><span class="st"> </span>selection_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="st">  </span><span class="kw">adjust_pvalue</span>(<span class="dt">method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span><span class="st">  </span><span class="co"># Apply Bonferroni correction for multiple comparisons</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="st">  </span><span class="kw">add_significance</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="st">  </span><span class="kw">add_xy_position</span>(<span class="dt">x=</span><span class="st">&quot;selection_name&quot;</span>,<span class="dt">step.increase=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">stat.test<span class="op">$</span>label &lt;-<span class="st"> </span><span class="kw">mapply</span>(p_label,stat.test<span class="op">$</span>p.adj)</a></code></pre></div>
+<p>Then we make raincloud plots of each selection scheme.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">elite_final_performance_fig &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">      <span class="dt">x=</span>selection_name,</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">      <span class="dt">y=</span>elite_trait_avg,</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb11-8" data-line-number="8">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_flat_violin</span>(</a>
+<a class="sourceLine" id="cb11-10" data-line-number="10">    <span class="dt">position =</span> <span class="kw">position_nudge</span>(<span class="dt">x =</span> <span class="fl">.2</span>, <span class="dt">y =</span> <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb11-11" data-line-number="11">    <span class="dt">alpha =</span> <span class="fl">.8</span>,</a>
+<a class="sourceLine" id="cb11-12" data-line-number="12">    <span class="dt">scale=</span><span class="st">&quot;width&quot;</span></a>
+<a class="sourceLine" id="cb11-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="st">  </span><span class="kw">geom_point</span>(</a>
+<a class="sourceLine" id="cb11-15" data-line-number="15">    <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">color=</span>selection_name),</a>
+<a class="sourceLine" id="cb11-16" data-line-number="16">    <span class="dt">position =</span> <span class="kw">position_jitter</span>(<span class="dt">width =</span> <span class="fl">.15</span>),</a>
+<a class="sourceLine" id="cb11-17" data-line-number="17">    <span class="dt">size =</span> <span class="fl">.5</span>,</a>
+<a class="sourceLine" id="cb11-18" data-line-number="18">    <span class="dt">alpha =</span> <span class="fl">0.8</span></a>
+<a class="sourceLine" id="cb11-19" data-line-number="19">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-20" data-line-number="20"><span class="st">  </span><span class="kw">geom_boxplot</span>(</a>
+<a class="sourceLine" id="cb11-21" data-line-number="21">    <span class="dt">width =</span> <span class="fl">.1</span>,</a>
+<a class="sourceLine" id="cb11-22" data-line-number="22">    <span class="dt">outlier.shape =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb11-23" data-line-number="23">    <span class="dt">alpha =</span> <span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb11-24" data-line-number="24">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb11-26" data-line-number="26">    <span class="dt">name=</span><span class="st">&quot;Average trait performance&quot;</span>,</a>
+<a class="sourceLine" id="cb11-27" data-line-number="27">    <span class="dt">limits=</span><span class="kw">c</span>(<span class="dv">0</span>, performance_ylim)</a>
+<a class="sourceLine" id="cb11-28" data-line-number="28">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-29" data-line-number="29"><span class="st">  </span><span class="kw">scale_x_discrete</span>(</a>
+<a class="sourceLine" id="cb11-30" data-line-number="30">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb11-31" data-line-number="31">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-32" data-line-number="32"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(</a>
+<a class="sourceLine" id="cb11-33" data-line-number="33">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb11-34" data-line-number="34">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-35" data-line-number="35"><span class="st">  </span><span class="kw">scale_color_discrete</span>(</a>
+<a class="sourceLine" id="cb11-36" data-line-number="36">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb11-37" data-line-number="37">  ) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-38" data-line-number="38"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb11-39" data-line-number="39">elite_final_performance_fig</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/final_performance_plot-1.png" width="672" /></p>
+<p>These observations look fairly consistent with the timeseries plots.</p>
+<p>Next, we output the results of our significance testing.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">stat.test <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="st">  </span><span class="kw">kbl</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="st">  </span><span class="kw">kable_styling</span>(</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">    <span class="dt">bootstrap_options =</span> <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">      <span class="st">&quot;striped&quot;</span>,</a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">      <span class="st">&quot;hover&quot;</span>,</a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">      <span class="st">&quot;condensed&quot;</span>,</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8">      <span class="st">&quot;responsive&quot;</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb12-10" data-line-number="10">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width=</span><span class="st">&quot;600px&quot;</span>)</a></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:600px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+.y.
+</th>
+<th style="text-align:left;">
+group1
+</th>
+<th style="text-align:left;">
+group2
+</th>
+<th style="text-align:right;">
+n1
+</th>
+<th style="text-align:right;">
+n2
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+p.adj
+</th>
+<th style="text-align:left;">
+p.adj.signif
+</th>
+<th style="text-align:right;">
+y.position
+</th>
+<th style="text-align:left;">
+groups
+</th>
+<th style="text-align:right;">
+xmin
+</th>
+<th style="text-align:right;">
+xmax
+</th>
+<th style="text-align:left;">
+label
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+1561
+</td>
+<td style="text-align:right;">
+3.20e-02
+</td>
+<td style="text-align:right;">
+3.20e-01
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+1.922000
+</td>
+<td style="text-align:left;">
+EcoEA , Fitness Sharing
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+p = 0.32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+2.946444
+</td>
+<td style="text-align:left;">
+EcoEA , Lexicase
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2500
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+3.970889
+</td>
+<td style="text-align:left;">
+EcoEA , Random
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+1939
+</td>
+<td style="text-align:right;">
+2.10e-06
+</td>
+<td style="text-align:right;">
+2.07e-05
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+4.995333
+</td>
+<td style="text-align:left;">
+EcoEA , Tournament
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+593
+</td>
+<td style="text-align:right;">
+2.69e-05
+</td>
+<td style="text-align:right;">
+2.69e-04
+</td>
+<td style="text-align:left;">
+***
+</td>
+<td style="text-align:right;">
+6.019778
+</td>
+<td style="text-align:left;">
+Fitness Sharing, Lexicase
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+p = 0.000269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2500
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+7.044222
+</td>
+<td style="text-align:left;">
+Fitness Sharing, Random
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+1549
+</td>
+<td style="text-align:right;">
+4.00e-02
+</td>
+<td style="text-align:right;">
+4.00e-01
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+8.068667
+</td>
+<td style="text-align:left;">
+Fitness Sharing, Tournament
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p = 0.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2350
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+9.093111
+</td>
+<td style="text-align:left;">
+Lexicase, Random
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2098
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+10.117556
+</td>
+<td style="text-align:left;">
+Lexicase , Tournament
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+elite_trait_avg
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:right;">
+0.00e+00
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+11.142000
+</td>
+<td style="text-align:left;">
+Random , Tournament
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="final-activation-position-coverage" class="section level4">
+<h4><span class="header-section-number">3.2.0.2</span> Final activation position Coverage</h4>
+<p>Now we do the same analysis for final activation position coverage.</p>
+<p>First we calculate the statistics</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># Compute manual labels for geom_signif</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">stat.test &lt;-<span class="st"> </span>final_data <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span><span class="kw">wilcox_test</span>(unique_start_positions_coverage <span class="op">~</span><span class="st"> </span>selection_name) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="st">  </span><span class="kw">adjust_pvalue</span>(<span class="dt">method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="st">  </span><span class="kw">add_significance</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="st">  </span><span class="kw">add_xy_position</span>(<span class="dt">x=</span><span class="st">&quot;selection_name&quot;</span>,<span class="dt">step.increase=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">stat.test<span class="op">$</span>manual_position &lt;-<span class="st"> </span>stat.test<span class="op">$</span>y.position <span class="op">*</span><span class="st"> </span><span class="fl">1.05</span></a>
+<a class="sourceLine" id="cb13-8" data-line-number="8">stat.test<span class="op">$</span>label &lt;-<span class="st"> </span><span class="kw">mapply</span>(p_label,stat.test<span class="op">$</span>p.adj)</a></code></pre></div>
+<p>Then we make raincloud plots</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">unique_start_positions_coverage_final_fig &lt;-<span class="st"> </span><span class="kw">ggplot</span>(</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">    final_data,</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">    <span class="kw">aes</span>(</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">      <span class="dt">x=</span>selection_name,</a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">      <span class="dt">y=</span>unique_start_positions_coverage,</a>
+<a class="sourceLine" id="cb14-6" data-line-number="6">      <span class="dt">fill=</span>selection_name</a>
+<a class="sourceLine" id="cb14-7" data-line-number="7">    )</a>
+<a class="sourceLine" id="cb14-8" data-line-number="8">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_flat_violin</span>(</a>
+<a class="sourceLine" id="cb14-10" data-line-number="10">    <span class="dt">position =</span> <span class="kw">position_nudge</span>(<span class="dt">x =</span> <span class="fl">.2</span>, <span class="dt">y =</span> <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb14-11" data-line-number="11">    <span class="dt">alpha =</span> <span class="fl">.8</span>,</a>
+<a class="sourceLine" id="cb14-12" data-line-number="12">    <span class="dt">scale=</span><span class="st">&quot;width&quot;</span></a>
+<a class="sourceLine" id="cb14-13" data-line-number="13">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-14" data-line-number="14"><span class="st">  </span><span class="kw">geom_point</span>(</a>
+<a class="sourceLine" id="cb14-15" data-line-number="15">    <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">color=</span>selection_name),</a>
+<a class="sourceLine" id="cb14-16" data-line-number="16">    <span class="dt">position =</span> <span class="kw">position_jitter</span>(<span class="dt">width =</span> <span class="fl">.15</span>),</a>
+<a class="sourceLine" id="cb14-17" data-line-number="17">    <span class="dt">size =</span> <span class="fl">.5</span>,</a>
+<a class="sourceLine" id="cb14-18" data-line-number="18">    <span class="dt">alpha =</span> <span class="fl">0.8</span></a>
+<a class="sourceLine" id="cb14-19" data-line-number="19">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-20" data-line-number="20"><span class="st">  </span><span class="kw">geom_boxplot</span>(</a>
+<a class="sourceLine" id="cb14-21" data-line-number="21">    <span class="dt">width =</span> <span class="fl">.1</span>,</a>
+<a class="sourceLine" id="cb14-22" data-line-number="22">    <span class="dt">outlier.shape =</span> <span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb14-23" data-line-number="23">    <span class="dt">alpha =</span> <span class="fl">0.5</span></a>
+<a class="sourceLine" id="cb14-24" data-line-number="24">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-25" data-line-number="25"><span class="st">  </span><span class="kw">scale_y_continuous</span>(</a>
+<a class="sourceLine" id="cb14-26" data-line-number="26">    <span class="dt">name=</span><span class="st">&quot;Activation position coverage&quot;</span>,</a>
+<a class="sourceLine" id="cb14-27" data-line-number="27">    <span class="dt">limits=</span><span class="kw">c</span>(<span class="dv">0</span>, coverage_ylim)</a>
+<a class="sourceLine" id="cb14-28" data-line-number="28">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-29" data-line-number="29"><span class="st">  </span><span class="kw">scale_x_discrete</span>(</a>
+<a class="sourceLine" id="cb14-30" data-line-number="30">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb14-31" data-line-number="31">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-32" data-line-number="32"><span class="st">  </span><span class="kw">scale_fill_discrete</span>(</a>
+<a class="sourceLine" id="cb14-33" data-line-number="33">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb14-34" data-line-number="34">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-35" data-line-number="35"><span class="st">  </span><span class="kw">scale_color_discrete</span>(</a>
+<a class="sourceLine" id="cb14-36" data-line-number="36">    <span class="dt">name=</span><span class="st">&quot;Selection&quot;</span></a>
+<a class="sourceLine" id="cb14-37" data-line-number="37">  ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-38" data-line-number="38"><span class="st">  </span><span class="kw">theme</span>(</a>
+<a class="sourceLine" id="cb14-39" data-line-number="39">    <span class="dt">legend.position=</span><span class="st">&quot;none&quot;</span></a>
+<a class="sourceLine" id="cb14-40" data-line-number="40">  )</a>
+<a class="sourceLine" id="cb14-41" data-line-number="41">unique_start_positions_coverage_final_fig</a></code></pre></div>
+<p><img src="phylodiversity-in-EC-supplement_files/figure-html/unique_start_positions_final-1.png" width="672" /></p>
+<p>These also look unsurprising.</p>
+<p>Lastly, we output the results of significance testing.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">stat.test <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw">kbl</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="st">  </span><span class="kw">kable_styling</span>(</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">    <span class="dt">bootstrap_options =</span> <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">      <span class="st">&quot;striped&quot;</span>,</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">      <span class="st">&quot;hover&quot;</span>,</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">      <span class="st">&quot;condensed&quot;</span>,</a>
+<a class="sourceLine" id="cb15-8" data-line-number="8">      <span class="st">&quot;responsive&quot;</span></a>
+<a class="sourceLine" id="cb15-9" data-line-number="9">    )</a>
+<a class="sourceLine" id="cb15-10" data-line-number="10">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-11" data-line-number="11"><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">width=</span><span class="st">&quot;600px&quot;</span>)</a></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:600px; ">
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+.y.
+</th>
+<th style="text-align:left;">
+group1
+</th>
+<th style="text-align:left;">
+group2
+</th>
+<th style="text-align:right;">
+n1
+</th>
+<th style="text-align:right;">
+n2
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+p
+</th>
+<th style="text-align:right;">
+p.adj
+</th>
+<th style="text-align:left;">
+p.adj.signif
+</th>
+<th style="text-align:right;">
+y.position
+</th>
+<th style="text-align:left;">
+groups
+</th>
+<th style="text-align:right;">
+xmin
+</th>
+<th style="text-align:right;">
+xmax
+</th>
+<th style="text-align:right;">
+manual_position
+</th>
+<th style="text-align:left;">
+label
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2392.5
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+1.420000
+</td>
+<td style="text-align:left;">
+EcoEA , Fitness Sharing
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1.491000
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+2.175556
+</td>
+<td style="text-align:left;">
+EcoEA , Lexicase
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2.284333
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+339.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+2.931111
+</td>
+<td style="text-align:left;">
+EcoEA , Random
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3.077667
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+EcoEA
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2387.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+3.686667
+</td>
+<td style="text-align:left;">
+EcoEA , Tournament
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+3.871000
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+4.442222
+</td>
+<td style="text-align:left;">
+Fitness Sharing, Lexicase
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4.664333
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+25.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+5.197778
+</td>
+<td style="text-align:left;">
+Fitness Sharing, Random
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5.457667
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+Fitness Sharing
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+1274.5
+</td>
+<td style="text-align:right;">
+0.708
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+ns
+</td>
+<td style="text-align:right;">
+5.953333
+</td>
+<td style="text-align:left;">
+Fitness Sharing, Tournament
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6.251000
+</td>
+<td style="text-align:left;">
+p = 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2350.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+6.708889
+</td>
+<td style="text-align:left;">
+Lexicase, Random
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+7.044333
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+Lexicase
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2350.0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+7.464444
+</td>
+<td style="text-align:left;">
+Lexicase , Tournament
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+7.837667
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+unique_start_positions_coverage
+</td>
+<td style="text-align:left;">
+Random
+</td>
+<td style="text-align:left;">
+Tournament
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+50
+</td>
+<td style="text-align:right;">
+2475.5
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+****
+</td>
+<td style="text-align:right;">
+8.220000
+</td>
+<td style="text-align:left;">
+Random , Tournament
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+8.631000
+</td>
+<td style="text-align:left;">
+p &lt; 1e-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="setup.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="phylogenetic-diversity.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021/tree/master/analysis/Exploration_diagnostic_analysis.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["phylodiversity-in-EC-supplement.pdf"],
+"search": {
+"engine": "lunr",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

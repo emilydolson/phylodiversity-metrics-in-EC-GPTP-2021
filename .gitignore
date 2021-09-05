@@ -1,0 +1,7 @@
+*.dot
+snapshot_*.csv
+*.csv
+ecology_parameter_sweep
+.vscode/
+eco_ea_video/
+time_solved
