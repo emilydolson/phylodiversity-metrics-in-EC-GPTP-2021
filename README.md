@@ -2,6 +2,7 @@
 
 This repository contains all code and supplemental material for "What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?", originally presented at [Genetic Programming in Theory and Practice](http://gptp-workshop.com/schedule.html), 2021. This paper is currently available as a preprint, and will eventually appear in the published conference proceedings.
 
+[![supplemental](https://img.shields.io/badge/go%20to-supplemental%20material-ff69b4)](https://emilydolson.github.io/phylodiversity-metrics-in-EC-GPTP-2021/book/)
 [![preprint](https://img.shields.io/badge/preprint-arXiv:2108.12586-brightgreen)](https://arxiv.org/abs/2108.12586)
 [![OSF](https://img.shields.io/badge/data%20%40%20OSF-https%3A%2F%2Fosf.io%2F6rndg%2F-blue)](https://osf.io/6rndg/) 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4733407.svg)](https://doi.org/10.5281/zenodo.4733407)
@@ -17,10 +18,7 @@ This repository contains all code and supplemental material for "What can phylog
 
 ## Supplemental information
 
-The supplemental information for this paper is still under construction, but the key analyses can be found here:
-
-- [Exploration diagnostic](https://emilydolson.github.io/phylodiversity-metrics-in-EC-GPTP-2021/analysis/Exploration_diagnostic_analysis.html)
-- [Other fitness landscapes](https://emilydolson.github.io/phylodiversity-metrics-in-EC-GPTP-2021/analysis/other_problems_analysis.html)
+The supplemental information for this paper is [here](https://emilydolson.github.io/phylodiversity-metrics-in-EC-GPTP-2021/book/).
 
 ## Dependencies
 
