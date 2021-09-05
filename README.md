@@ -5,7 +5,9 @@ This repository contains all code and supplemental material for "What can phylog
 [![supplemental](https://img.shields.io/badge/go%20to-supplemental%20material-ff69b4)](https://emilydolson.github.io/phylodiversity-metrics-in-EC-GPTP-2021/book/)
 [![preprint](https://img.shields.io/badge/preprint-arXiv:2108.12586-brightgreen)](https://arxiv.org/abs/2108.12586)
 [![OSF](https://img.shields.io/badge/data%20%40%20OSF-https%3A%2F%2Fosf.io%2F6rndg%2F-blue)](https://osf.io/6rndg/) 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4733407.svg)](https://doi.org/10.5281/zenodo.4733407)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5456710.svg)](https://doi.org/10.5281/zenodo.5456710)
+
+
 
 
   **Contents:**
