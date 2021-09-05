@@ -25,4 +25,5 @@ Imports:
     ggpubr,
     infotheo,
     scales,
-    osfr
+    osfr,
+    plyr
