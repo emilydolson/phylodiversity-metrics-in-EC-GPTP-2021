@@ -25,3 +25,9 @@ The supplemental information for this paper is [here](https://emilydolson.github
 The C++ code to run these experiments requires:
 - [Empirical](https://github.com/devosoft/Empirical)
 - The [EC Ecology toolbox](https://github.com/emilydolson/ec_ecology_toolbox)
+
+## Authors
+
+- [Jose Guadalupe Hernandez](https://jgh9094.github.io/)
+- [Alexander Lalejini](https://lalejini.com/)
+- [Emily Dolson](http://emilyldolson.com/)
