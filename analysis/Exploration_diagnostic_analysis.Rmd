@@ -17,6 +17,8 @@ knitr::opts_chunk$set(cache = TRUE, warning = FALSE,
                       message = FALSE)
 ```
 
+First, we need to do some set up to analyze our data
+
 Include dependencies
 
 ```{r, dependencies, message=FALSE, cache=FALSE, warning=FALSE}
@@ -71,7 +73,9 @@ coverage_ylim <- 1.0
 theme_set(theme_cowplot())
 ```
 
-```{r, data_import, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy = FALSE}
+The data for this project are hosted on [osf.io](https://osf.io/6rndg/). The following chunk downloads them automatically if they haven't already been downloaded.
+
+```{r, data_import, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy = FALSE, results='hide'}
 # Read in data
 osf_retrieve_file("esm4r") %>% osf_download(conflicts = "skip")  # Download data from osf
 data_loc <- "final_exploration_diagnostic_data.csv"
@@ -114,7 +118,7 @@ First we look at the dynamics of performance over time.
 
 #### Trait performance
 
-Plot average trait performance (i.e. fitness) over time for each selection scheme. We log the x-axis because Eco-EA gains fitness over a very long time scale, whereas the interesting dynamics for the other selection schemes occur relatively quickly.
+Here, we plot average trait performance (i.e. fitness) over time for each selection scheme. We log the x-axis because Eco-EA gains fitness over a very long time scale, whereas the interesting dynamics for the other selection schemes occur relatively quickly.
 
 ```{r, performance_over_time, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -145,7 +149,7 @@ ggplot(
   scale_fill_discrete("Selection")    # Set legend title
 ```
 
-As observed by Hernandez et al. in their original paper on the exploration diagnostic, fitness in tournament selection initially increases quickly and then plateaus. Fitness in lexicase selection increases slightly slower but plateaus at a much higher value (nearly 100%). Fitness sharing behaves similarly to tournament selection, but maintains a slight upward trajectory (note that, because the x axis is on a log scale, this trajectory is very gradual). Eco-EA takes substantially longer to increase in fitness but ultimately surpasses fitness sharing and tournament selection. It is unclear whether it would pass lexicase selection if these runs were allowed to continue for slightly longer; they do not appear to have plateaued yet. We chose to cut them off at 500,000 generations due to resource constraints and the fact that the questions we're asking here are not really about final fitness.
+As observed by Hernandez et al. in their original paper on the exploration diagnostic [@hernandez_ExplorationExplorationMeasuring_2021], fitness in tournament selection initially increases quickly and then plateaus. Fitness in lexicase selection increases slightly slower but plateaus at a much higher value (nearly 100%). Fitness sharing behaves similarly to tournament selection, but maintains a slight upward trajectory (note that, because the x axis is on a log scale, this trajectory is very gradual). Eco-EA takes substantially longer to increase in fitness but ultimately surpasses fitness sharing and tournament selection. It is unclear whether it would pass lexicase selection if these runs were allowed to continue for slightly longer; they do not appear to have plateaued yet. We chose to cut them off at 500,000 generations due to resource constraints and the fact that the questions we're asking here are not really about final fitness.
 
 #### Activation position coverage
 
@@ -162,8 +166,7 @@ ggplot(data, aes(x=gen, y=unique_start_positions_coverage, color=selection_name,
     linetype=0
   ) +
   scale_y_continuous(
-    name="Activation position coverage",
-    limits=c(0, 100)
+    name="Activation position coverage"
   ) +
   scale_x_log10(
     name="Generation"
@@ -192,7 +195,7 @@ stat.test <- final_data %>%
 stat.test$label <- mapply(p_label,stat.test$p.adj)
 ```
 
-Then we make raincloud plots of each selection scheme.
+Then we make raincloud plots [@allen_RaincloudPlotsMultiplatform_2021a] of each selection scheme.
 
 ```{r, final_performance_plot, message=FALSE, cache=TRUE, warning=FALSE}
 elite_final_performance_fig <- ggplot(
@@ -253,6 +256,8 @@ stat.test %>%
   ) %>%
   scroll_box(width="600px")
 ```
+
+Fitness sharing did not perform significantly differently from Eco-EA or Tournament selection, but all other selection schemes are significantly different.
 
 #### Final activation position Coverage
 
@@ -341,7 +346,9 @@ Next, we analyze the behavior of phylogenetic diversity on the exploration diagn
 
 ### Over time
 
-First we plot mean pairwise distance over time. We log the y axis because there is such variation in mean pairwise distance across selection schemes.
+#### Mean pairwise distance
+
+First we plot mean pairwise distance over time. We log the y axis because there is such variation in mean pairwise distance across selection schemes, and the x-axis for the same reason as before.
 
 ```{r, phylogeny_over_time_plot_mpd, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -374,6 +381,8 @@ ggplot(
 
 Lexicase selection maintains a monotonic increase in phylogenetic diversity over the course of the entire experiment. It likely never experiences a full coalesence event (where the most-recent common ancestor changes). Eco-EA nearly keeps pace with lexicase selection until towards the end, when its phylogenetic diversity crashes. This is likely the result of selective sweeps that begin to occur as the population discovers high fitness solutions. Fitness sharing shows a slight dip at the same time that its fitness plateaus (likely also the result of a selective sweep), but phylogenetic diversity recovers afterwards, making for a relatively constant level. over time. Tournament selection, on the other hand, maintains the same (low) level of phylogenetic diversity as fitness sharing, up until the point that fitness plateaus, at which point tournament selection's phylodiversity drops to nearly 0. Interestingly, lexicase selection and Eco-EA both maintain more phylodiversity than random selection, whereas fitness sharing and tournament selection maintain less.
 
+#### Mean evolutionary distinctiveness
+
 For comparison, we make the same plot with mean evolutionary distinctiveness.
 
 ```{r, phylogeny_over_time_plot_med, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
@@ -405,11 +414,15 @@ ggplot(
 
 ```
 
+Interestingly, Fitness Sharing and tournament selection both start increasing in evolutionary distinctiveness only after their fitnesses have plateaued. This seems likely to be due to some sort of pathological behavior of mean evolutionary distinctiveness on small trees, but more investigation would be necessary to figure out exactly what's going on. Trends in other selection schemes are largely similar.
+
 ### Final
 
 Next, we perform a more in-depth analysis of phylodiversity distributions at the final time point.
 
 #### Mean pairwise distance
+
+First, we test which selection schemes end up with significantly different final distributions of mean pairwise distance.
 
 ```{r, final_phylogeny_stats_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 # Pairwise wilcoxon teset to determine which conditions are significantly different from each other
@@ -433,6 +446,8 @@ stat.test %>%
   ) %>%
   scroll_box(width="600px")
 ```
+
+Looks like they are all significantly different from each other.
 
 ```{r, final_phylogeny_plot_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 # Raincloud plot of final mean pairwise distance
@@ -480,6 +495,8 @@ This shows something interesting! Final phylogenetic diversity in Eco-EA is heav
 
 #### Mean evolutionary distinctiveness
 
+Tests for significant differences:
+
 ```{r, final_phylogeny_stats_med, message=FALSE, cache=TRUE, warning=FALSE}
 # Pairwise wilcoxon teset to determine which conditions are significantly different from each other
 stat.test <- final_data %>%
@@ -503,6 +520,8 @@ stat.test %>%
   ) %>%
   scroll_box(width="600px")
 ```
+
+Looks like everything except fitness sharing and tournament are significantly different from each other.
 
 ```{r, final_phylogeny_plot_med, message=FALSE, cache=TRUE, warning=FALSE}
 # Raincloud plot of final mean evolutionary distinctiveness
@@ -546,9 +565,15 @@ ggplot(
 
 ```
 
+Again, this looks fairly similar to MPD, except that fitness sharing and tournament are higher.
+
 ## Phenotypic diversity
 
+Now we analyze phenotypic (i.e. population-level) diversity. Here, we're defining phenotypes to only include the sites that are actively contributing to fitness. So the phenotype of [1,4,2,6,5,4,3,6,7] would be [0,0,0,6,5,4,3,0,0]. Note that phylogenetic trees are also built using this conception of phenotypes.
+
 ### Relationship between different types of phenotypic diversity
+
+First, we should assess the extent to which different metrics of phenotypic diversity are capturing different information.
 
 ```{r, richness_vs_shannon, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -581,7 +606,13 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+Looks like at the final time point they are pretty much always closely correlated, although this correlation is weaker for lexicase selection than for other selection schemes.
+
 ### Over time
+
+Now we examine the behavior of each phenotypic diversity metric over time.
+
+#### Richness
 
 ```{r, phenotypic_diversity_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -614,7 +645,9 @@ ggplot(
 
 In contrast to the phylodiversity results, phenotypic richness in all selection schemes (even tournament selection) ultimately exceeds that of random selection. Eco-EA monotonically increases while lexicase selection reaches a maximum around the same time it reaches its fitness plateau. The only real similarity to the phylodiversity results is the behavior tournament selection and fitness sharing relative to each other.
 
-We also looked at phenotypic shannon entropy:
+#### Shannon diversity
+
+We also looked at phenotypic shannon diversity:
 
 ```{r, phenotypic_diversity_over_time_plot_shannon, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
 ggplot(
@@ -645,9 +678,17 @@ ggplot(
 
 ```
 
+This is more different from the richness results than we might have expected based on the correlation at the final time point. There is a much more pronounced drop off in Shannon entropy for tournament and fitness sharing than in richness. This difference is probably driven by the fact that, after plateauing, these selection schemes are likely both at mutation-selection balance. Thus, there are very many single-mutant phenotypes with only one copy in the population. These do not contribute much to Shannon entropy or phylogenetic diversity, but it does show up in richness.
+
+We also see that, after plataeuing, lexicase selection does actually start to decrease in Shannon entropy, but slowly. Similarly, in Eco-EA, the increase in Shannon entropy towards the end is much more modest than the increase in richness.
+
 ### Final
 
+Now we assess the final phenotypic diversity
+
 #### Richness
+
+Hypothesis-testing differences between groups:
 
 ```{r, final_phenotypic_stats, message=FALSE, cache=TRUE, warning=FALSE}
 # Determine which conditions are significantly diferrent from each other
@@ -670,6 +711,8 @@ stat.test %>%
   ) %>%
   scroll_box(width="600px")
 ```
+
+Raincloud plot:
 
 ```{r, final_phenotypic_plot, message=FALSE, cache=TRUE, warning=FALSE}
 # Raincloud plot of final phenotypic diversity
@@ -739,6 +782,8 @@ stat.test %>%
   scroll_box(width="600px")
 ```
 
+Interestingly, the final shannon diversity values of different selection schemes are much more distinguishable from each other than the final richness values.
+
 ```{r, final_phenotypic_plot_shannon, message=FALSE, cache=TRUE, warning=FALSE}
 # Raincloud plot of final phenotypic diversity
 ggplot(
@@ -781,7 +826,13 @@ ggplot(
 
 ```
 
+Again, we know from the time series plots that these relative relationships varied a lot over time. Eco-EA is only higher than lexicase selection at the very end.
+
 ## Relationship between phenotypic and phylogenetic diversity
+
+Now, we can finally begin to address the main questions. Do phenotypic diversity and phylogenetic diversity capture different information?
+
+### Phenotypic richness vs. mean pairwise distance
 
 ```{r, phen_vs_phylo_richness_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -816,6 +867,44 @@ ggplot(
 
 ```
 
+The linear models for some of these are questionable, but the Spearman correlation coefficient should be fine because it does not require linearity. Only tournament selection is significantly different from 0. Eco-EA is even negative (although non-significant), which is probably driven by the fact that there are really two groups of runs in Eco-EA: those that have found a good solution and had their diversity crash, and those that haven't yet.
+
+Lets take a look at how each of those groups behave (we'll show fitness as color, just to better understand what's happening):
+
+```{r, eco_ea_zoom_in, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000, selection_name == "EcoEA"),
+    aes(
+        y=phen_num_taxa,
+        x=mean_phenotype_pairwise_distance,
+        color = elite_trait_avg
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Phenotypic richness"
+  ) +
+  scale_x_continuous(
+        name="Mean pairwise distance",
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~mean_phenotype_pairwise_distance > 100, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  scale_color_continuous(type="viridis")
+
+
+```
+
+### Phenotypic richness vs. mean evolutionary distinctiveness
+
 ```{r, phen_vs_phylo_richness_med, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -848,6 +937,10 @@ ggplot(
 
 
 ```
+
+These are mostly significant, but negative. That's interesting and worthy of further exploration (but it's a little beyond the scope of this analysis).
+
+### Phenotypic shannon diversity vs. mean pairwise distance
 
 ```{r, phen_vs_phylo_shannon_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -882,6 +975,10 @@ ggplot(
 
 ```
 
+Again, these are mostly not significant (although fitness sharing notably now is).
+
+### Phenotypic shannon diversity vs. mean evolutionary distinctiveness
+
 ```{r, phen_vs_phylo_shannon_med, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -915,9 +1012,18 @@ ggplot(
 
 ```
 
+Again, all significant but negative. From this we can conclude that there is substantially more overlap between the information captured by phenotypic diversity and mean evolutionary disinctiveness than between phenotypic diversity metrics and mean pairwise distance. However, thus information has wildly different implications in the two contexts. Moreover, the long term trends are still very different. Thus, we still feel confident in saying that these metrics are meaningfully different. More investigation here may be worthwhile in the future.
+
+Overall, based on these end of time analyses and qualitative comparison of the temporal graphs, we conclude that phenotypic and phylogenetic diversity are meaningfully different from each other in the context of evolutionary computation. In retrospect, this finding may seem obvious. However a lot of people tend to assume that these two classes of diversity are closely related.
+
 ## Relationship between diversity and success
 
-### Earlier in run
+At last, we can finally assess whether diversity leads to actually solving problems! We start out by looking at correlations between diversity success across a few different time points,
+although we ultimately conclude that this approach is not particularly informative.
+
+### Very early in run
+
+#### Mean pairwise distance
 
 ```{r, phylogeny_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
@@ -950,6 +1056,41 @@ ggplot(
 
 ```
 
+#### Mean evolutionary distinctiveness
+
+```{r, phylogeny_vs_performance_very_early_med, message=FALSE, cache=TRUE, warning=FALSE}
+ggplot(
+    data %>% filter(gen==25000),
+    aes(
+        y=elite_trait_avg,
+        x=mean_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Average trait performance"
+  ) +
+  scale_x_continuous(
+        name="Mean evolutionary distinctiveness"
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+
+
+```
+
+#### Richness
+
 ```{r, richness_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
 ggplot(
     data %>% filter(gen==25000),
@@ -980,8 +1121,44 @@ ggplot(
  
 ```
 
+#### Shannon diversity
+
+```{r, shannon_vs_performance_very_early, message=FALSE, cache=TRUE, warning=FALSE}
+ggplot(
+    data %>% filter(gen==25000),
+    aes(
+        y=elite_trait_avg,
+        x=phen_diversity,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Average trait performance"
+  ) +
+  scale_x_continuous(
+        name="Phenotypic Shannon diversity"
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+ 
+```
+
+### Middle of run
+
+#### Mean pairwise distance
+
 ```{r, phylogeny_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
-phylogney_vs_performance <- ggplot(
+ggplot(
     data %>% filter(gen==50000),
     aes(
         y=elite_trait_avg,
@@ -1007,13 +1184,46 @@ phylogney_vs_performance <- ggplot(
     method="spearman", cor.coef.name = "rho", color="black"
   ) +
   theme(legend.position = "none")
-  
-phylogney_vs_performance
+
 
 ```
 
+#### Mean evolutionary distinctiveness
+
+```{r, med_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
+ggplot(
+    data %>% filter(gen==50000),
+    aes(
+        y=elite_trait_avg,
+        x=mean_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Average trait performance"
+  ) +
+  scale_x_continuous(
+        name="Mean evolutionary distinctiveness"
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+
+```
+
+#### Richness
+
 ```{r, richness_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
-richness_vs_performance <- ggplot(
+ggplot(
     data %>% filter(gen==50000),
     aes(
         y=elite_trait_avg,
@@ -1039,15 +1249,49 @@ richness_vs_performance <- ggplot(
     method="spearman", cor.coef.name = "rho", color="black"
   ) +
   theme(legend.position = "none")
-  
-richness_vs_performance
 
 ```
+
+#### Shannon diversity
+
+```{r, shannon_vs_performance_early, message=FALSE, cache=TRUE, warning=FALSE}
+ggplot(
+    data %>% filter(gen==50000),
+    aes(
+        y=elite_trait_avg,
+        x=phen_diversity,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Average trait performance"
+  ) +
+  scale_x_continuous(
+        name="Phenotypic Shannon diversity"
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+  
+
+```
+
 
 ### End of run
 
+#### Mean pairwise distance
+
 ```{r, phylogeny_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
-final_phylogney_vs_performance <- ggplot(
+ggplot(
     final_data,
     aes(
         y=elite_trait_avg,
@@ -1073,13 +1317,45 @@ final_phylogney_vs_performance <- ggplot(
     method="spearman", cor.coef.name = "rho", color="black"
   ) +
   theme(legend.position = "none")
-  
-final_phylogney_vs_performance
 
 ```
 
+#### Mean evolutionary distinctiveness
+
+```{r, med_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
+ggplot(
+    final_data,
+    aes(
+        y=elite_trait_avg,
+        x=mean_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Average trait performance"
+  ) +
+  scale_x_continuous(
+        name="Mean evolutionary distinctiveness"
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+
+```
+
+#### Richness
+
 ```{r, richness_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
-final_richness_vs_performance <- ggplot(
+ggplot(
     final_data,
     aes(
         y=elite_trait_avg,
@@ -1105,14 +1381,50 @@ final_richness_vs_performance <- ggplot(
     method="spearman", cor.coef.name = "rho", color="black"
   ) +
   theme(legend.position = "none")
-  
-final_richness_vs_performance
+
+```
+
+#### Shannon diversity
+
+```{r, shannon_vs_performance, message=FALSE, cache=TRUE, warning=FALSE}
+ggplot(
+    final_data,
+    aes(
+        y=elite_trait_avg,
+        x=phen_diversity,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Average trait performance"
+  ) +
+  scale_x_continuous(
+        name="Phenotypic Shannon diversity"
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
 
 ```
 
 ## Causality analysis
 
+Ultimately, it's hard to draw useful inferences either from these single time point analyses or from comparison of line plots. Due to the feedbacks between diversity and performance, there may be a time delay in when one affects the other.
+
+To analyze the drivers of this feedback loop in a more rigorous way, we turn to [Transfer Entropy](https://towardsdatascience.com/causality-931372313a1c) as a metric of [Granger Causality](http://www.scholarpedia.org/article/Granger_causality). For a more thorough description, see the paper associated with this supplement.
+
 ### Transfer entropy from diversity to fitness
+
+First, we calculate the information that each type of diversity gives us about future fitness.
 
 #### Max pairwise distance vs. phenotypic richness
 
@@ -1183,6 +1495,28 @@ ggplot(
         legend.justification = c(1, 0)) + 
   scale_color_discrete("")
 
+```
+
+```{r, info_theory_stats, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+stat.test <- res %>%
+  group_by(selection_name, offset) %>%
+  wilcox_test(value ~ Type) %>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance() 
+stat.test$label <- mapply(p_label,stat.test$p.adj)
+
+stat.test %>%
+  kbl() %>%
+  kable_styling(
+    bootstrap_options = c(
+      "striped",
+      "hover",
+      "condensed",
+      "responsive"
+    )
+  ) %>%
+  scroll_box(width="600px")
 ```
 
 #### Mean pairwise distance vs. phenotypic richness
@@ -1256,6 +1590,8 @@ ggplot(
 
 ```
 
+Mean and max pairwise distance appear to behave virtually identically. 
+
 #### Mean pairwise distance vs. shannon entropy
 
 ```{r, information_theory_mpd_shannon, message=FALSE, cache=TRUE, warning=FALSE}
@@ -1327,6 +1663,8 @@ ggplot(
 
 ```
 
+Looks like Shannon Diversity is more predictive of fitness than phenotypic richness (at least for lexicase), although still not as much as mean pairwise distance.
+
 #### Mean evolutionary distinctiveness vs. phenotypic richness
 
 ```{r, information_theory_med, message=FALSE, cache=TRUE, warning=FALSE}
@@ -1397,6 +1735,8 @@ ggplot(
   scale_color_discrete("")
 
 ```
+
+Interestingly, mean evolutionary distinctiveness looks fairly comparable to mean pairwise distance (although note that the y axis doesn't go quite as far).
 
 #### Mean evolutionary distinctiveness vs. shannon entropy
 
@@ -1471,6 +1811,8 @@ ggplot(
 
 ### Transfer entropy between types of diversity
 
+While we're calculating transfer entropy, we might as well also calculate it between phenotypic diversity and phylogenetic diversity, as these could potentially also be in a feedback loop.
+
 #### Max pairwise distance and phenotypic richness
 
 ```{r, information_theory_pheno_phylo, message=FALSE, cache=TRUE, warning=FALSE}
@@ -1534,6 +1876,8 @@ ggplot(
 
 ```
 
+
+
 #### Mean pairwise distance and phenotypic richness
 
 ```{r, information_theory_pheno_phylo_mpd, message=FALSE, cache=TRUE, warning=FALSE}
@@ -1596,6 +1940,8 @@ ggplot(
   scale_color_discrete("")
 
 ```
+
+Here, on the other hand, there's a pretty notable difference between mean and max pairwise distance. Looks like max pairwise distance is in general more predictive of phenotypic richness than mean pairwise distance is (for fitness sharing, mean richness even has a high transfer entropy to MPD than the other way around).
 
 #### Mean pairwise distance and shannon diversity
 
