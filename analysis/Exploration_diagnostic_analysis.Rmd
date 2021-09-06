@@ -344,6 +344,10 @@ stat.test %>%
 
 Next, we analyze the behavior of phylogenetic diversity on the exploration diagnostic.
 
+### Relationship between different types of phenotypic diversity
+
+TODO
+
 ### Over time
 
 #### Mean pairwise distance
@@ -1422,11 +1426,48 @@ Ultimately, it's hard to draw useful inferences either from these single time po
 
 To analyze the drivers of this feedback loop in a more rigorous way, we turn to [Transfer Entropy](https://towardsdatascience.com/causality-931372313a1c) as a metric of [Granger Causality](http://www.scholarpedia.org/article/Granger_causality). For a more thorough description, see the paper associated with this supplement.
 
+### Setup
+
+First let's define a function we'll use to calculate and output significance and effect size for these results:
+
+```{r, info_theory_stat_function}
+transfer_entropy_stats <- function(res) {
+  stat.test <- res %>%
+    group_by(selection_name, offset) %>%
+    wilcox_test(value ~ Type) %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance() 
+  stat.test$label <- mapply(p_label,stat.test$p.adj)
+  
+  # Calculate effect sizes for these differences
+  effect_sizes <- res %>%
+    group_by(selection_name, offset) %>%
+    wilcox_effsize(value ~ Type)
+  
+  stats.test$effsize <- effect_sizes$effsize
+  stats.test$magnitude <- effect_sizes$magnitude
+  
+  stat.test %>%
+    kbl() %>%
+    kable_styling(
+      bootstrap_options = c(
+        "striped",
+        "hover",
+        "condensed",
+        "responsive"
+      )
+    ) %>%
+    scroll_box(width="600px")
+}
+```
+
 ### Transfer entropy from diversity to fitness
 
 First, we calculate the information that each type of diversity gives us about future fitness.
 
 #### Max pairwise distance vs. phenotypic richness
+
+We plot the differences in transfer entropy from phylogenetic diversity to fitness and from phenotypic diversity to fitness, at a range of different lags.
 
 ```{r, information_theory, message=FALSE, cache=TRUE, warning=FALSE}
 # Calculate transfer entropy for max pairwise distance
@@ -1497,26 +1538,11 @@ ggplot(
 
 ```
 
-```{r, info_theory_stats, message=FALSE, cache=TRUE, warning=FALSE}
-# Determine which conditions are significantly different from each other
-stat.test <- res %>%
-  group_by(selection_name, offset) %>%
-  wilcox_test(value ~ Type) %>%
-  adjust_pvalue(method = "bonferroni") %>%
-  add_significance() 
-stat.test$label <- mapply(p_label,stat.test$p.adj)
+Next we calculate statistics to quantify these differences
 
-stat.test %>%
-  kbl() %>%
-  kable_styling(
-    bootstrap_options = c(
-      "striped",
-      "hover",
-      "condensed",
-      "responsive"
-    )
-  ) %>%
-  scroll_box(width="600px")
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
 ```
 
 #### Mean pairwise distance vs. phenotypic richness
@@ -1592,6 +1618,11 @@ ggplot(
 
 Mean and max pairwise distance appear to behave virtually identically. 
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
 #### Mean pairwise distance vs. shannon entropy
 
 ```{r, information_theory_mpd_shannon, message=FALSE, cache=TRUE, warning=FALSE}
@@ -1664,6 +1695,11 @@ ggplot(
 ```
 
 Looks like Shannon Diversity is more predictive of fitness than phenotypic richness (at least for lexicase), although still not as much as mean pairwise distance.
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
 
 #### Mean evolutionary distinctiveness vs. phenotypic richness
 
@@ -1738,6 +1774,12 @@ ggplot(
 
 Interestingly, mean evolutionary distinctiveness looks fairly comparable to mean pairwise distance (although note that the y axis doesn't go quite as far).
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
 #### Mean evolutionary distinctiveness vs. shannon entropy
 
 ```{r, information_theory_med_shannon, message=FALSE, cache=TRUE, warning=FALSE}
@@ -1809,6 +1851,12 @@ ggplot(
 
 ```
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
 ### Transfer entropy between types of diversity
 
 While we're calculating transfer entropy, we might as well also calculate it between phenotypic diversity and phylogenetic diversity, as these could potentially also be in a feedback loop.
@@ -1876,6 +1924,10 @@ ggplot(
 
 ```
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
 
 
 #### Mean pairwise distance and phenotypic richness
@@ -1943,6 +1995,12 @@ ggplot(
 
 Here, on the other hand, there's a pretty notable difference between mean and max pairwise distance. Looks like max pairwise distance is in general more predictive of phenotypic richness than mean pairwise distance is (for fitness sharing, mean richness even has a high transfer entropy to MPD than the other way around).
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
 #### Mean pairwise distance and shannon diversity
 
 ```{r, information_theory_pheno_phylo_mpd_shannon, message=FALSE, cache=TRUE, warning=FALSE}
@@ -2005,6 +2063,12 @@ ggplot(
   scale_color_discrete("")
 
 ```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
 
 #### Mean evolutionary distinctiveness and phenotypic richness
 
@@ -2079,6 +2143,12 @@ ggplot(
 
 ```
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
 #### Mean evolutionary distinctiveness and  shannon diversity
 
 ```{r, information_theory_pheno_phylo_med_shannon, message=FALSE, cache=TRUE, warning=FALSE}
@@ -2150,4 +2220,9 @@ ggplot(
         legend.justification = c(1, 0)) + 
   scale_color_discrete("")
 
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
 ```
