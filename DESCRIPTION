@@ -26,4 +26,5 @@ Imports:
     infotheo,
     scales,
     osfr,
-    plyr
+    plyr,
+    coin
