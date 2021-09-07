@@ -771,7 +771,7 @@ final_data %>%
 
 #### Lexicase selection
 
-```{r, phylodiversity_correlation_plot}
+```{r, phylodiversity_correlation_plot_lexicase}
 final_data %>% 
   filter(selection_name=="Lexicase") %>%
   transmute(MinPD=min_phenotype_pairwise_distance, 
@@ -793,7 +793,7 @@ final_data %>%
 
 #### Eco-EA
 
-```{r, phylodiversity_correlation_plot}
+```{r, phylodiversity_correlation_plot_ecoea}
 final_data %>% 
   filter(selection_name=="EcoEA") %>%
   transmute(MinPD=min_phenotype_pairwise_distance, 
