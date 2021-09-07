@@ -13,6 +13,12 @@ final
 trait-performance-1
 final-activation-position-coverage
 phylogenetic-diversity
+relationship-between-different-types-of-pylogenetic-diversity
+random
+tournament
+fitness-sharing
+lexicase-selection
+eco-ea
 over-time-1
 mean-pairwise-distance
 mean-evolutionary-distinctiveness
@@ -49,6 +55,7 @@ mean-evolutionary-distinctiveness-4
 richness-4
 shannon-diversity-4
 causality-analysis
+setup-1
 transfer-entropy-from-diversity-to-fitness
 max-pairwise-distance-vs.-phenotypic-richness
 mean-pairwise-distance-vs.-phenotypic-richness
@@ -62,7 +69,7 @@ mean-pairwise-distance-and-shannon-diversity
 mean-evolutionary-distinctiveness-and-phenotypic-richness
 mean-evolutionary-distinctiveness-and-shannon-diversity
 other-fitness-landscapes
-setup-1
+setup-2
 performance-1
 over-time-3
 final-3
