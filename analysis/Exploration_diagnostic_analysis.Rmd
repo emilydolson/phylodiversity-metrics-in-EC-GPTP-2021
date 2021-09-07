@@ -344,9 +344,475 @@ stat.test %>%
 
 Next, we analyze the behavior of phylogenetic diversity on the exploration diagnostic.
 
-### Relationship between different types of phenotypic diversity
+### Relationship between different types of pylogenetic diversity
 
-TODO
+First, to get a big-picture overview, we make correlation matrices of all the different phylogenetic diversity metrics:
+
+```{r, phylodiversity_correlation_plot}
+final_data %>% 
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phen_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phen_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
+Since these could vary by selection scheme, we also make a correlation matrix for each selection scheme, below.
+
+In general, it looks like the pairwise distance metrics behave similarly to each other and the evolutionary distinctiveness metrics behave similarly to each other. Let's spot check that by looking at some scatter plots (we're excluding min pairwise distance, because it's pretty much always 1).
+
+```{r, meanpd_vs_varpd, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=variance_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, meanpd_vs_maxpd, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, varpd_vs_maxpd, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=variance_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+And let's check that it doesn't look radically different early on in the run:
+
+```{r, meanpd_vs_varpd_early, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=variance_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, meanpd_vs_maxpd_early, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, varpd_vs_maxpd_early, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=variance_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+Similarly, the evolutionary distinctiveness metrics look largely similar to each other, but let's spot check that too.
+
+```{r, med_vs_ved, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=variance_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, med_vs_max_ed, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=max_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, med_vs_min_ed, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=min_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+And let's check out an earlier time point
+
+```{r, med_vs_ved_early, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=variance_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, med_vs_max_ed_early, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=max_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, med_vs_min_ed_early, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=min_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+Looks like the evolutionary distinctiveness statistics capture more different information from each other than the pairwise distance statistics. However, in a lot of cases they still correlate. There is definitely more exploration to be done on what differences in these metrics imply, but for simplicity we'll stick to one pairwise distance metric and one evolutionary distinctiveness metric.
+
+#### Random
+
+```{r, phylodiversity_correlation_plot_random}
+final_data %>% 
+  filter(selection_name=="Random") %>%
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phen_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phen_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
+#### Tournament
+
+```{r, phylodiversity_correlation_plot_tournament}
+final_data %>% 
+  filter(selection_name=="Tournament") %>%
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phen_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phen_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
+#### Fitness Sharing
+
+```{r, phylodiversity_correlation_plot_sharing}
+final_data %>% 
+  filter(selection_name=="Fitness sharing") %>%
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phen_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phen_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
+#### Lexicase selection
+
+```{r, phylodiversity_correlation_plot}
+final_data %>% 
+  filter(selection_name=="Lexicase") %>%
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phen_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phen_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
+#### Eco-EA
+
+```{r, phylodiversity_correlation_plot}
+final_data %>% 
+  filter(selection_name=="EcoEA") %>%
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phen_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phen_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
 
 ### Over time
 
@@ -383,7 +849,7 @@ ggplot(
 
 ```
 
-Lexicase selection maintains a monotonic increase in phylogenetic diversity over the course of the entire experiment. It likely never experiences a full coalesence event (where the most-recent common ancestor changes). Eco-EA nearly keeps pace with lexicase selection until towards the end, when its phylogenetic diversity crashes. This is likely the result of selective sweeps that begin to occur as the population discovers high fitness solutions. Fitness sharing shows a slight dip at the same time that its fitness plateaus (likely also the result of a selective sweep), but phylogenetic diversity recovers afterwards, making for a relatively constant level. over time. Tournament selection, on the other hand, maintains the same (low) level of phylogenetic diversity as fitness sharing, up until the point that fitness plateaus, at which point tournament selection's phylodiversity drops to nearly 0. Interestingly, lexicase selection and Eco-EA both maintain more phylodiversity than random selection, whereas fitness sharing and tournament selection maintain less.
+Lexicase selection maintains a monotonic increase in phylogenetic diversity over the course of the entire experiment. It likely never experiences a full coalescence event (where the most-recent common ancestor changes). Eco-EA nearly keeps pace with lexicase selection until towards the end, when its phylogenetic diversity crashes. This is likely the result of selective sweeps that begin to occur as the population discovers high fitness solutions. Fitness sharing shows a slight dip at the same time that its fitness plateaus (likely also the result of a selective sweep), but phylogenetic diversity recovers afterwards, making for a relatively constant level. over time. Tournament selection, on the other hand, maintains the same (low) level of phylogenetic diversity as fitness sharing, up until the point that fitness plateaus, at which point tournament selection's phylodiversity drops to nearly 0. Interestingly, lexicase selection and Eco-EA both maintain more phylodiversity than random selection, whereas fitness sharing and tournament selection maintain less.
 
 #### Mean evolutionary distinctiveness
 
@@ -1444,8 +1910,8 @@ transfer_entropy_stats <- function(res) {
     group_by(selection_name, offset) %>%
     wilcox_effsize(value ~ Type)
   
-  stats.test$effsize <- effect_sizes$effsize
-  stats.test$magnitude <- effect_sizes$magnitude
+  stat.test$effsize <- effect_sizes$effsize
+  stat.test$magnitude <- effect_sizes$magnitude
   
   stat.test %>%
     kbl() %>%
