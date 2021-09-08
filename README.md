@@ -11,8 +11,10 @@ This repository contains all code and supplemental material for "What can phylog
   - [Abstract](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#abstract)
   - [Supplemental information](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#supplemental-information)
   - [Dependencies](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#dependencies)
+  - [Compilation](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#compilation)
   - [Authors](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#authors)
   - [Research overview](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#research-overview)
+  - [Repository contents](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#repository-contents)
 
 ## Abstract
 
@@ -27,6 +29,41 @@ The supplemental information for this paper is [here](https://emilydolson.github
 The C++ code to run these experiments requires:
 - [Empirical](https://github.com/devosoft/Empirical)
 - The [EC Ecology toolbox](https://github.com/emilydolson/ec_ecology_toolbox)
+
+## Compilation
+
+You can compile and run the code used in the paper as follows:
+
+```{bash, shell_installation}
+# Clone Empirical
+git clone --recursive https://github.com/devosoft/Empirical.git 
+
+# Clone EC-ecology-toolbox
+git clone https://github.com/emilydolson/ec_ecology_toolbox.git
+
+# Clone the repo for this project
+git clone --recursive https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021.git
+
+### Complex fitness landscapes
+
+# Compile the executable to run experiments for this project
+make
+
+# Run an experiment. To set parameters, use command line flags
+# e.g. to set the selection scheme, run ./ecology_parameter_sweep -SELECTION 2
+# To see all options, run ./ecology_parameter_sweep --help
+./ecology_parameter_sweep
+
+### Exploration diagnostic
+
+# all of the code for the exploration diagnostic lives in the exploration_diagnostic submodule
+cd exploration_diagnostic
+make
+./dia_world
+
+# the dia_world executable can be configured in the same way as the ecology_parameter_sweep executable
+
+```
 
 ## Authors
 
@@ -70,3 +107,34 @@ We ran 5 selection schemes (random, tournament, fitness sharing, lexicase select
 - Phylogenetic diversity and phenotypic diversity are both broad classes of metrics, and there is substantial variation in how different phylogenetic diversity metrics behave in different contexts.
 
 - There is clearly variation in all of this over time and by fitness landscape.
+
+## Repository contents
+
+- **.github/workflows**: Github actions to automatically build supplemental material
+- **analysis**: Contains Rmarkdown (and compiled html) for all code used to analyze data for this project. This is broken into analysis for the exploration diagnostic and analysis for the other four problems. These files are compiled into the supplemental material
+- **book**: The supplemental material (this is a pre-compiled backup - the full supplemental material is auto-generated via github actions)
+- **exploration_diagnostic**: A submodule containing all code for the exploration diagnostic experiments.
+- **scripts**: Contains all scripts used to wrangle experiments and data
+  - count_convergence.py: A script to count the number of times a phylogeny rediscovers the same phenotype
+  - de_dup_phylogeny.py: A script to remove duplicate lines from phylogenies (can happen when phylogeny files from multiple time points are concatenated)
+  - generate_hpcc_jobs.py: The script used to submit experiments for this paper to our computing cluster
+  - munge_data.py: The script used to pull all of the data into a single file.
+- **source**: Contains the code used to generate the executable that was run in all complex fitness landscape experiments:
+  - ecology_world.hpp: Contains the bulk of the code for the experiment
+  - BitSorterMutators.hpp: Handles mutations for the sorting networks problem
+  - TaskSet.hpp: Used to build the Logic-9 problem
+  - TestcaseSet.hpp: Used for the program synthesis problem
+  - org_types.hpp: Used to help wrangle the different representations used for each fitness landscape
+  - **native**: Contains the .cc file that is ultimately compiled.
+- **testcases**: Contains test cases (from the [program synthesis benchmark suite](https://thelmuth.github.io/GECCO_2015_Benchmarks_Materials/)) used for the program synthesis problems.
+- DESCRIPION: For keeping tracking of R dependencies
+- LICENSE: The MIT License
+- Makefile: contains instructions for compiling the executable
+- \_bookdown.yml: For the supplemental material
+- \output.yml: For the supplemental material
+- book.bib: For the supplemental material
+- build_book.sh: Builds the supplemental material
+- index.Rmd: Contains the beginning of the supplemental material
+- packages.bib: Citations for all the R packages we used
+- style.css: Styling for the supplemental material
+- tail.Rmd: For the supplemental material
