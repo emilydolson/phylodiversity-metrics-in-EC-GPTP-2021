@@ -187,6 +187,369 @@ stat.test %>%
 
 ## Phylogenetic diversity
 
+### Relationship between different types of pylogenetic diversity
+
+First, to get a big-picture overview, we make correlation matrices of all the different phylogenetic diversity metrics:
+
+```{r, phylodiversity_correlation_plot_complex}
+final_data %>% 
+  transmute(MinPD=min_phenotype_pairwise_distance, 
+            MeanPD=mean_phenotype_pairwise_distance, 
+            MaxPD=max_phenotype_pairwise_distance, 
+            VarPD=variance_phenotype_pairwise_distance, 
+            MinED = min_phenotype_evolutionary_distinctiveness,
+            MeanED= mean_phenotype_evolutionary_distinctiveness,
+            MaxED=max_phenotype_evolutionary_distinctiveness,
+            VarED=variance_phenotype_evolutionary_distinctiveness,
+            PD=phenotype_current_phylogenetic_diversity,  # See Faith 1992
+            MRCA=phenotype_mrca_depth,  # Phylogenetic depth of most recent common ancestor
+            N=phenotype_num_taxa     # Number of taxonomically-distinct phenotypes
+  ) %>%
+  cor_mat() %>% 
+  pull_lower_triangle() %>% 
+  cor_plot()
+```
+
+However, these correlations may well vary by selection scheme and by problem, and even over time within a selection scheme and problem. Let's take a look at some scatter plots.
+
+```{r, meanpd_vs_varpd_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=variance_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+
+```{r, meanpd_vs_maxpd_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, varpd_vs_maxpd_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=variance_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, meanpd_vs_varpd_early_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=variance_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+
+```{r, meanpd_vs_maxpd_early_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, varpd_vs_maxpd_early_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=variance_phenotype_pairwise_distance,
+        x=max_phenotype_pairwise_distance,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+
+```{r, med_vs_ved_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=variance_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, med_vs_max_ed_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=max_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, med_vs_min_ed_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=min_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, med_vs_ved_early_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=variance_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, med_vs_max_ed_early_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=max_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
+
+```{r, med_vs_min_ed_early_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==5000),
+    aes(
+        y=mean_phenotype_evolutionary_distinctiveness,
+        x=min_phenotype_evolutionary_distinctiveness,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+  scale_x_continuous(
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
 ### Over time
 
 ```{r, complex_landscape_phylogeny_over_time_plot, message=FALSE, cache=TRUE, warning=FALSE, cache.lazy=FALSE}
@@ -277,6 +640,42 @@ stat.test %>%
 
 
 ## Phenotypic diversity
+
+### Relationship between different types of phenotypic diversity
+
+First, we should assess the extent to which different metrics of phenotypic diversity are capturing different information.
+
+```{r, richness_vs_shannon_complex, message=FALSE, cache=TRUE, warning=FALSE}
+
+ggplot(
+    data %>% filter(gen==500000),
+    aes(
+        y=phenotype_diversity,
+        x=phenotype_num_taxa,
+        color=selection_name,
+        fill=selection_name
+    )
+  ) +
+  geom_point() +
+    scale_y_continuous(
+        name="Phenotypic shannon diversity"
+  ) +
+  scale_x_continuous(
+        name="Phenotypic richness",
+        breaks = breaks_extended(4)
+  ) + 
+  facet_wrap(
+      ~selection_name*problem_name, scales="free"
+  ) + 
+  stat_smooth(
+    method="lm"
+  ) + 
+  stat_cor(
+    method="spearman", cor.coef.name = "rho", color="black"
+  ) +
+  theme(legend.position = "none")
+```
+
 
 ### Over time
 
@@ -596,6 +995,45 @@ ggplot(
 
 ## Causality analysis
 
+### Setup
+
+First let's define a function we'll use to calculate and output significance and effect size for these results:
+
+```{r, complex_landscape_info_theory_stat_function}
+transfer_entropy_stats <- function(res) {
+  stat.test <- res %>%
+    group_by(selection_name, offset) %>%
+    wilcox_test(value ~ Type) %>%
+    adjust_pvalue(method = "bonferroni") %>%
+    add_significance() 
+  stat.test$label <- mapply(p_label,stat.test$p.adj)
+  
+  # Calculate effect sizes for these differences
+  effect_sizes <- res %>%
+    group_by(selection_name, offset) %>%
+    wilcox_effsize(value ~ Type)
+  
+  stat.test$effsize <- effect_sizes$effsize
+  stat.test$magnitude <- effect_sizes$magnitude
+  
+  stat.test %>%
+    kbl() %>%
+    kable_styling(
+      bootstrap_options = c(
+        "striped",
+        "hover",
+        "condensed",
+        "responsive"
+      )
+    ) %>%
+    scroll_box()
+}
+```
+
+
+### Transfer entropy from diversity to fitness
+
+#### Max pairwise distance vs. phenotypic richness
 
 ```{r, complex_landscape_information_theory, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
@@ -629,6 +1067,13 @@ ggplot(
 
 ```
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+#### Mean pairwise distance vs. phenotypic richness
+
 ```{r, complex_landscape_information_theory_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
@@ -660,6 +1105,52 @@ ggplot(
   theme(legend.position = "bottom")
 
 ```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+#### Mean pairwise distance vs. phenotypic Shannon diversity
+
+```{r, complex_landscape_information_theory_mpd_shannon, message=FALSE, cache=TRUE, warning=FALSE}
+res <- data %>% group_by(SEED, selection_name, problem_name) %>%
+summarise(
+  fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 1)), discretize(lag(max_performance, 1))),
+  fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 10)), discretize(lag(max_performance, 10))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 100)), discretize(lag(max_performance, 100))),
+    fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 1)), discretize(lag(max_performance, 1))),
+      fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 10)), discretize(lag(max_performance, 10))),
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 100)), discretize(lag(max_performance, 100)))
+      )
+
+res <- res %>% pivot_longer(cols=contains("o_10"))
+res$offset <- str_extract(res$name, "[:digit:]*$")
+res$Type <- case_when(str_detect(res$name, "phylo") ~ "Phylogenetic", TRUE ~ "Phenotypic")
+
+ggplot(
+  res %>% filter(str_detect(name, "fit_ph*")), 
+  aes(
+    x=as.factor(offset), 
+    y=value, 
+    color=Type
+    )
+  ) + 
+  geom_boxplot() + 
+  facet_wrap(~problem_name*selection_name) + 
+  scale_x_discrete("Lag") + 
+  scale_y_continuous("Transfer Entropy") + 
+  scale_color_discrete("") + 
+  theme(legend.position = "bottom")
+
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+#### Mean evolutionary distinctiveness vs. phenotypic richness
 
 ```{r, complex_landscape_information_theory_mean_evolutionary_distinctivess, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
@@ -693,7 +1184,51 @@ ggplot(
 
 ```
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
 
+#### Mean evolutionary distinctiveness vs. phenotypic Shannon diveristy
+
+```{r, complex_landscape_information_theory_mean_evolutionary_distinctivess_shannon, message=FALSE, cache=TRUE, warning=FALSE}
+res <- data %>% group_by(SEED, selection_name, problem_name) %>%
+summarise(
+  fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(max_performance, 1))),
+  fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)), discretize(lag(max_performance, 10))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)), discretize(lag(max_performance, 100))),
+    fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 1)), discretize(lag(max_performance, 1))),
+      fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 10)), discretize(lag(max_performance, 10))),
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 100)), discretize(lag(max_performance, 100)))
+      )
+
+res <- res %>% pivot_longer(cols=contains("o_10"))
+res$offset <- str_extract(res$name, "[:digit:]*$")
+res$Type <- case_when(str_detect(res$name, "phylo") ~ "Phylogenetic", TRUE ~ "Phenotypic")
+
+ggplot(
+  res %>% filter(str_detect(name, "fit_ph*")), 
+  aes(
+    x=as.factor(offset), 
+    y=value, 
+    color=Type
+    )
+  ) + 
+  geom_boxplot() + 
+  facet_wrap(~problem_name*selection_name) + 
+  scale_x_discrete("Lag") + 
+  scale_y_continuous("Transfer Entropy") + 
+  scale_color_discrete("") + 
+  theme(legend.position = "bottom")
+
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+#### Variance evolutionary distinctiveness vs. phenotypic richness
 
 ```{r, complex_landscape_information_theory_variance_evolutionary_distinctivess, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
@@ -727,21 +1262,60 @@ ggplot(
 
 ```
 
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+### Transfer entropy between types of diversity
+
+
+While we're calculating transfer entropy, we might as well also calculate it between phenotypic diversity and phylogenetic diversity, as these could potentially also be in a feedback loop.
+
+#### Max pairwise distance and phenotypic richness
 
 ```{r, complex_landscape_information_theory_pheno_phylo, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
-  phen_phylo_10 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_pairwise_distance, 1)), discretize(lag(phenotype_num_taxa, 1))),
-  phen_phylo_100 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_pairwise_distance, 10)), discretize(lag(phenotype_num_taxa, 10))),
-  pheno_phylo_1000 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_pairwise_distance, 100)), discretize(lag(phenotype_num_taxa, 100))),
-    phylo_pheno_10 = condinformation(discretize(max_phenotype_pairwise_distance), discretize(lag(phenotype_num_taxa, 1)), discretize(lag(max_phenotype_pairwise_distance, 1))),
-      phylo_pheno_100 = condinformation(discretize(max_phenotype_pairwise_distance), discretize(lag(phenotype_num_taxa, 10)), discretize(lag(max_phenotype_pairwise_distance, 10))),
-      phylo_pheno_1000 = condinformation(discretize(max_phenotype_pairwise_distance), discretize(lag(phenotype_num_taxa, 100)), discretize(lag(max_phenotype_pairwise_distance, 100)))
-      )
+  phen_phylo_10 =      condinformation(discretize(phenotype_num_taxa), 
+                                       discretize(lag(max_phenotype_pairwise_distance, 1)), 
+                                       discretize(lag(phenotype_num_taxa, 1))),
+  phen_phylo_100 =     condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(max_phenotype_pairwise_distance, 10)),
+                                       discretize(lag(phenotype_num_taxa, 10))),
+  pheno_phylo_1000 =   condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(max_phenotype_pairwise_distance, 100)),
+                                       discretize(lag(phenotype_num_taxa, 100))),
+  pheno_phylo_10000 =  condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(max_phenotype_pairwise_distance, 1000)),
+                                       discretize(lag(phenotype_num_taxa, 1000))),
+  pheno_phylo_100000 = condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(max_phenotype_pairwise_distance, 10000)),
+                                       discretize(lag(phenotype_num_taxa, 10000))),
+  
+  phylo_pheno_10 =     condinformation(discretize(max_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 1)),
+                                       discretize(lag(max_phenotype_pairwise_distance, 1))),
+  phylo_pheno_100 =    condinformation(discretize(max_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 10)),
+                                       discretize(lag(max_phenotype_pairwise_distance, 10))),
+  phylo_pheno_1000 =   condinformation(discretize(max_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 100)),
+                                       discretize(lag(max_phenotype_pairwise_distance, 100))),
+  phylo_pheno_10000 =  condinformation(discretize(max_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 1000)),
+                                       discretize(lag(max_phenotype_pairwise_distance, 1000))),
+  phylo_pheno_100000 = condinformation(discretize(max_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 10000)),
+                                       discretize(lag(max_phenotype_pairwise_distance, 10000)))
+)
 
+# Turn Transfer Entropy columns into rows
 res <- res %>% pivot_longer(cols=contains("phylo"))
+# Pull lag into a column
 res$offset <- str_extract(res$name, "[:digit:]*$")
-res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "Phenotypic -> Phylogenetic", TRUE ~ "Phylogenetic -> Phenotypic")
+# Make column indicating direction of transfer entropy
+res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "\nPhenotypic\n\t->\nPhylogenetic\n", TRUE ~ "\nPhylogenetic\n\t->\nPhenotypic\n")
 
 ggplot(
   res, 
@@ -752,28 +1326,63 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
-  scale_x_discrete("Lag") + 
+  facet_wrap(~selection_name* problem_name) + 
+  scale_x_discrete("Lag",labels=c("10","","1000","","100000")) + 
   scale_y_continuous("Transfer Entropy") + 
-  scale_color_discrete("") + 
-  theme(legend.position = "bottom")
+  scale_color_discrete("")
 
 ```
 
-```{r, complex_landscape_information_theory_pheno_phylo_evolutionary_distinctiveness, message=FALSE, cache=TRUE, warning=FALSE}
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
+#### Mean pairwise distance and phenotypic richness
+
+```{r, complex_landscape_information_theory_pheno_phylo_mpd, message=FALSE, cache=TRUE, warning=FALSE}
 res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
-  phen_phylo_10 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(phenotype_num_taxa, 1))),
-  phen_phylo_100 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_evolutionary_distinctiveness, 10)), discretize(lag(phenotype_num_taxa, 10))),
-  pheno_phylo_1000 = condinformation(discretize(phenotype_num_taxa), discretize(lag(max_phenotype_evolutionary_distinctiveness, 100)), discretize(lag(phenotype_num_taxa, 100))),
-    phylo_pheno_10 = condinformation(discretize(max_phenotype_evolutionary_distinctiveness), discretize(lag(phenotype_num_taxa, 1)), discretize(lag(max_phenotype_evolutionary_distinctiveness, 1))),
-      phylo_pheno_100 = condinformation(discretize(max_phenotype_evolutionary_distinctiveness), discretize(lag(phenotype_num_taxa, 10)), discretize(lag(max_phenotype_evolutionary_distinctiveness, 10))),
-      phylo_pheno_1000 = condinformation(discretize(max_phenotype_evolutionary_distinctiveness), discretize(lag(phenotype_num_taxa, 100)), discretize(lag(max_phenotype_evolutionary_distinctiveness, 100)))
-      )
+  phen_phylo_10 =      condinformation(discretize(phenotype_num_taxa), 
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1)), 
+                                       discretize(lag(phenotype_num_taxa, 1))),
+  phen_phylo_100 =     condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10)),
+                                       discretize(lag(phenotype_num_taxa, 10))),
+  pheno_phylo_1000 =   condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100)),
+                                       discretize(lag(phenotype_num_taxa, 100))),
+  pheno_phylo_10000 =  condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1000)),
+                                       discretize(lag(phenotype_num_taxa, 1000))),
+  pheno_phylo_100000 = condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10000)),
+                                       discretize(lag(phenotype_num_taxa, 10000))),
+  
+  phylo_pheno_10 =     condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 1)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1))),
+  phylo_pheno_100 =    condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 10)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10))),
+  phylo_pheno_1000 =   condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 100)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100))),
+  phylo_pheno_10000 =  condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 1000)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1000))),
+  phylo_pheno_100000 = condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 10000)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10000)))
+)
 
+# Turn Transfer Entropy columns into rows
 res <- res %>% pivot_longer(cols=contains("phylo"))
+# Pull lag into a column
 res$offset <- str_extract(res$name, "[:digit:]*$")
-res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "Phenotypic -> Phylogenetic", TRUE ~ "Phylogenetic -> Phenotypic")
+# Make column indicating direction of transfer entropy
+res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "\nPhenotypic\n\t->\nPhylogenetic\n", TRUE ~ "\nPhylogenetic\n\t->\nPhenotypic\n")
 
 ggplot(
   res, 
@@ -784,10 +1393,236 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
-  scale_x_discrete("Lag") + 
+  facet_wrap(~selection_name*problem_name) + 
+  scale_x_discrete("Lag",labels=c("10","","1000","","100000")) + 
   scale_y_continuous("Transfer Entropy") + 
-  scale_color_discrete("") + 
-  theme(legend.position = "bottom")
+  scale_color_discrete("")
 
+```
+
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
+#### Mean pairwise distance and shannon diversity
+
+```{r, complex_landscape_information_theory_pheno_phylo_mpd_shannon, message=FALSE, cache=TRUE, warning=FALSE}
+res <- data %>% group_by(SEED, selection_name, problem_name) %>%
+summarise(
+  phen_phylo_10 =      condinformation(discretize(phen_diversity), 
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1)), 
+                                       discretize(lag(phen_diversity, 1))),
+  phen_phylo_100 =     condinformation(discretize(phen_diversity),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10)),
+                                       discretize(lag(phen_diversity, 10))),
+  pheno_phylo_1000 =   condinformation(discretize(phen_diversity),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100)),
+                                       discretize(lag(phen_diversity, 100))),
+  pheno_phylo_10000 =  condinformation(discretize(phen_diversity),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1000)),
+                                       discretize(lag(phen_diversity, 1000))),
+  pheno_phylo_100000 = condinformation(discretize(phen_diversity),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10000)),
+                                       discretize(lag(phen_diversity, 10000))),
+  
+  phylo_pheno_10 =     condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phen_diversity, 1)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1))),
+  phylo_pheno_100 =    condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phen_diversity, 10)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10))),
+  phylo_pheno_1000 =   condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phen_diversity, 100)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100))),
+  phylo_pheno_10000 =  condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phen_diversity, 1000)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 1000))),
+  phylo_pheno_100000 = condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phen_diversity, 10000)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 10000)))
+)
+
+# Turn Transfer Entropy columns into rows
+res <- res %>% pivot_longer(cols=contains("phylo"))
+# Pull lag into a column
+res$offset <- str_extract(res$name, "[:digit:]*$")
+# Make column indicating direction of transfer entropy
+res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "\nPhenotypic\n\t->\nPhylogenetic\n", TRUE ~ "\nPhylogenetic\n\t->\nPhenotypic\n")
+
+ggplot(
+  res, 
+  aes(
+    x=as.factor(offset), 
+    y=value, 
+    color=Type
+    )
+  ) + 
+  geom_boxplot() + 
+  facet_wrap(~selection_name*problem_name) + 
+  scale_x_discrete("Lag",labels=c("10","","1000","","100000")) + 
+  scale_y_continuous("Transfer Entropy") + 
+  scale_color_discrete("")
+
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
+#### Mean evolutionary distinctiveness and phenotypic richness
+
+```{r, complex_landscape_information_theory_pheno_phylo_med, message=FALSE, cache=TRUE, warning=FALSE}
+res <- data %>% group_by(SEED, selection_name, problem_name) %>%
+summarise(
+  phen_phylo_10 =      condinformation(
+                          discretize(phenotype_num_taxa), 
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1)), 
+                          discretize(lag(phenotype_num_taxa, 1))),
+  phen_phylo_100 =     condinformation(
+                          discretize(phenotype_num_taxa),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)),
+                          discretize(lag(phenotype_num_taxa, 10))),
+  pheno_phylo_1000 =   condinformation(
+                          discretize(phenotype_num_taxa),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)),
+                          discretize(lag(phenotype_num_taxa, 100))),
+  pheno_phylo_10000 =  condinformation(
+                          discretize(phenotype_num_taxa),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1000)),
+                          discretize(lag(phenotype_num_taxa, 1000))),
+  pheno_phylo_100000 = condinformation(
+                          discretize(phenotype_num_taxa),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10000)),
+                          discretize(lag(phenotype_num_taxa, 10000))),
+  
+  phylo_pheno_10 =     condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phenotype_num_taxa, 1)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1))),
+  phylo_pheno_100 =    condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phenotype_num_taxa, 10)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10))),
+  phylo_pheno_1000 =   condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phenotype_num_taxa, 100)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100))),
+  phylo_pheno_10000 =  condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phenotype_num_taxa, 1000)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1000))),
+  phylo_pheno_100000 = condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phenotype_num_taxa, 10000)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10000)))
+)
+
+# Turn Transfer Entropy columns into rows
+res <- res %>% pivot_longer(cols=contains("phylo"))
+# Pull lag into a column
+res$offset <- str_extract(res$name, "[:digit:]*$")
+# Make column indicating direction of transfer entropy
+res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "\nPhenotypic\n\t->\nPhylogenetic\n", TRUE ~ "\nPhylogenetic\n\t->\nPhenotypic\n")
+
+ggplot(
+  res, 
+  aes(
+    x=as.factor(offset), 
+    y=value, 
+    color=Type
+    )
+  ) + 
+  geom_boxplot() + 
+  facet_wrap(~selection_name*problem_name) + 
+  scale_x_discrete("Lag",labels=c("10","","1000","","100000")) + 
+  scale_y_continuous("Transfer Entropy") +  
+  scale_color_discrete("")
+
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
+```
+
+
+#### Mean evolutionary distinctiveness and  shannon diversity
+
+```{r, complex_landscape_information_theory_pheno_phylo_med_shannon, message=FALSE, cache=TRUE, warning=FALSE}
+res <- data %>% group_by(SEED, selection_name, problem_name) %>%
+summarise(
+  phen_phylo_10 =      condinformation(
+                          discretize(phen_diversity), 
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1)), 
+                          discretize(lag(phen_diversity, 1))),
+  phen_phylo_100 =     condinformation(
+                          discretize(phen_diversity),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)),
+                          discretize(lag(phen_diversity, 10))),
+  pheno_phylo_1000 =   condinformation(
+                          discretize(phen_diversity),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)),
+                          discretize(lag(phen_diversity, 100))),
+  pheno_phylo_10000 =  condinformation(
+                          discretize(phen_diversity),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1000)),
+                          discretize(lag(phen_diversity, 1000))),
+  pheno_phylo_100000 = condinformation(
+                          discretize(phen_diversity),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10000)),
+                          discretize(lag(phen_diversity, 10000))),
+  
+  phylo_pheno_10 =     condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phen_diversity, 1)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1))),
+  phylo_pheno_100 =    condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phen_diversity, 10)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10))),
+  phylo_pheno_1000 =   condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phen_diversity, 100)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100))),
+  phylo_pheno_10000 =  condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phen_diversity, 1000)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1000))),
+  phylo_pheno_100000 = condinformation(
+                          discretize(mean_phenotype_evolutionary_distinctiveness),
+                          discretize(lag(phen_diversity, 10000)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10000)))
+)
+
+# Turn Transfer Entropy columns into rows
+res <- res %>% pivot_longer(cols=contains("phylo"))
+# Pull lag into a column
+res$offset <- str_extract(res$name, "[:digit:]*$")
+# Make column indicating direction of transfer entropy
+res$Type <- case_when(str_detect(res$name, "phylo_pheno") ~ "\nPhenotypic\n\t->\nPhylogenetic\n", TRUE ~ "\nPhylogenetic\n\t->\nPhenotypic\n")
+
+ggplot(
+  res, 
+  aes(
+    x=as.factor(offset), 
+    y=value, 
+    color=Type
+    )
+  ) + 
+  geom_boxplot() + 
+  facet_wrap(~selection_name*problem_name) + 
+  scale_x_discrete("Lag",labels=c("10","","1000","","100000")) + 
+  scale_y_continuous("Transfer Entropy") + 
+  scale_color_discrete("")
+
+```
+
+```{r, message=FALSE, cache=TRUE, warning=FALSE}
+# Determine which conditions are significantly different from each other
+transfer_entropy_stats(res)
 ```

@@ -367,9 +367,7 @@ final_data %>%
   cor_plot()
 ```
 
-Since these could vary by selection scheme, we also make a correlation matrix for each selection scheme, below.
-
-In general, it looks like the pairwise distance metrics behave similarly to each other and the evolutionary distinctiveness metrics behave similarly to each other. Let's spot check that by looking at some scatter plots (we're excluding min pairwise distance, because it's pretty much always 1).
+However, these correlations may well vary by selection scheme, and even over time within a selection scheme. Let's take a look at some scatter plots.
 
 ```{r, meanpd_vs_varpd, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -398,6 +396,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+Mean and variance of pairwise distances appears to correlate fairly closely with each other across selection schemes. The exception to this is tournament selection, where the range of values for both of these metrics are very small and the correlation is directly inverse. This is likely being driven by there being a small number of taxa that are mostly siblings of each other. 
+
 ```{r, meanpd_vs_maxpd, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -425,6 +425,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+Maximum and mean pairwise distance also correlate pretty closely, with the exception again being tournament. These data shed further light on the previous graph as well - the maximum pariwise distance for tournament selection is always 2. 
+
 ```{r, varpd_vs_maxpd, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -451,6 +453,8 @@ ggplot(
   ) +
   theme(legend.position = "none")
 ```
+
+Max and variance of pairwise distances behave similarly.
 
 And let's check that it doesn't look radically different early on in the run:
 
@@ -481,6 +485,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+The correlation between these two metrics is substantially weaker for Eco-Ea and lexicase selection at the early time point. 
+
 ```{r, meanpd_vs_maxpd_early, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -508,6 +514,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+This relationship is also weaker, although not as much weaker.
+
 ```{r, varpd_vs_maxpd_early, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -534,6 +542,8 @@ ggplot(
   ) +
   theme(legend.position = "none")
 ```
+
+Similarly, the correlation between max and variance of pariwise distances is weakend, but still robust. So the relationship between mean and variance of pairwise distances is the only one that is really weaker at the earlier time points. Understanding exactly what drives these discrepancies is a promising angle for future work, as it may shed further light on the dynamics occurring in the run. It is particularly interesting that EcoEA and Lexicase selection are the scenarios where they diverge.
 
 Similarly, the evolutionary distinctiveness metrics look largely similar to each other, but let's spot check that too.
 
@@ -564,6 +574,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+These aren't the strongest correlations; different information is definitely being captured by each metric. However, they still correlate to a fair extent.
+
 ```{r, med_vs_max_ed, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -591,6 +603,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+Again, for the most part there is a fairly high degree of correlation here.
+
 ```{r, med_vs_min_ed, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -617,6 +631,8 @@ ggplot(
   ) +
   theme(legend.position = "none")
 ```
+
+And here too, although it's getting kind of weak for lexicase.
 
 And let's check out an earlier time point
 
@@ -647,6 +663,8 @@ ggplot(
   theme(legend.position = "none")
 ```
 
+The relationship between min and mean evolutionary distinctiveness holds up at the earlier time point for everything except fitness sharing. 
+
 ```{r, med_vs_max_ed_early, message=FALSE, cache=TRUE, warning=FALSE}
 
 ggplot(
@@ -673,6 +691,8 @@ ggplot(
   ) +
   theme(legend.position = "none")
 ```
+
+And here, for everything except lexicase
 
 ```{r, med_vs_min_ed_early, message=FALSE, cache=TRUE, warning=FALSE}
 
@@ -701,7 +721,11 @@ ggplot(
   theme(legend.position = "none")
 ```
 
-Looks like the evolutionary distinctiveness statistics capture more different information from each other than the pairwise distance statistics. However, in a lot of cases they still correlate. There is definitely more exploration to be done on what differences in these metrics imply, but for simplicity we'll stick to one pairwise distance metric and one evolutionary distinctiveness metric.
+These are relatively weak for the most part.
+
+Looks like the evolutionary distinctiveness statistics capture more different information from each other than the pairwise distance statistics (in general the correlations are weaker, and there are more deviations from the pattern of positive correlations). However, in a lot of cases they still correlate. There is definitely more exploration to be done on what differences in these metrics imply, but for simplicity we'll stick to one pairwise distance metric and one evolutionary distinctiveness metric.
+
+Since it's hard to get a gestalt impression from the scatterplots, let's take a look at the correlation matrices for each selection scheme. Note that these are at the final time point, which clearly misses some dynamics that occurr earlier.
 
 #### Random
 
@@ -725,6 +749,8 @@ final_data %>%
   cor_plot()
 ```
 
+In random selection, all the pairwise distance metrics correlate with each other, and also more weakly with some of the evolutionary distinctiveness metrics, but not max and variance (although they correlate strongly with each other). It is somewhat surprising that the depth of the most recent common ancestor and Faith's Phylogenetic Diveristy metric have so little correlation with the others.
+
 #### Tournament
 
 ```{r, phylodiversity_correlation_plot_tournament}
@@ -746,6 +772,8 @@ final_data %>%
   pull_lower_triangle() %>% 
   cor_plot()
 ```
+
+Here, all the evolutionary distinctiveness metrics coreelate strongly with each other, but the pairiwse distance metrics less so (although this is likely an artifact of the extremely low phylogenetic diversity in tournament selection)
 
 #### Fitness Sharing
 
@@ -769,6 +797,8 @@ final_data %>%
   cor_plot()
 ```
 
+Here, the pairwise distance metrics correlate with each other and the evolutionary distinctivenes metrics correlated with each other. There are some correlations between pairwise distance and evolutionary distinctiveness metrics, but they're weaker.
+
 #### Lexicase selection
 
 ```{r, phylodiversity_correlation_plot_lexicase}
@@ -790,6 +820,8 @@ final_data %>%
   pull_lower_triangle() %>% 
   cor_plot()
 ```
+
+Again, the pairwise distance metrics correlate with each other but not wth the volutionary distinctivness metrics. The evolutionary distinctiveness metrics sort of correlate with each other.
 
 #### Eco-EA
 
@@ -813,6 +845,7 @@ final_data %>%
   cor_plot()
 ```
 
+In Eco-EA, there is an impressively strong positive correlation among all the phylodiversity metrics. Understanding what causes Eco-EA to deviate from lexicase selection (and to a lesser extent fitness sharing) in this way would be worthy of further research.
 
 ### Over time
 
@@ -1923,7 +1956,7 @@ transfer_entropy_stats <- function(res) {
         "responsive"
       )
     ) %>%
-    scroll_box(width="600px")
+    scroll_box()
 }
 ```
 
