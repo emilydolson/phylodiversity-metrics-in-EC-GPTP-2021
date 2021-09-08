@@ -92,7 +92,7 @@ The C++ code to run these experiments requires:
 
 You can compile and run the code used in the paper as follows:
 
-```{bash, shell_installation}
+```{bash, shell_installation, eval=FALSE}
 # Clone Empirical
 git clone --recursive https://github.com/devosoft/Empirical.git 
 
