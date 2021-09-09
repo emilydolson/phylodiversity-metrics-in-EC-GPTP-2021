@@ -1021,7 +1021,7 @@ stat.test %>%
       "responsive"
     )
   ) %>%
-  scroll_box(width="600px")
+  scroll_box(width="100%")
 ```
 
 Looks like everything except fitness sharing and tournament are significantly different from each other.
