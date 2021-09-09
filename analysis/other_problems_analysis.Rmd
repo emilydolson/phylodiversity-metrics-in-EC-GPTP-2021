@@ -1030,7 +1030,7 @@ transfer_entropy_stats <- function(res) {
         "responsive"
       )
     ) %>%
-    scroll_box(width="600px")
+    scroll_box(width="100%")
 }
 ```
 
