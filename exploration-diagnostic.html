@@ -24,7 +24,7 @@
 <meta name="author" content="Jose Guadalupe Hernandez, Alexander Lalejini, Emily Dolson" />
 
 
-<meta name="date" content="2021-09-08" />
+<meta name="date" content="2021-09-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -5029,7 +5029,7 @@ although we ultimately conclude that this approach is not particularly informati
 <span id="cb63-24"><a href="exploration-diagnostic.html#cb63-24"></a>        <span class="st">&quot;responsive&quot;</span></span>
 <span id="cb63-25"><a href="exploration-diagnostic.html#cb63-25"></a>      )</span>
 <span id="cb63-26"><a href="exploration-diagnostic.html#cb63-26"></a>    ) <span class="op">%&gt;%</span></span>
-<span id="cb63-27"><a href="exploration-diagnostic.html#cb63-27"></a><span class="st">    </span><span class="kw">scroll_box</span>()</span>
+<span id="cb63-27"><a href="exploration-diagnostic.html#cb63-27"></a><span class="st">    </span><span class="kw">scroll_box</span>(<span class="dt">width=</span><span class="st">&quot;800px&quot;</span>)</span>
 <span id="cb63-28"><a href="exploration-diagnostic.html#cb63-28"></a>}</span></code></pre></div>
 </div>
 <div id="transfer-entropy-from-diversity-to-fitness" class="section level3">
@@ -5107,7 +5107,7 @@ although we ultimately conclude that this approach is not particularly informati
 <p>Next we calculate statistics to quantify these differences</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="exploration-diagnostic.html#cb65-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb65-2"><a href="exploration-diagnostic.html#cb65-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -6333,7 +6333,7 @@ small
 <p>Mean and max pairwise distance appear to behave virtually identically.</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="exploration-diagnostic.html#cb67-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb67-2"><a href="exploration-diagnostic.html#cb67-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -7557,7 +7557,7 @@ moderate
 <p>Looks like Shannon Diversity is more predictive of fitness than phenotypic richness (at least for lexicase), although still not as much as mean pairwise distance.</p>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="exploration-diagnostic.html#cb69-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb69-2"><a href="exploration-diagnostic.html#cb69-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -8783,7 +8783,7 @@ small
 <p>Interestingly, mean evolutionary distinctiveness looks fairly comparable to mean pairwise distance (although note that the y axis doesn’t go quite as far).</p>
 <div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="exploration-diagnostic.html#cb71-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb71-2"><a href="exploration-diagnostic.html#cb71-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -10006,7 +10006,7 @@ large
 <p><img src="phylodiversity-in-EC-supplement_files/figure-html/information_theory_med_shannon-1.png" width="672" /></p>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="exploration-diagnostic.html#cb73-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb73-2"><a href="exploration-diagnostic.html#cb73-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -11227,7 +11227,7 @@ large
 <p><img src="phylodiversity-in-EC-supplement_files/figure-html/information_theory_pheno_phylo-1.png" width="672" /></p>
 <div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="exploration-diagnostic.html#cb75-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb75-2"><a href="exploration-diagnostic.html#cb75-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -12546,7 +12546,7 @@ large
 <p>Here, on the other hand, there’s a pretty notable difference between mean and max pairwise distance. Looks like max pairwise distance is in general more predictive of phenotypic richness than mean pairwise distance is (for fitness sharing, mean richness even has a high transfer entropy to MPD than the other way around).</p>
 <div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="exploration-diagnostic.html#cb77-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb77-2"><a href="exploration-diagnostic.html#cb77-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -13863,7 +13863,7 @@ small
 <p><img src="phylodiversity-in-EC-supplement_files/figure-html/information_theory_pheno_phylo_mpd_shannon-1.png" width="672" /></p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="exploration-diagnostic.html#cb79-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb79-2"><a href="exploration-diagnostic.html#cb79-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -15188,7 +15188,7 @@ small
 <p><img src="phylodiversity-in-EC-supplement_files/figure-html/information_theory_pheno_phylo_med-1.png" width="672" /></p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="exploration-diagnostic.html#cb81-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb81-2"><a href="exploration-diagnostic.html#cb81-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -16515,7 +16515,7 @@ moderate
 <p><img src="phylodiversity-in-EC-supplement_files/figure-html/information_theory_pheno_phylo_med_shannon-1.png" width="672" /></p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="exploration-diagnostic.html#cb83-1"></a><span class="co"># Determine which conditions are significantly different from each other</span></span>
 <span id="cb83-2"><a href="exploration-diagnostic.html#cb83-2"></a><span class="kw">transfer_entropy_stats</span>(res)</span></code></pre></div>
-<div style="border: 1px solid #ddd; padding: 5px; ">
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:800px; ">
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
