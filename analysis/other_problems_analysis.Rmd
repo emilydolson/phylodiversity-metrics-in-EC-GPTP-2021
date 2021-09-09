@@ -14,7 +14,7 @@ output:
 ```{r, complex_landscape_setupknitr, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(cache = TRUE, warning = FALSE, 
-                      message = FALSE)
+                      message = FALSE, fig.fullwidth=TRUE, out.width="100%", fig.height = 10)
 ```
 
 ```{r, complex_landscape_dependencies, message=FALSE, cache=FALSE, warning=FALSE}
@@ -141,7 +141,7 @@ stat.test <- final_data %>%
   add_significance() %>%
   add_xy_position(x="selection_name",step.increase=1)
 #stat.test$manual_position <- stat.test$y.position * .5
-#stat.test$manual_position <- c(110, 150, 170, 170, 130, 110)
+#stat.test$manual_position <- c(110, 1100, 170, 170, 130, 110)
 stat.test$label <- mapply(p_label,stat.test$p.adj)
 ```
 
@@ -230,7 +230,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -259,7 +259,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -287,7 +287,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -315,7 +315,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -344,7 +344,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -372,7 +372,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -401,7 +401,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -429,7 +429,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -457,7 +457,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -485,7 +485,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -513,7 +513,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -541,7 +541,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -667,7 +667,7 @@ ggplot(
         breaks = breaks_extended(4)
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -787,7 +787,7 @@ ggplot(
         name="Mean pairwise distance"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -824,7 +824,7 @@ ggplot(
         name="Mean pairwise distance"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -855,7 +855,7 @@ ggplot(
         name="Phenotypic richness"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -885,7 +885,7 @@ phylogney_vs_performance <- ggplot(
         name="Mean pairwise distance"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -917,7 +917,7 @@ ggplot(
         name="Phenotypic richness"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -950,7 +950,7 @@ ggplot(
         name="Mean pairwise distance"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -981,7 +981,7 @@ ggplot(
         name="Phenotypic richness"
   ) + 
   facet_wrap(
-      ~selection_name*problem_name, scales="free"
+      ~selection_name*problem_name, ncol=4, scales="free"
   ) + 
   stat_smooth(
     method="lm"
@@ -1004,7 +1004,8 @@ First let's define a function we'll use to calculate and output significance and
 ```{r, complex_landscape_info_theory_stat_function}
 transfer_entropy_stats <- function(res) {
   stat.test <- res %>%
-    group_by(selection_name, offset) %>%
+    group_by(selection_name, problem_name, offset) %>%
+    filter(max(value) > 0) %>% # Sorting networks have some values of 0, which won't work for Wilcox test
     wilcox_test(value ~ Type) %>%
     adjust_pvalue(method = "bonferroni") %>%
     add_significance() 
@@ -1012,7 +1013,8 @@ transfer_entropy_stats <- function(res) {
   
   # Calculate effect sizes for these differences
   effect_sizes <- res %>%
-    group_by(selection_name, offset) %>%
+    group_by(selection_name, problem_name, offset) %>%
+    filter(max(value) > 0) %>%
     wilcox_effsize(value ~ Type)
   
   stat.test$effsize <- effect_sizes$effsize
@@ -1028,7 +1030,7 @@ transfer_entropy_stats <- function(res) {
         "responsive"
       )
     ) %>%
-    scroll_box()
+    scroll_box(width="800px")
 }
 ```
 
@@ -1042,10 +1044,10 @@ res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(max_phenotype_pairwise_distance, 1)), discretize(lag(max_performance, 1))),
   fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(max_phenotype_pairwise_distance, 10)), discretize(lag(max_performance, 10))),
-  fit_phylo_500 = condinformation(discretize(max_performance), discretize(lag(max_phenotype_pairwise_distance, 50)), discretize(lag(max_performance, 50))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(max_phenotype_pairwise_distance, 100)), discretize(lag(max_performance, 100))),
     fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 1)), discretize(lag(max_performance, 1))),
       fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 10)), discretize(lag(max_performance, 10))),
-      fit_pheno_500 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 50)), discretize(lag(max_performance, 50)))
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 100)), discretize(lag(max_performance, 100)))
       )
 
 res <- res %>% pivot_longer(cols=contains("o_10"))
@@ -1061,7 +1063,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_x_discrete("Lag") + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("") + 
@@ -1081,10 +1083,10 @@ res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 1)), discretize(lag(max_performance, 1))),
   fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 10)), discretize(lag(max_performance, 10))),
-  fit_phylo_500 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 50)), discretize(lag(max_performance, 50))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 100)), discretize(lag(max_performance, 100))),
     fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 1)), discretize(lag(max_performance, 1))),
       fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 10)), discretize(lag(max_performance, 10))),
-      fit_pheno_500 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 50)), discretize(lag(max_performance, 50)))
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 100)), discretize(lag(max_performance, 100)))
       )
 
 res <- res %>% pivot_longer(cols=contains("o_10"))
@@ -1100,7 +1102,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_x_discrete("Lag") + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("") + 
@@ -1120,10 +1122,10 @@ res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 1)), discretize(lag(max_performance, 1))),
   fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 10)), discretize(lag(max_performance, 10))),
-  fit_phylo_500 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 50)), discretize(lag(max_performance, 50))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_pairwise_distance, 100)), discretize(lag(max_performance, 100))),
     fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 1)), discretize(lag(max_performance, 1))),
       fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 10)), discretize(lag(max_performance, 10))),
-      fit_pheno_500 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 50)), discretize(lag(max_performance, 50)))
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 100)), discretize(lag(max_performance, 100)))
       )
 
 res <- res %>% pivot_longer(cols=contains("o_10"))
@@ -1139,7 +1141,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_x_discrete("Lag") + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("") + 
@@ -1159,10 +1161,10 @@ res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(max_performance, 1))),
   fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)), discretize(lag(max_performance, 10))),
-  fit_phylo_500 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 50)), discretize(lag(max_performance, 50))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)), discretize(lag(max_performance, 100))),
     fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 1)), discretize(lag(max_performance, 1))),
       fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 10)), discretize(lag(max_performance, 10))),
-      fit_pheno_500 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 50)), discretize(lag(max_performance, 50)))
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 100)), discretize(lag(max_performance, 100)))
       )
 
 res <- res %>% pivot_longer(cols=contains("o_10"))
@@ -1178,7 +1180,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_x_discrete("Lag") + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("") + 
@@ -1198,10 +1200,10 @@ res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(max_performance, 1))),
   fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)), discretize(lag(max_performance, 10))),
-  fit_phylo_500 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 50)), discretize(lag(max_performance, 50))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)), discretize(lag(max_performance, 100))),
     fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 1)), discretize(lag(max_performance, 1))),
       fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 10)), discretize(lag(max_performance, 10))),
-      fit_pheno_500 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 50)), discretize(lag(max_performance, 50)))
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_diversity, 100)), discretize(lag(max_performance, 100)))
       )
 
 res <- res %>% pivot_longer(cols=contains("o_10"))
@@ -1217,7 +1219,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_x_discrete("Lag") + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("") + 
@@ -1237,10 +1239,10 @@ res <- data %>% group_by(SEED, selection_name, problem_name) %>%
 summarise(
   fit_phylo_10 = condinformation(discretize(max_performance), discretize(lag(variance_phenotype_evolutionary_distinctiveness, 1)), discretize(lag(max_performance, 1))),
   fit_phylo_100 = condinformation(discretize(max_performance), discretize(lag(variance_phenotype_evolutionary_distinctiveness, 10)), discretize(lag(max_performance, 10))),
-  fit_phylo_500 = condinformation(discretize(max_performance), discretize(lag(variance_phenotype_evolutionary_distinctiveness, 50)), discretize(lag(max_performance, 50))),
+  fit_phylo_1000 = condinformation(discretize(max_performance), discretize(lag(variance_phenotype_evolutionary_distinctiveness, 100)), discretize(lag(max_performance, 100))),
     fit_pheno_10 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 1)), discretize(lag(max_performance, 1))),
       fit_pheno_100 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 10)), discretize(lag(max_performance, 10))),
-      fit_pheno_500 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 50)), discretize(lag(max_performance, 50)))
+      fit_pheno_1000 = condinformation(discretize(max_performance), discretize(lag(phenotype_num_taxa, 100)), discretize(lag(max_performance, 100)))
       )
 
 res <- res %>% pivot_longer(cols=contains("o_10"))
@@ -1256,7 +1258,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~problem_name*selection_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_x_discrete("Lag") + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("") + 
@@ -1285,9 +1287,9 @@ summarise(
   phen_phylo_100 =     condinformation(discretize(phenotype_num_taxa),
                                        discretize(lag(max_phenotype_pairwise_distance, 10)),
                                        discretize(lag(phenotype_num_taxa, 10))),
-  pheno_phylo_500 =   condinformation(discretize(phenotype_num_taxa),
-                                       discretize(lag(max_phenotype_pairwise_distance, 50)),
-                                       discretize(lag(phenotype_num_taxa, 50))),
+  pheno_phylo_1000 =   condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(max_phenotype_pairwise_distance, 100)),
+                                       discretize(lag(phenotype_num_taxa, 100))),
   
   phylo_pheno_10 =     condinformation(discretize(max_phenotype_pairwise_distance),
                                        discretize(lag(phenotype_num_taxa, 1)),
@@ -1295,9 +1297,9 @@ summarise(
   phylo_pheno_100 =    condinformation(discretize(max_phenotype_pairwise_distance),
                                        discretize(lag(phenotype_num_taxa, 10)),
                                        discretize(lag(max_phenotype_pairwise_distance, 10))),
-  phylo_pheno_500 =   condinformation(discretize(max_phenotype_pairwise_distance),
-                                       discretize(lag(phenotype_num_taxa, 50)),
-                                       discretize(lag(max_phenotype_pairwise_distance, 50))))
+  phylo_pheno_1000 =   condinformation(discretize(max_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 100)),
+                                       discretize(lag(max_phenotype_pairwise_distance, 100))))
 
 # Turn Transfer Entropy columns into rows
 res <- res %>% pivot_longer(cols=contains("phylo"))
@@ -1315,7 +1317,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~selection_name* problem_name) + 
+  facet_wrap(~selection_name* problem_name, ncol=4) + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("")
 
@@ -1338,9 +1340,9 @@ summarise(
   phen_phylo_100 =     condinformation(discretize(phenotype_num_taxa),
                                        discretize(lag(mean_phenotype_pairwise_distance, 10)),
                                        discretize(lag(phenotype_num_taxa, 10))),
-  pheno_phylo_500 =   condinformation(discretize(phenotype_num_taxa),
-                                       discretize(lag(mean_phenotype_pairwise_distance, 50)),
-                                       discretize(lag(phenotype_num_taxa, 50))),
+  pheno_phylo_1000 =   condinformation(discretize(phenotype_num_taxa),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100)),
+                                       discretize(lag(phenotype_num_taxa, 100))),
   
   phylo_pheno_10 =     condinformation(discretize(mean_phenotype_pairwise_distance),
                                        discretize(lag(phenotype_num_taxa, 1)),
@@ -1348,9 +1350,9 @@ summarise(
   phylo_pheno_100 =    condinformation(discretize(mean_phenotype_pairwise_distance),
                                        discretize(lag(phenotype_num_taxa, 10)),
                                        discretize(lag(mean_phenotype_pairwise_distance, 10))),
-  phylo_pheno_500 =   condinformation(discretize(mean_phenotype_pairwise_distance),
-                                       discretize(lag(phenotype_num_taxa, 50)),
-                                       discretize(lag(mean_phenotype_pairwise_distance, 50)))
+  phylo_pheno_1000 =   condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_num_taxa, 100)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100)))
 )
 
 # Turn Transfer Entropy columns into rows
@@ -1369,7 +1371,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~selection_name*problem_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("")
 
@@ -1393,18 +1395,18 @@ summarise(
   phen_phylo_100 =     condinformation(discretize(phenotype_diversity),
                                        discretize(lag(mean_phenotype_pairwise_distance, 10)),
                                        discretize(lag(phenotype_diversity, 10))),
-  pheno_phylo_500 =   condinformation(discretize(phenotype_diversity),
-                                       discretize(lag(mean_phenotype_pairwise_distance, 50)),
-                                       discretize(lag(phenotype_diversity, 50))),
+  pheno_phylo_1000 =   condinformation(discretize(phenotype_diversity),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100)),
+                                       discretize(lag(phenotype_diversity, 100))),
   phylo_pheno_10 =     condinformation(discretize(mean_phenotype_pairwise_distance),
                                        discretize(lag(phenotype_diversity, 1)),
                                        discretize(lag(mean_phenotype_pairwise_distance, 1))),
   phylo_pheno_100 =    condinformation(discretize(mean_phenotype_pairwise_distance),
                                        discretize(lag(phenotype_diversity, 10)),
                                        discretize(lag(mean_phenotype_pairwise_distance, 10))),
-  phylo_pheno_500 =   condinformation(discretize(mean_phenotype_pairwise_distance),
-                                       discretize(lag(phenotype_diversity, 50)),
-                                       discretize(lag(mean_phenotype_pairwise_distance, 50)))
+  phylo_pheno_1000 =   condinformation(discretize(mean_phenotype_pairwise_distance),
+                                       discretize(lag(phenotype_diversity, 100)),
+                                       discretize(lag(mean_phenotype_pairwise_distance, 100)))
   
 )
 
@@ -1424,7 +1426,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~selection_name*problem_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("")
 
@@ -1449,10 +1451,10 @@ summarise(
                           discretize(phenotype_num_taxa),
                           discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)),
                           discretize(lag(phenotype_num_taxa, 10))),
-  pheno_phylo_500 =   condinformation(
+  pheno_phylo_1000 =   condinformation(
                           discretize(phenotype_num_taxa),
-                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 50)),
-                          discretize(lag(phenotype_num_taxa, 50))),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)),
+                          discretize(lag(phenotype_num_taxa, 100))),
   
   phylo_pheno_10 =     condinformation(
                           discretize(mean_phenotype_evolutionary_distinctiveness),
@@ -1462,10 +1464,10 @@ summarise(
                           discretize(mean_phenotype_evolutionary_distinctiveness),
                           discretize(lag(phenotype_num_taxa, 10)),
                           discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10))),
-  phylo_pheno_500 =   condinformation(
+  phylo_pheno_1000 =   condinformation(
                           discretize(mean_phenotype_evolutionary_distinctiveness),
-                          discretize(lag(phenotype_num_taxa, 50)),
-                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 50)))
+                          discretize(lag(phenotype_num_taxa, 100)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)))
 )
 
 # Turn Transfer Entropy columns into rows
@@ -1484,7 +1486,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~selection_name*problem_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_y_continuous("Transfer Entropy") +  
   scale_color_discrete("")
 
@@ -1509,10 +1511,10 @@ summarise(
                           discretize(phenotype_diversity),
                           discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10)),
                           discretize(lag(phenotype_diversity, 10))),
-  pheno_phylo_500 =   condinformation(
+  pheno_phylo_1000 =   condinformation(
                           discretize(phenotype_diversity),
-                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 50)),
-                          discretize(lag(phenotype_diversity, 50))),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)),
+                          discretize(lag(phenotype_diversity, 100))),
   
   phylo_pheno_10 =     condinformation(
                           discretize(mean_phenotype_evolutionary_distinctiveness),
@@ -1522,10 +1524,10 @@ summarise(
                           discretize(mean_phenotype_evolutionary_distinctiveness),
                           discretize(lag(phenotype_diversity, 10)),
                           discretize(lag(mean_phenotype_evolutionary_distinctiveness, 10))),
-  phylo_pheno_500 =   condinformation(
+  phylo_pheno_1000 =   condinformation(
                           discretize(mean_phenotype_evolutionary_distinctiveness),
-                          discretize(lag(phenotype_diversity, 50)),
-                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 50)))
+                          discretize(lag(phenotype_diversity, 100)),
+                          discretize(lag(mean_phenotype_evolutionary_distinctiveness, 100)))
 )
 
 # Turn Transfer Entropy columns into rows
@@ -1544,7 +1546,7 @@ ggplot(
     )
   ) + 
   geom_boxplot() + 
-  facet_wrap(~selection_name*problem_name) + 
+  facet_wrap(~selection_name*problem_name, ncol=4) + 
   scale_y_continuous("Transfer Entropy") + 
   scale_color_discrete("")
 
