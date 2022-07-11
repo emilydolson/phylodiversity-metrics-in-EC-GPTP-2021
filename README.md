@@ -15,6 +15,7 @@ This repository contains all code and supplemental material for "What can phylog
   - [Compilation](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#compilation)
   - [Authors](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#authors)
   - [Research overview](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#research-overview)
+  - [Measuring phylogenies](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#measuring-phylogenies)
   - [Repository contents](https://github.com/emilydolson/phylodiversity-metrics-in-EC-GPTP-2021#repository-contents)
 
 ## Abstract
