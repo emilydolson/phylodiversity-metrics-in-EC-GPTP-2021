@@ -1,9 +1,10 @@
 # What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?
 
-This repository contains all code and supplemental material for "What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?", originally presented at [Genetic Programming in Theory and Practice](http://gptp-workshop.com/schedule.html), 2021. This paper is currently available as a preprint, and will eventually appear in the published conference proceedings.
+This repository contains all code and supplemental material for "What can phylogenetic metrics tell us about useful diversity in evolutionary algorithms?", originally presented at [Genetic Programming in Theory and Practice](http://gptp-workshop.com/schedule.html), 2021. This paper is available as a [preprint](https://arxiv.org/abs/2108.12586) and in the [published conference proceedings](https://link.springer.com/chapter/10.1007/978-981-16-8113-4_4).
 
 [![supplemental](https://img.shields.io/badge/go%20to-supplemental%20material-ff69b4)](https://emilydolson.github.io/phylodiversity-metrics-in-EC-GPTP-2021)
 [![preprint](https://img.shields.io/badge/preprint-arXiv:2108.12586-brightgreen)](https://arxiv.org/abs/2108.12586)
+[![paper](https://img.shields.io/badge/published%20in-GPTP%202021-yellow)](https://link.springer.com/chapter/10.1007/978-981-16-8113-4_4)
 [![OSF](https://img.shields.io/badge/data%20%40%20OSF-https%3A%2F%2Fosf.io%2F6rndg%2F-blue)](https://osf.io/6rndg/) 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5456710.svg)](https://doi.org/10.5281/zenodo.5456710)
 
@@ -107,6 +108,13 @@ We ran 5 selection schemes (random, tournament, fitness sharing, lexicase select
 - Phylogenetic diversity and phenotypic diversity are both broad classes of metrics, and there is substantial variation in how different phylogenetic diversity metrics behave in different contexts.
 
 - There is clearly variation in all of this over time and by fitness landscape.
+
+## Measuring phylogenies
+
+If you want to start measuring phylogenetic diversity in your own research, check out the following phylogeny-tracking libraries:
+
+- [phylotrackpy](https://github.com/emilydolson/phylotrackpy/) (python)
+- [Empirical phylogeny tracker](https://empirical--466.org.readthedocs.build/en/466/library/Evolve/systematics.html) (C++) - part of a larger library, but the library is header-only so you can just use the systematics manager module. Phylotrackpy is just a wrapper around this code and is currently better documented, so we currently reccomend reading the phylotrackpy documentation to even if you're using the C++ implementation
 
 ## Repository contents
 
